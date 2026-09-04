@@ -1,64 +1,33 @@
 # Repository architecture (OpenFin)
 
-## Rule of thumb
+## `kushagra-agarwal-a` — single source of truth
 
-| What | Where | OpenFin uses |
-|------|--------|--------------|
-| **Holdings data** (catalog, portfolios, filings, meta) | **`kushagra-agarwal-a/fund-holdings-data` only** | Yes — sole data source |
-| **Parser / pipeline** (fetch, parse, sync scripts) | **Both** accounts (mirrored) | No — internal tooling |
+| Path | Role |
+|------|------|
+| [`fund-holdings-data`](https://github.com/kushagra-agarwal-a/fund-holdings-data) | **Everything OpenFin needs** |
+| `catalog/`, `portfolios/`, `meta.json` | Published holdings (CDN) |
+| `pipeline/` | Parser (fetch, parse, sync) |
 
-OpenFin (`openfin.pocketedge.in`) reads **only** from `kushagra-agarwal-a/fund-holdings-data`.
+OpenFin (`openfin.pocketedge.in`) reads only `catalog/`, `portfolios/`, `meta.json` at repo root.
 
-Do **not** maintain holdings copies on `subscriptionmanager26-png` or anywhere else.
-
-## GitHub accounts
-
-### `kushagra-agarwal-a` (canonical for OpenFin)
+## `subscriptionmanager26-png` — parser mirror only
 
 | Repo | Role |
 |------|------|
-| [`fund-holdings-data`](https://github.com/kushagra-agarwal-a/fund-holdings-data) | Public CDN store — catalog + `portfolios/asof/*` |
-| [`fund-disclosures`](https://github.com/kushagra-agarwal-a/fund-disclosures) | Parser pipeline (mirror of subscriptionmanager copy) |
+| [`fund-disclosures`](https://github.com/subscriptionmanager26-png/fund-disclosures) | Parser mirror (no holdings copy) |
+| [`pocketedge`](https://github.com/subscriptionmanager26-png/pocketedge) | OpenFin API app (Vercel) |
 
-### `subscriptionmanager26-png` (parser mirror)
+Do **not** maintain holdings on `subscriptionmanager26-png`.
 
-| Repo | Role |
-|------|------|
-| [`fund-disclosures`](https://github.com/subscriptionmanager26-png/fund-disclosures) | Parser pipeline (development mirror) |
-| [`pocketedge`](https://github.com/subscriptionmanager26-png/pocketedge) | OpenFin API **app** (Vercel); reads kushagra data |
-| ~~`fund-holdings-data`~~ | **Deprecated** — do not sync or reference |
-
-## Sync flow
+## Workflow
 
 ```text
-fund-disclosures (either account)
-  fetch → parse → enrich → holdings:sync* --push
-                              ↓
-              kushagra-agarwal-a/fund-holdings-data
-                              ↓
-              openfin.pocketedge.in/api/v1/*
+pipeline/  (in fund-holdings-data, or mirror on subscriptionmanager)
+  fetch → parse → holdings:sync* --push  →  repo root (catalog, portfolios)
+                                              ↓
+                              openfin.pocketedge.in/api/v1/*
 ```
 
-## Keeping parser repos in sync
+## Secrets
 
-After committing on either account:
-
-```bash
-npm run parser:push-both
-```
-
-Or manually:
-
-```bash
-git push origin main          # subscriptionmanager26-png
-git push kushagra main        # kushagra-agarwal-a
-```
-
-Requires `HOLDINGS_GH_TOKEN` (kushagra-agarwal-a PAT with `repo` on **both** repos).
-
-## Environment
-
-| Variable | Value |
-|----------|--------|
-| `HOLDINGS_DATA_OWNER` | `kushagra-agarwal-a` (default in sync scripts) |
-| `HOLDINGS_DATA_REPO` | `fund-holdings-data` |
+`HOLDINGS_GH_TOKEN` — `kushagra-agarwal-a` PAT with `repo` on `fund-holdings-data`.

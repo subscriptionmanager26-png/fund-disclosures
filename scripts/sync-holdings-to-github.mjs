@@ -49,6 +49,7 @@ import {
   loadRepoCatalog,
   mergeCatalogAsOfFromRepo,
 } from "./lib/holdings-guard.mjs";
+import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -87,7 +88,7 @@ const asof = normalizeAsOf(asofRaw);
 const cadence = argValue("cadence", asof ? "monthly" : "");
 const sourcePeriod =
   argValue("source-period", "") || (asof ? sourcePeriodFromAsOf(asof) : "");
-const outDir = argValue("out", join(ROOT, ".tmp/fund-holdings-data"));
+const outDir = argValue("out", defaultHoldingsOutDir(ROOT));
 const lookupPath = argValue(
   "lookup",
   join(ROOT, "holdings-browser/api/amfi-lookup.json"),

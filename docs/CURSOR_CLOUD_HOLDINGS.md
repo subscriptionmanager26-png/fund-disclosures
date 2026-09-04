@@ -1,59 +1,29 @@
 # Cursor Cloud — automated holdings update
 
-Run from **`kushagra-agarwal-a/fund-disclosures`** (preferred) or `subscriptionmanager26-png/fund-disclosures` — same parser, mirrored.
+Run from **`kushagra-agarwal-a/fund-holdings-data`** (clone repo, work in `pipeline/`).
 
-Holdings publish **only** to `kushagra-agarwal-a/fund-holdings-data` (OpenFin’s sole data source).
+Holdings publish to **repo root** (`catalog/`, `portfolios/`, `meta.json`). OpenFin reads only those paths.
 
-## Required secrets (Cursor Cloud → Agent secrets)
+## Required secrets
 
 | Secret | Purpose |
 |--------|---------|
-| `HOLDINGS_GH_TOKEN` | Push to `kushagra-agarwal-a/fund-holdings-data` |
-| `EDELWEISS_API_SECRET` | Edelweiss AMC statutory fetch |
-| `GH_TOKEN` | Optional; defaults to `HOLDINGS_GH_TOKEN` for git operations |
-
-Never commit tokens. `.env` is gitignored.
+| `HOLDINGS_GH_TOKEN` | `kushagra-agarwal-a` PAT with `repo` on `fund-holdings-data` |
+| `EDELWEISS_API_SECRET` | Edelweiss AMC fetch |
 
 ## One-command update
 
 ```bash
+git clone https://github.com/kushagra-agarwal-a/fund-holdings-data.git
+cd fund-holdings-data/pipeline
 npm ci
 python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt
-export GH_TOKEN="${HOLDINGS_GH_TOKEN:-$GH_TOKEN}"
-node scripts/cloud-holdings-update.mjs --push
+export GH_TOKEN="$HOLDINGS_GH_TOKEN"
+npm run holdings:cloud -- --push
 ```
 
-`--push` publishes to GitHub. Omit for a dry run (fetch/parse/sync locally only).
+## Canonical repo
 
-## What the script does
+**Only** `kushagra-agarwal-a/fund-holdings-data` — data + parser. No holdings on other accounts.
 
-1. **Fetch** — current and previous calendar month (`monthly` + `fortnightly` AMC packs)
-2. **Parse** — resume-safe parse for those periods
-3. **Enrich + locks** — `holdings:enrich`, `holdings:assert-locks`
-4. **Sync** — `holdings:sync-window` for a rolling 3-month window → `kushagra-agarwal-a/fund-holdings-data`
-5. **Catalog** — `holdings:refresh-filings --push`
-6. **Verify** — `GET https://openfin.pocketedge.in/api/v1/filings` and spot-check one AMFI code
-
-Regression guards block accidental portfolio deletions. If sync fails with a regression error, **do not** use `--allow-regression` unless the drop is intentional.
-
-## Manual month-end (first weekday of month)
-
-On the first run of each month, also run the full mapping loop from `docs/PIPELINE.md` steps 3–6 (`amfi:catalog`, `amfi:match:reuse`, `holdings:catalog`, `registry:persist`) before the cloud script.
-
-## Troubleshooting
-
-| Symptom | Fix |
-|---------|-----|
-| `403` pushing holdings | `HOLDINGS_GH_TOKEN` must be a `kushagra-agarwal-a` PAT with `repo` scope |
-| `Holdings data regression blocked` | Parsed data missing vs repo; re-fetch/parse or investigate — never force-push |
-| OpenFin API stale | Wait 2 min (CDN TTL) or confirm `pocketedge` deploy has meta.json commit pinning |
-| `.venv` missing | Re-run `python3 -m venv .venv && pip install -r requirements.txt` |
-
-## Canonical repos (OpenFin)
-
-| Repo | Account |
-|------|---------|
-| Data | `kushagra-agarwal-a/fund-holdings-data` |
-| Parser | `kushagra-agarwal-a/fund-disclosures` (mirror: `subscriptionmanager26-png/fund-disclosures`) |
-
-No holdings data on subscriptionmanager26-png.
+`subscriptionmanager26-png/fund-disclosures` is an optional parser mirror (`npm run parser:mirror-subscriptionmanager`).

@@ -24,6 +24,7 @@ import {
   buildFilingsFromAsOfDirs,
   scanExistingAsOfDirs,
 } from "./lib/asof-portfolios.mjs";
+import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -46,7 +47,7 @@ function hasFlag(name) {
 const dryRun = hasFlag("dry-run");
 const doPush = hasFlag("push");
 const months = Math.max(1, Number(argValue("months", "3")) || 3);
-const outDir = argValue("out", join(ROOT, ".tmp/fund-holdings-data"));
+const outDir = argValue("out", defaultHoldingsOutDir(ROOT));
 
 function ensureDir(p) {
   mkdirSync(p, { recursive: true });

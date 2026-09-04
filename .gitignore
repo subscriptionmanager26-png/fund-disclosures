@@ -48,6 +48,7 @@ scripts/*.mjs
 !scripts/refresh-filings-catalog.mjs
 !scripts/cloud-holdings-update.mjs
 !scripts/push-parser-both.mjs
+!scripts/lib/resolve-holdings-out-dir.mjs
 
 # Local wrangler / probe AMC scratch (never ship)
 .wrangler/
