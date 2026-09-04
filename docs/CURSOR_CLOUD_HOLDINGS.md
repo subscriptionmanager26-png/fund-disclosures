@@ -1,20 +1,34 @@
 # Cursor Cloud — daily holdings update
 
-Run from **`kushagra-agarwal-a/fund-holdings-data`** → work in **`pipeline/`**.
+## Cursor Automation (recommended setup)
 
-Holdings publish to **repo root** (`catalog/`, `portfolios/`, `meta.json`). OpenFin reads only those paths.
-
-## Cursor Automation
+**Use the parser mirror repo for checkout** — Cursor’s GitHub App can resolve branches there.
 
 | Setting | Value |
 |---------|--------|
-| **Repo** | `kushagra-agarwal-a/fund-holdings-data` |
+| **Repo** | `subscriptionmanager26-png/fund-disclosures` |
 | **Branch** | `main` |
-| **Working dir** | `pipeline/` |
 | **Schedule** | Daily 6:30 AM IST → cron `0 1 * * *` (UTC) |
 | **Runtime** | Cloud Agent |
 
-Command the agent runs after setup:
+**Data still publishes to** `kushagra-agarwal-a/fund-holdings-data` via the `HOLDINGS_GH_TOKEN` secret (not via automation repo checkout).
+
+### Why not `kushagra-agarwal-a/fund-holdings-data`?
+
+Cursor Automations resolve branches through the **Cursor GitHub App** on your linked account. If the app is installed on `subscriptionmanager26-png` but not `kushagra-agarwal-a`, you get **“Cannot resolve branch”** even though `main` exists. That’s an integration scope issue, not a missing branch.
+
+**To use the monorepo directly:** install the [Cursor GitHub App](https://cursor.com/docs/integrations/github) on `kushagra-agarwal-a` and grant `fund-holdings-data` access, then set repo to `kushagra-agarwal-a/fund-holdings-data` and run from `pipeline/`.
+
+### One-command update (standalone mirror)
+
+```bash
+npm ci
+python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt
+export GH_TOKEN="$HOLDINGS_GH_TOKEN"
+npm run holdings:cloud -- --push
+```
+
+### One-command update (monorepo, if GitHub App has access)
 
 ```bash
 cd pipeline
