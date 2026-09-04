@@ -1,5 +1,7 @@
 # Fund disclosures month-end pipeline
 
+> **Repos:** Parser lives on both `kushagra-agarwal-a/fund-disclosures` and `subscriptionmanager26-png/fund-disclosures`. Holdings publish **only** to `kushagra-agarwal-a/fund-holdings-data`. See [ARCHITECTURE.md](./ARCHITECTURE.md).
+
 Canonical layout:
 
 ```text

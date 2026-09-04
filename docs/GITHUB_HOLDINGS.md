@@ -5,13 +5,14 @@ via **jsDelivr**. No card-on-file cloud.
 
 ## Accounts / repo
 
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full split.
+
 | Role | Value |
 |------|--------|
-| **Data account (canonical)** | `kushagra-agarwal-a` |
-| Data repo | [`fund-holdings-data`](https://github.com/kushagra-agarwal-a/fund-holdings-data) (public) |
-| Pipeline repo | [`subscriptionmanager26-png/fund-disclosures`](https://github.com/subscriptionmanager26-png/fund-disclosures) |
+| **Data (OpenFin CDN)** | [`kushagra-agarwal-a/fund-holdings-data`](https://github.com/kushagra-agarwal-a/fund-holdings-data) — **only** copy |
+| **Parser** | [`kushagra-agarwal-a/fund-disclosures`](https://github.com/kushagra-agarwal-a/fund-disclosures) + [`subscriptionmanager26-png/fund-disclosures`](https://github.com/subscriptionmanager26-png/fund-disclosures) (mirrored) |
 
-Do **not** treat `kushagra-agarwal-a/fund-holdings-data` as canonical — it is a stale mirror.
+Do **not** use `subscriptionmanager26-png/fund-holdings-data` — deprecated stale mirror.
 
 ## Dedup model (important)
 

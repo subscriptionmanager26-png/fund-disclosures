@@ -1,6 +1,8 @@
 # Cursor Cloud — automated holdings update
 
-Run this from the `subscriptionmanager26-png/fund-disclosures` repo on a **Cursor Cloud Agent** with secrets configured (see below).
+Run from **`kushagra-agarwal-a/fund-disclosures`** (preferred) or `subscriptionmanager26-png/fund-disclosures` — same parser, mirrored.
+
+Holdings publish **only** to `kushagra-agarwal-a/fund-holdings-data` (OpenFin’s sole data source).
 
 ## Required secrets (Cursor Cloud → Agent secrets)
 
@@ -47,6 +49,11 @@ On the first run of each month, also run the full mapping loop from `docs/PIPELI
 | OpenFin API stale | Wait 2 min (CDN TTL) or confirm `pocketedge` deploy has meta.json commit pinning |
 | `.venv` missing | Re-run `python3 -m venv .venv && pip install -r requirements.txt` |
 
-## Canonical data repo
+## Canonical repos (OpenFin)
 
-`https://github.com/kushagra-agarwal-a/fund-holdings-data` — **not** `subscriptionmanager26-png/fund-holdings-data`.
+| Repo | Account |
+|------|---------|
+| Data | `kushagra-agarwal-a/fund-holdings-data` |
+| Parser | `kushagra-agarwal-a/fund-disclosures` (mirror: `subscriptionmanager26-png/fund-disclosures`) |
+
+No holdings data on subscriptionmanager26-png.
