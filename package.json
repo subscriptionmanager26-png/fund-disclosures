@@ -34,7 +34,8 @@
     "holdings:sync-asof": "node scripts/sync-asof-holdings-to-github.mjs",
     "holdings:sync-window": "node scripts/sync-asof-window.mjs",
     "holdings:prune-retention": "node scripts/prune-retention-asof.mjs",
-    "holdings:refresh-filings": "node scripts/refresh-filings-catalog.mjs"
+    "holdings:refresh-filings": "node scripts/refresh-filings-catalog.mjs",
+    "holdings:cloud": "node scripts/cloud-holdings-update.mjs"
   },
   "engines": {
     "node": ">=20"
