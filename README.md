@@ -73,6 +73,15 @@ data/               disclosures/ and parsed/ are gitignored (regenerate locally)
 docs/               runbooks
 ```
 
+## Cloud Deployment & Ingestion Pipelines
+
+The ingestion pipeline can be run as a containerized job that fetches statutory disclosures, parses portfolios, enriches them with canonical AMFI codes, and exports Snappy-compressed Parquet datasets directly to cloud object storage.
+
+* **[Multi-Cloud Deployment Guide](docs/MULTI_CLOUD_DEPLOYMENT.md)** — Run on **Google Cloud Platform (GCS)**, **Amazon Web Services (S3)**, or **Microsoft Azure (Blob)** with a single unified container image.
+* **[GCP Cloud Run & Cloud Scheduler Guide](docs/GCP_CLOUD_RUN_SCHEDULER.md)** — Step-by-step setup for automated monthly Cloud Run Jobs triggered via Cloud Scheduler.
+* **[Data Layout & Conventions](docs/DATA_LAYOUT.md)** — Calendar date partitioning and storage path standard.
+* **[Portfolio Deduplication Model](docs/GITHUB_HOLDINGS.md)** — Deduplicating 8,600 share-classes into ~1,900 unique portfolios.
+
 ## Policy
 
 - **AMC-direct only** (no Advisorkhoj as primary source).
@@ -86,6 +95,10 @@ Frozen under `exports/baseline/` after Aug 2026 QC:
 
 - Disclosure rows mapped ≈ **2386 / 2387** (Taurus IE pool ignored)
 - Shortcode map: `registry/disclosure_shortcode_map.json`
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for history of releases and PR additions.
 
 ## License
 

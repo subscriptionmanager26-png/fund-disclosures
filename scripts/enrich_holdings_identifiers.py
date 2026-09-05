@@ -327,6 +327,7 @@ def main() -> int:
             payload["meta"] = meta
             # Always stamp this period's file so historical as-of sync can resolve
             # AMFI ids even when a newer book wins the "best" contest.
+            pj.parent.mkdir(parents=True, exist_ok=True)
             pj.write_text(
                 json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
                 encoding="utf-8",
@@ -356,6 +357,7 @@ def main() -> int:
     for rec in best.values():
         payload = rec.pop("payload")
         local = ROOT / rec["local_path"]
+        local.parent.mkdir(parents=True, exist_ok=True)
         local.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         if rec.get("amfi_code"):
             mapped += 1
@@ -370,6 +372,7 @@ def main() -> int:
         "b2_prefix": "fund-disclosures/holdings/latest/",
         "schemes": rows,
     }
+    OUT_MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     OUT_MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(
         json.dumps(
