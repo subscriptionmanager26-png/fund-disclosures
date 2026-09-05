@@ -36,6 +36,13 @@ npm run fetch -- --type=monthly --period=2026-07 --list-only
 npm run parse:amc -- --list
 ```
 
+One-shot bootstrap (venv + Python deps + `holdings-browser` Node deps), also
+used by the Cloud Agent environment:
+
+```bash
+bash scripts/cloud-setup.sh
+```
+
 Node ≥ 20. Full month-end loop: [docs/PIPELINE.md](docs/PIPELINE.md).
 
 Local holdings browser (after a parse + catalog build):
