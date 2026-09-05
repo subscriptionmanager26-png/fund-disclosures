@@ -56,7 +56,7 @@ Optional env (defaults are fine):
 | Var | Default | Purpose |
 |-----|---------|---------|
 | `FETCH_TIMEOUT_MS` | `180000` | Per-request timeout (avoids false errors on slow AMC sites) |
-| `FETCH_CONCURRENCY` | `8` | Parallel AMC fetches |
+| `FETCH_CONCURRENCY` | `4` | Parallel AMC fetches (8 can hang Node with exit 13) |
 
 ## What `holdings:cloud` does
 

@@ -129,7 +129,25 @@ const run = {
   results: [],
 };
 
-async function fetchOneAmc(amc) {
+const amcTimeoutMs = Math.max(
+  60_000,
+  (Number(process.env.FETCH_TIMEOUT_MS) || 180_000) + 30_000,
+);
+
+function withTimeout(promise, ms, label) {
+  let timer;
+  return Promise.race([
+    promise.finally(() => clearTimeout(timer)),
+    new Promise((_, reject) => {
+      timer = setTimeout(
+        () => reject(new Error(`${label} timed out after ${ms}ms`)),
+        ms,
+      );
+    }),
+  ]);
+}
+
+async function fetchOneAmcInner(amc) {
   const adapterName = amc.fetch?.[type]?.adapter;
   process.stderr.write(`→ ${amc.id} [${adapterName}]\n`);
   try {
@@ -209,6 +227,22 @@ async function mapPool(items, poolSize, fn) {
   const n = Math.min(poolSize, items.length);
   await Promise.all(Array.from({ length: n }, () => worker()));
   return results;
+}
+
+async function fetchOneAmc(amc) {
+  try {
+    return await withTimeout(fetchOneAmcInner(amc), amcTimeoutMs, amc.id);
+  } catch (e) {
+    const adapterName = amc.fetch?.[type]?.adapter;
+    console.log(`  ${amc.name}: ERROR ${e.message || e}`);
+    return {
+      id: amc.id,
+      name: amc.name,
+      adapter: adapterName,
+      status: "error",
+      error: String(e.message || e),
+    };
+  }
 }
 
 run.results = await mapPool(amcs, concurrency, fetchOneAmc);

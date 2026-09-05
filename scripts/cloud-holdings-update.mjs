@@ -121,7 +121,7 @@ if (!process.env.EDELWEISS_API_SECRET) {
 
 // Fewer parallel AMC fetches + longer HTTP timeout reduces false "error" from timeouts.
 process.env.FETCH_TIMEOUT_MS = process.env.FETCH_TIMEOUT_MS || "180000";
-const fetchConcurrency = process.env.FETCH_CONCURRENCY || "8";
+const fetchConcurrency = process.env.FETCH_CONCURRENCY || "4";
 
 const toYm = monthYm();
 // Daily job: previous + current month only. Older months are already on GitHub.
