@@ -56,17 +56,17 @@ Optional env (defaults are fine):
 | Var | Default | Purpose |
 |-----|---------|---------|
 | `FETCH_TIMEOUT_MS` | `180000` | Per-request timeout (avoids false errors on slow AMC sites) |
-| `FETCH_CONCURRENCY` | `4` | Parallel AMC fetches (lower = fewer timeouts) |
+| `FETCH_CONCURRENCY` | `8` | Parallel AMC fetches |
 
 ## What `holdings:cloud` does
 
-1. Fetch **monthly + fortnightly** for the last **3 calendar months**
+1. Fetch **monthly + fortnightly** for the **previous + current** calendar month only
 2. Parse all AMCs (`--all`)
 3. Enrich identifiers (`--allow-incomplete` — partial months are normal early in the month)
-4. **Merge-sync** to GitHub (never deletes existing portfolio files)
+4. **Merge-sync** to GitHub (skips empty slices; never deletes existing portfolio files)
 5. Refresh `catalog/filings.json` + pin `meta.json`
 6. Verify `https://openfin.pocketedge.in/api/v1/filings`
-7. Write JSON report under `pipeline/data/probes/cloud-holdings-report-*.json`
+7. Write JSON report under `data/probes/cloud-holdings-report-*.json`
 
 ## Safety rules
 
@@ -84,9 +84,9 @@ Optional env (defaults are fine):
 
 `empty` is not a bug. Most AMCs publish month-end monthly 3–7 days after month close.
 
-## Slack report (automation prompt)
+## Slack / Cloud Agent prompt
 
-After the run, DM a short summary: periods fetched, AMC ok/empty/error counts, new portfolio files, new as-of dates, OpenFin filings list, and any push failures.
+Keep the prompt short. After setup, run only `npm run holdings:cloud -- --push`. Print the latest `data/probes/cloud-holdings-report-*.json`. Do not search the repo, Slack tools, or automations APIs afterwards. If Slack is configured, DM that summary.
 
 ## Canonical repo
 

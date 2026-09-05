@@ -282,6 +282,11 @@ if (dryRun) {
   process.exit(0);
 }
 
+if (entries.length === 0) {
+  console.log("skip: no local portfolios for this slice (nothing to push)");
+  process.exit(0);
+}
+
 initOrClone();
 const repoCatalogBefore = loadRepoCatalog(outDir);
 

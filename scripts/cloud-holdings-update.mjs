@@ -121,11 +121,12 @@ if (!process.env.EDELWEISS_API_SECRET) {
 
 // Fewer parallel AMC fetches + longer HTTP timeout reduces false "error" from timeouts.
 process.env.FETCH_TIMEOUT_MS = process.env.FETCH_TIMEOUT_MS || "180000";
-const fetchConcurrency = process.env.FETCH_CONCURRENCY || "4";
+const fetchConcurrency = process.env.FETCH_CONCURRENCY || "8";
 
 const toYm = monthYm();
-const fromYm = shiftYm(toYm, -2);
-const periods = [fromYm, shiftYm(toYm, -1), toYm].filter((v, i, a) => a.indexOf(v) === i);
+// Daily job: previous + current month only. Older months are already on GitHub.
+const fromYm = shiftYm(toYm, -1);
+const periods = [fromYm, toYm].filter((v, i, a) => a.indexOf(v) === i);
 
 const outDir = defaultHoldingsOutDir(ROOT);
 const report = {
