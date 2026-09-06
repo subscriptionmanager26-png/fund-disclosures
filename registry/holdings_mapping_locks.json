@@ -43,6 +43,30 @@
       "shortcode": "MONEY MARKET",
       "canonical_amfi_code": "120209",
       "label": "ICICI Prudential Money Market Fund"
+    },
+    {
+      "amc_id": "hdfc-mutual-fund",
+      "shortcode": "MY2005",
+      "canonical_amfi_code": "103130",
+      "label": "HDFC Multi-Asset Fund / Multi-Asset Allocation Fund"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "151",
+      "canonical_amfi_code": "101834",
+      "label": "UTI - Master Equity Unit Scheme"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "002",
+      "canonical_amfi_code": "100646",
+      "label": "UTI - Unit Linked Insurance"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "UTI Nifty 1D Rate Liquid ETF - Growth",
+      "canonical_amfi_code": "154466",
+      "label": "UTI Nifty 1D Rate Liquid ETF - Growth"
     }
   ],
   "aliases": {
@@ -56,6 +80,10 @@
     "103635": "120209",
     "103636": "120209",
     "103637": "120209",
-    "130013": "120209"
+    "130013": "120209",
+    "120784": "100646",
+    "103131": "103130",
+    "119130": "103130",
+    "119131": "103130"
   }
 }

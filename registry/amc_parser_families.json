@@ -141,7 +141,7 @@
   "jio-blackrock-mutual-fund": {
     "family": "sebi_title",
     "prefer_leading_code": true,
-    "multi_sheet": false,
+    "multi_sheet": true,
     "skip_mega": true
   },
   "jm-financial-mutual-fund": {
