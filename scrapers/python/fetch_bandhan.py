@@ -17,9 +17,13 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from disclosure_date import dates_match_as_of, extract_dates, year_month_key
 
 CMS = "https://cmsnew.bandhanmutual.com/wp-json/finance-api/v1/posts"
 MONTHLY_API = f"{CMS}/monthly-portfolios"
@@ -29,26 +33,6 @@ REFERER_MONTHLY = (
 )
 REFERER_FORTNIGHTLY = (
     "https://bandhanmutual.com/statutory-disclosures/scheme-portfolios/fortnightly"
-)
-
-MONTH_NAME_TO_NUM = {
-    "january": "01",
-    "february": "02",
-    "march": "03",
-    "april": "04",
-    "may": "05",
-    "june": "06",
-    "july": "07",
-    "august": "08",
-    "september": "09",
-    "october": "10",
-    "november": "11",
-    "december": "12",
-}
-
-TITLE_DATE_RE = re.compile(
-    r"(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})\s*$",
-    re.I,
 )
 
 
@@ -61,16 +45,16 @@ def safe_filename(url: str) -> str:
     return re.sub(r"[^\w.\-() ]", "_", base).strip()[:200] or "download.bin"
 
 
-def parse_title_date(title: str) -> tuple[str, int] | None:
-    """Return (YYYY-MM, day) from title date suffix."""
-    m = TITLE_DATE_RE.search((title or "").strip())
-    if not m:
-        return None
-    day, month_name, year = int(m.group(1)), m.group(2), m.group(3)
-    mm = MONTH_NAME_TO_NUM.get(month_name.lower())
-    if not mm:
-        return None
-    return f"{year}-{mm}", day
+def parse_title_date(title: str, url: str = "") -> tuple[str, int] | None:
+    """Return (YYYY-MM, day) from title or file URL."""
+    dates = extract_dates(title or "", url or "")
+    if not dates:
+        mk = year_month_key(title or "", url or "")
+        if not mk:
+            return None
+        return mk, 0
+    d = dates[0]
+    return f"{d.year:04d}-{d.month:02d}", d.day
 
 
 def _get_json(url: str, referer: str) -> dict | list:
@@ -149,7 +133,7 @@ def load_monthly_rows(
         for row in batch:
             if not isinstance(row, dict):
                 continue
-            parsed = parse_title_date(row.get("title") or "")
+            parsed = parse_title_date(row.get("title") or "", file_url_from_row(row) or "")
             if not parsed or not file_url_from_row(row):
                 continue
             mk, _day = parsed
@@ -200,11 +184,17 @@ def load_fortnightly_rows(month_keys: list[str]) -> dict[str, list[dict]]:
     for row in rows:
         if not isinstance(row, dict):
             continue
-        parsed = parse_title_date(row.get("title") or "")
+        parsed = parse_title_date(row.get("title") or "", file_url_from_row(row) or "")
         if not parsed:
             continue
-        mk, day = parsed
-        if mk not in per_month or day != 15:
+        mk, _day = parsed
+        if mk not in per_month:
+            continue
+        if not dates_match_as_of(
+            row.get("title") or "",
+            file_url_from_row(row) or "",
+            as_of=f"{mk}-15",
+        ):
             continue
         if not file_url_from_row(row):
             continue

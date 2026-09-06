@@ -16,10 +16,13 @@ import argparse
 import hashlib
 import json
 import re
-from datetime import datetime
+import sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from disclosure_date import year_month_key
 
 PAGE_URL = "https://growwmf.in/statutory-disclosure/portfolio"
 
@@ -36,11 +39,6 @@ HEADERS = {
 NEXT_DATA_RE = re.compile(
     r'<script id="__NEXT_DATA__" type="application/json"[^>]*>(.*?)</script>',
     re.S,
-)
-
-DATE_PATTERNS = (
-    "%b %d, %Y",   # Jan 31, 2026
-    "%B %d, %Y",   # January 31, 2026
 )
 
 
@@ -67,19 +65,7 @@ def fetch_next_data() -> dict:
 
 
 def infer_month_key(name: str) -> str | None:
-    """Extract YYYY-MM from file name text."""
-    n = " ".join((name or "").replace("_", " ").replace("-", " - ").split())
-    m = re.search(r"([A-Za-z]{3,9}\s+\d{1,2},\s+\d{4})", n)
-    if not m:
-        return None
-    token = m.group(1)
-    for fmt in DATE_PATTERNS:
-        try:
-            dt = datetime.strptime(token, fmt)
-            return f"{dt.year:04d}-{dt.month:02d}"
-        except ValueError:
-            continue
-    return None
+    return year_month_key(name or "")
 
 
 def collect_monthly_files(next_data: dict) -> list[dict]:

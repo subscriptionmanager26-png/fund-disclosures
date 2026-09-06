@@ -47,17 +47,30 @@ export function parsePeriodInput(period) {
 }
 
 /**
- * Folder name for raw disclosure files (and matching parsed tree).
+ * All folder keys for a fetch/parse period argument.
+ * Fortnightly YYYY-MM expands to both mid-month (15) and month-end so daily
+ * jobs never miss debt packs that only appear on the 31st (e.g. new launches).
+ * @param {ReturnType<typeof parsePeriodInput>} parsed
+ * @param {'monthly'|'fortnightly'} cadence
+ * @returns {string[]}
+ */
+export function disclosureStorageKeys(parsed, cadence) {
+  if (parsed.isFullDate) return [parsed.storageKey];
+  const end = `${parsed.input}-${String(parsed.monthEndDay).padStart(2, "0")}`;
+  if (cadence === "fortnightly") {
+    return [`${parsed.input}-15`, end];
+  }
+  return [end];
+}
+
+/**
+ * Primary folder name (first of {@link disclosureStorageKeys}).
+ * Prefer {@link disclosureStorageKeys} when both FN slices matter.
  * @param {ReturnType<typeof parsePeriodInput>} parsed
  * @param {'monthly'|'fortnightly'} cadence
  */
 export function disclosureStorageKey(parsed, cadence) {
-  if (parsed.isFullDate) return parsed.storageKey;
-  const mm = String(parsed.month).padStart(2, "0");
-  if (cadence === "fortnightly") {
-    return `${parsed.input}-15`;
-  }
-  return `${parsed.input}-${String(parsed.monthEndDay).padStart(2, "0")}`;
+  return disclosureStorageKeys(parsed, cadence)[0];
 }
 
 /**

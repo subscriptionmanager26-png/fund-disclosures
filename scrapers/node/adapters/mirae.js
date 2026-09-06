@@ -68,7 +68,7 @@ export const miraeAdapter = {
           ? raw
           : new URL(raw, "https://www.miraeassetmf.co.in").href;
         if (seen.has(url)) continue;
-        if (!isPeriodPortfolioFile(url, blob, matchers, ctx.type)) continue;
+        if (!isPeriodPortfolioFile(url, blob, matchers, ctx.type, p)) continue;
         seen.add(url);
         matchedOnPage++;
         files.push({

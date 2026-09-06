@@ -32,6 +32,10 @@ from pathlib import Path
 from urllib.parse import quote, unquote, urlencode, urljoin, urlparse, urlunparse
 import http.cookiejar
 import urllib.request
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from disclosure_date import year_month_key
 
 PAGE_URL = "https://www.kotakmf.com/Information/statutory-disclosure"
 API_BASE = "https://java17vlbapi.kotakmf.com/kotakapi/forms/user/v1"
@@ -136,6 +140,9 @@ def infer_month_key_from_text(combined: str) -> str | None:
 
 def text_month_to_key(text: str) -> str | None:
     t = " ".join(strip_tags(text).split())
+    shared = year_month_key(t)
+    if shared:
+        return shared
     m = ISO_DATE_RE.search(t)
     if m:
         return f"{m.group(1)}-{m.group(2)}"

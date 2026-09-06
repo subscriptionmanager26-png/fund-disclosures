@@ -8,7 +8,7 @@ import re
 import shutil
 import tempfile
 from dataclasses import asdict, dataclass, field, replace
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -262,6 +262,36 @@ def norm_cell(v: Any) -> str:
     return str(v).strip()
 
 
+def excel_serial_to_iso(serial: float | int) -> str | None:
+    """Convert Excel (Windows) date serial to YYYY-MM-DD."""
+    try:
+        n = float(serial)
+    except (TypeError, ValueError):
+        return None
+    # Portfolio as-of dates are modern; ignore tiny/huge serials.
+    if n < 30000 or n > 80000:
+        return None
+    try:
+        # Excel's day 0 is 1899-12-30 (Windows / xlrd default).
+        return (date(1899, 12, 30) + timedelta(days=int(n))).isoformat()
+    except (OverflowError, ValueError):
+        return None
+
+
+def assert_zip_readable(path: Path) -> None:
+    """Raise BadZipFile when a .zip is truncated or otherwise unreadable."""
+    import zipfile
+
+    if path.suffix.lower() != ".zip":
+        return
+    with zipfile.ZipFile(path) as zf:
+        bad = zf.testzip()
+        if bad is not None:
+            raise zipfile.BadZipFile(f"{path.name}: corrupt member {bad}")
+        if not zf.namelist():
+            raise zipfile.BadZipFile(f"{path.name}: empty zip")
+
+
 def file_kind(path: Path) -> str:
     try:
         head = path.read_bytes()[:8]
@@ -315,7 +345,18 @@ def sheet_rows_xlrd(path: Path) -> list[tuple[str, list[list[str]]]]:
         rows: list[list[str]] = []
         cols = min(ws.ncols, 80)
         for r in range(min(ws.nrows, 20000)):
-            rows.append([norm_cell(ws.cell_value(r, c)) for c in range(cols)])
+            row: list[str] = []
+            for c in range(cols):
+                cell = ws.cell(r, c)
+                if cell.ctype == xlrd.XL_CELL_DATE:
+                    try:
+                        t = xlrd.xldate_as_tuple(cell.value, book.datemode)
+                        row.append(f"{t[0]:04d}-{t[1]:02d}-{t[2]:02d}")
+                        continue
+                    except Exception:
+                        pass
+                row.append(norm_cell(cell.value))
+            rows.append(row)
         sheets.append((ws.name or "", rows))
     return sheets
 
@@ -989,6 +1030,17 @@ _AS_OF_LABEL_RE = re.compile(
     r"(?:monthly|fortnightly|half[\s-]?yearly)?\s*portfolio\s+statement|"
     r"portfolio\s+(?:disclosure\s+)?as\s+o[nf]|holdings?\s+as\s+o[nf])"
 )
+# Strong portfolio as-of banners (checked before generic "as on").
+_PORTFOLIO_AS_OF_LABEL_RE = re.compile(
+    r"(?i)(?:portfolio\s+statement\s+as\s+o[nf]|holdings?\s+as\s+o[nf]|"
+    r"(?:monthly|fortnightly)\s+portfolio\s+as\s+o[nf]|"
+    r"portfolio\s+disclosure\s+as\s+o[nf]|scheme\s+portfolio\s+as\s+o[nf])"
+)
+# NAV / dividend history rows contain "as on" but are not the filing as-of.
+_AS_OF_NOISE_RE = re.compile(
+    r"(?i)nav\s+(?:histrory|history)|dividend\s+history|"
+    r"nav\s+rs\.?\s+per\s+unit\s+as\s+on|inception\s+date|date\s+of\s+allotment"
+)
 
 
 def _iso_date(year: int, month: int, day: int) -> str | None:
@@ -1010,6 +1062,13 @@ def parse_as_of(text: str) -> str | None:
     s = (text or "").replace("_", " ")
     s = re.sub(r"\s+", " ", s)
     s = re.sub(r"(?i)(\d)(?:st|nd|rd|th)\b", r"\1", s)
+
+    # Bare Excel serial left in a cell (e.g. "PORTFOLIO STATEMENT AS ON : | 46218").
+    m_serial = re.search(r"(?<!\d)(\d{5})(?:\.\d+)?(?!\d)", s)
+    if m_serial and _AS_OF_LABEL_RE.search(s):
+        got = excel_serial_to_iso(float(m_serial.group(1)))
+        if got:
+            return got
 
     m = re.search(r"\b(20\d{2})-(\d{2})-(\d{2})\b", s)
     if m:
@@ -1047,19 +1106,45 @@ def parse_as_of(text: str) -> str | None:
     return None
 
 
-def extract_as_of_from_rows(rows: list[list[str]]) -> str | None:
-    """Read as-of from banner rows (as on / as of / month ended), not holding dates."""
-    for row in rows[:40]:
-        joined = " | ".join(x for x in row if x)
-        if not joined or not _AS_OF_LABEL_RE.search(joined):
+def _row_as_of(row: list[str]) -> str | None:
+    joined = " | ".join(x for x in row if x)
+    if not joined or not _AS_OF_LABEL_RE.search(joined):
+        return None
+    if _AS_OF_NOISE_RE.search(joined):
+        return None
+    got = parse_as_of(joined)
+    if got:
+        return got
+    for cell in row:
+        if not cell or _AS_OF_NOISE_RE.search(cell):
             continue
-        got = parse_as_of(joined)
+        # Labeled banner + Excel serial in the next cell.
+        serial_iso = excel_serial_to_iso(cell) if re.fullmatch(r"\d{5}(?:\.\d+)?", cell) else None
+        if serial_iso and _AS_OF_LABEL_RE.search(joined):
+            return serial_iso
+        got = parse_as_of(cell)
         if got:
             return got
-        for cell in row:
-            got = parse_as_of(cell or "")
-            if got:
-                return got
+    return None
+
+
+def extract_as_of_from_rows(rows: list[list[str]]) -> str | None:
+    """Read as-of from banner rows (as on / as of / month ended), not holding dates."""
+    # Pass 1: strong portfolio-statement banners.
+    for row in rows[:40]:
+        joined = " | ".join(x for x in row if x)
+        if not joined or not _PORTFOLIO_AS_OF_LABEL_RE.search(joined):
+            continue
+        if _AS_OF_NOISE_RE.search(joined):
+            continue
+        got = _row_as_of(row)
+        if got:
+            return got
+    # Pass 2: other as-on / month-ended labels (still skip NAV/dividend history).
+    for row in rows[:40]:
+        got = _row_as_of(row)
+        if got:
+            return got
     return None
 
 
@@ -1068,13 +1153,17 @@ def extract_as_of(
     *,
     filename: str | None = None,
 ) -> str | None:
-    """Sheet banner first, then filename (double-check when the date is in the file name)."""
-    got = extract_as_of_from_rows(rows)
-    if got:
-        return got
-    if filename:
-        return parse_as_of(filename)
-    return None
+    """Sheet portfolio banner, then filename, then weaker sheet labels.
+
+    Disclosure filenames (…15th-July-2026…) are authoritative when the sheet
+    also has NAV-history "as on" dates that would otherwise win.
+    """
+    from_rows = extract_as_of_from_rows(rows)
+    from_name = parse_as_of(filename) if filename else None
+    if from_name and from_rows and from_name != from_rows:
+        # Prefer an explicit day-month-year in the filename over a conflicting sheet date.
+        return from_name
+    return from_rows or from_name
 
 
 def extract_scheme_name_cams(rows: list[list[str]]) -> str | None:

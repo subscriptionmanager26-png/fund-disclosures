@@ -83,6 +83,19 @@ const lookupPath = argValue(
   "lookup",
   join(ROOT, "holdings-browser/api/amfi-lookup.json"),
 );
+const keepIdsPath = argValue("keep-ids", "");
+const noMerge = hasFlag("no-merge");
+
+function loadKeepIds(path) {
+  if (!path) return null;
+  const raw = JSON.parse(readFileSync(path, "utf8"));
+  if (Array.isArray(raw)) return new Set(raw.map(String));
+  if (Array.isArray(raw.keep_ids)) return new Set(raw.keep_ids.map(String));
+  if (Array.isArray(raw.keep)) {
+    return new Set(raw.keep.map((r) => String(r.id || r.portfolio_id || r)));
+  }
+  throw new Error(`--keep-ids must be a JSON array or {keep_ids|keep: [...]}`);
+}
 
 if (!asof) {
   console.error("Required: --asof=YYYY-MM-DD");
@@ -249,9 +262,17 @@ const collected = collectAsOfPortfolios({
   asOf: asof,
   catalogLookup: lookup,
 });
+const keepIds = loadKeepIds(keepIdsPath);
 let entries = [...collected.values()].sort((a, b) =>
   a.portfolio_id.localeCompare(b.portfolio_id),
 );
+if (keepIds) {
+  const before = entries.length;
+  entries = entries.filter((e) => keepIds.has(e.portfolio_id));
+  console.log(
+    `keep-ids filter: ${before} → ${entries.length} (from ${keepIdsPath})`,
+  );
+}
 if (limit > 0) entries = entries.slice(0, limit);
 
 console.log(
@@ -262,6 +283,7 @@ console.log(
       source_period: sourcePeriod,
       portfolios_found: collected.size,
       syncing: entries.length,
+      keep_ids: Boolean(keepIds),
       update_latest: updateLatest,
       dry_run: dryRun,
       push: doPush,
@@ -335,9 +357,11 @@ const pruned = pruneOrphanAsOfPortfolios(
   lookup,
   {
   mergeExisting:
-    hasFlag("merge") ||
+    !noMerge &&
+    !keepIds &&
+    (hasFlag("merge") ||
     cadence === "fortnightly" ||
-    (isMonthEndAsOf(asof) && !hasFlag("no-merge")),
+    (isMonthEndAsOf(asof) && !hasFlag("no-merge"))),
   },
 );
 if (pruned) {

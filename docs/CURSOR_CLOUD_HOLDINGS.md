@@ -60,19 +60,26 @@ Optional env (defaults are fine):
 
 ## What `holdings:cloud` does
 
-1. Fetch **monthly + fortnightly** for the **previous + current** calendar month only
-2. Parse all AMCs (`--all`)
-3. Enrich identifiers (`--allow-incomplete` — partial months are normal early in the month)
-4. **Merge-sync** to GitHub (skips empty slices; never deletes existing portfolio files)
-5. Refresh `catalog/filings.json` + pin `meta.json`
-6. Verify `https://openfin.pocketedge.in/api/v1/filings`
-7. Write JSON report under `data/probes/cloud-holdings-report-*.json`
+1. Fetch **fortnightly mid-month, fortnightly month-end, and monthly** for the **previous + current** calendar month (never skip FN-31 — new debt launches often appear only there)
+2. **LLM cadence gate (required before parse/publish)** — after Excel/ZIP files land under `data/disclosures/{cadence}/{YYYY-MM-DD}/{amc}/`, the agent must inspect filenames (and paths) and confirm each file belongs in that cadence folder:
+   - **Fortnightly mid-month (`…-15`)** — mid-month / fortnightly / debt-scheme packs dated ~15th. Reject monthly packs, `31-Jul` / month-end files, equity/ELSS/flexi workbooks, and stale archives misfiled into the FN tree.
+   - **Fortnightly month-end (`…-31`)** — month-end debt/fortnightly packs only (same cadence tree as mid-month FN, different date folder).
+   - **Monthly (`…-31` or month-end)** — full monthly portfolios; do not mix mid-month FN packs here.
+   - Misfiled files must be **moved** to the correct cadence/date folder (or deleted), never synced “as-is” because `meta.as_of` happened to match.
+   - Record the verdict (keep / move / drop) in `data/probes/` before continuing.
+3. Parse all AMCs (`--all`) — only after the cadence gate
+4. Enrich identifiers (`--allow-incomplete` — partial months are normal early in the month)
+5. **Merge-sync** to GitHub (skips empty slices; never deletes existing portfolio files unless an explicit verified `--keep-ids` + `--no-merge` repair)
+6. Refresh `catalog/filings.json` + pin `meta.json`
+7. Verify `https://openfin.pocketedge.in/api/v1/filings`
+8. Write JSON report under `data/probes/cloud-holdings-report-*.json`
 
 ## Safety rules
 
 - **Never** use `--allow-regression` or prune scripts in the daily job
 - Sync always uses `--merge` (additive fortnightly; monthly only replaces schemes present in the new parse)
 - If regression guard blocks a push, investigate — do not bypass
+- **Never publish** portfolios whose source workbook is not a real disclosure for that as-of/cadence (filename/date/type must agree). Heuristic filters help; they do not replace the LLM cadence gate above.
 
 ## Interpreting fetch results
 
@@ -86,7 +93,14 @@ Optional env (defaults are fine):
 
 ## Slack / Cloud Agent prompt
 
-Keep the prompt short. After setup, run only `npm run holdings:cloud -- --push`. Print the latest `data/probes/cloud-holdings-report-*.json`. Do not search the repo, Slack tools, or automations APIs afterwards. If Slack is configured, DM that summary.
+Keep the prompt short. After setup:
+
+1. Run fetch for the target periods.
+2. **LLM cadence gate** — verify every new disclosure file sits in the correct `fortnightly` vs `monthly` date folder; move/drop misfiles and note verdicts under `data/probes/`.
+3. Only then run `npm run holdings:cloud -- --push` (or parse → enrich → sync).
+4. Print the latest `data/probes/cloud-holdings-report-*.json`.
+
+Do not search the repo, Slack tools, or automations APIs afterwards. If Slack is configured, DM that summary.
 
 ## Canonical repo
 

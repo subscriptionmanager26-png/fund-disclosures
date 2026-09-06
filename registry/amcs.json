@@ -774,12 +774,18 @@
       "notes": "",
       "fetch": {
         "monthly": {
-          "adapter": "static_html",
-          "notes": ""
+          "adapter": "python_ref",
+          "script": "fetch_helios.py",
+          "python_slug": "helios-mutual-fund",
+          "extra_args": [],
+          "notes": "python_ref — WordPress page; avoids static_html timeouts"
         },
         "fortnightly": {
-          "adapter": "static_html",
-          "notes": "HTML scrape of fortnightly hub"
+          "adapter": "python_ref",
+          "script": "fetch_helios.py",
+          "python_slug": "helios-mutual-fund",
+          "extra_args": [],
+          "notes": "python_ref fortnightly (avoids static_html timeouts)"
         }
       }
     },

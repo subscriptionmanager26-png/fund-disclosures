@@ -7,7 +7,6 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { filterFilesForStorageKey } from "../lib/asofFileFilter.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const scriptsDir = join(root, "scrapers/python");
@@ -27,7 +26,8 @@ function runPython(script, args) {
   const proc = spawnSync(pythonBin(), [scriptPath, ...args], {
     cwd: root,
     encoding: "utf8",
-    timeout: 300_000,
+    // Helios / slow AMC pages: allow retries inside the Python script within this budget.
+    timeout: Number(process.env.PYTHON_REF_TIMEOUT_MS) || 420_000,
     env: { ...process.env, PYTHONUNBUFFERED: "1" },
   });
   return {
@@ -167,17 +167,9 @@ export function createPythonRefAdapter(cfg) {
         }
       }
 
-      // Scripts receive --fortnightly and already scope results; filter by as-of day when known.
-      let out = filterFilesForStorageKey(files, ctx.storageKey, ctx.type);
-      if (out.length < files.length) {
-        return {
-          files: out,
-          notes: `python ${cfg.script} (${ctx.type}) · filtered ${files.length - out.length} wrong as-of`,
-        };
-      }
       return {
-        files: out,
-        notes: out.length
+        files,
+        notes: files.length
           ? `python ${cfg.script} (${ctx.type})`
           : `python ok but empty (${cfg.script}, ${ctx.type})`,
       };

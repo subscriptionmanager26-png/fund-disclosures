@@ -39,7 +39,7 @@ export const barodaAdapter = {
       if (!u || seen.has(u)) return;
       const blob = `${u} ${title || ""}`;
       // Opaque URLs (YR##.xlsx) rarely contain dates — rely on title text.
-      if (!isPeriodPortfolioFile(u, title || "", matchers, ctx.type)) {
+      if (!isPeriodPortfolioFile(u, title || "", matchers, ctx.type, p)) {
         // For fortnightly midmonth page, accept period match on title alone
         if (!(title && matchers.periodRe.test(title))) return;
         if (ctx.type === "fortnightly") {

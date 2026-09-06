@@ -1,9 +1,37 @@
+/**
+ * Download disclosure files with integrity checks.
+ * Rejects truncated ZIP archives (common ABSL failure mode) and retries once.
+ */
 import { createWriteStream, existsSync } from "node:fs";
-import { mkdir, writeFile, copyFile } from "node:fs/promises";
+import { mkdir, writeFile, copyFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { Readable } from "node:stream";
 import { httpFetch, fetchBuffer } from "./http.js";
+
+/** True when buffer looks like a complete ZIP (local header + EOCD). */
+export function isCompleteZipBuffer(buf) {
+  if (!buf || buf.length < 22) return false;
+  if (buf[0] !== 0x50 || buf[1] !== 0x4b) return false;
+  // End of central directory signature PK\x05\x06 — usually near the end.
+  // Allow for a short zip comment (scan last 64KiB+22).
+  const scanFrom = Math.max(0, buf.length - 65557);
+  for (let i = buf.length - 22; i >= scanFrom; i--) {
+    if (
+      buf[i] === 0x50 &&
+      buf[i + 1] === 0x4b &&
+      buf[i + 2] === 0x05 &&
+      buf[i + 3] === 0x06
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function looksLikeZipName(name) {
+  return /\.zip$/i.test(name || "");
+}
 
 /**
  * @param {object} args
@@ -78,24 +106,63 @@ export async function downloadDisclosureFile(args) {
       return { outPath, skipped: true, bytes: 0, status: "missing_local" };
     }
     await copyFile(fromDisk, outPath);
+    // Staging copies can still be truncated ABSL zips — never promote them.
+    if (looksLikeZipName(safe)) {
+      const { readFile } = await import("node:fs/promises");
+      const buf = await readFile(outPath);
+      if (!isCompleteZipBuffer(buf)) {
+        try {
+          await unlink(outPath);
+        } catch {
+          /* ignore */
+        }
+        return { outPath, skipped: true, bytes: 0, status: "truncated_zip" };
+      }
+    }
     return { outPath, skipped: false, bytes: undefined, status: "ok_local" };
   }
 
-  const { res, buf } = await fetchBuffer(url, {
-    headers: { referer: new URL(url).origin + "/" },
-  });
+  const maxAttempts = looksLikeZipName(safe) ? 2 : 1;
+  let lastStatus = "error";
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const { res, buf } = await fetchBuffer(url, {
+      headers: { referer: new URL(url).origin + "/" },
+    });
 
-  if (!res.ok) {
-    return {
-      outPath,
-      skipped: true,
-      bytes: 0,
-      status: `http_${res.status}`,
-    };
+    if (!res.ok) {
+      lastStatus = `http_${res.status}`;
+      continue;
+    }
+
+    const contentLength = Number(res.headers.get("content-length") || 0);
+    if (contentLength > 0 && buf.length < contentLength) {
+      lastStatus = "truncated_content_length";
+      continue;
+    }
+
+    if (looksLikeZipName(safe) && !isCompleteZipBuffer(buf)) {
+      lastStatus = "truncated_zip";
+      // Do not leave a corrupt zip on disk for the parser to trip over.
+      if (existsSync(outPath)) {
+        try {
+          await unlink(outPath);
+        } catch {
+          /* ignore */
+        }
+      }
+      continue;
+    }
+
+    await writeFile(outPath, buf);
+    return { outPath, skipped: false, bytes: buf.length, status: "ok" };
   }
 
-  await writeFile(outPath, buf);
-  return { outPath, skipped: false, bytes: buf.length, status: "ok" };
+  return {
+    outPath,
+    skipped: true,
+    bytes: 0,
+    status: lastStatus,
+  };
 }
 
 export async function downloadDisclosureStream(args) {
@@ -117,6 +184,20 @@ export async function downloadDisclosureStream(args) {
   }
   const file = createWriteStream(outPath);
   await pipeline(Readable.fromWeb(res.body), file);
+
+  // Stream path: validate zip after write when applicable.
+  if (looksLikeZipName(safe)) {
+    const { readFile } = await import("node:fs/promises");
+    const buf = await readFile(outPath);
+    if (!isCompleteZipBuffer(buf)) {
+      try {
+        await unlink(outPath);
+      } catch {
+        /* ignore */
+      }
+      return { outPath, skipped: true, bytes: 0, status: "truncated_zip" };
+    }
+  }
   return { outPath, skipped: false, bytes: undefined, status: "ok" };
 }
 

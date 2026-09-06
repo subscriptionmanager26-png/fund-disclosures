@@ -20,9 +20,13 @@ import hashlib
 import json
 import re
 import http.cookiejar
+import sys
 import urllib.request
 from pathlib import Path
 from urllib.parse import quote, unquote, urljoin, urlunparse, urlparse
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from disclosure_date import dates_match_as_of, first_iso
 
 API_URL = "https://choicemf.com/api/monthly-portfolio-report/portfolio-website-list"
 DOCUMENT_LIST_URL = "https://choicemf.com/api/document-master-list"
@@ -44,13 +48,6 @@ MONTH_NUM_TO_NAME = {
     11: "november",
     12: "december",
 }
-
-DATE_IN_NAME_RE = re.compile(
-    r"\b(\d{1,2})\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|"
-    r"Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|"
-    r"Nov(?:ember)?|Dec(?:ember)?)\s+(\d{4})\b",
-    re.I,
-)
 
 BASE_HEADERS = {
     "User-Agent": (
@@ -108,23 +105,8 @@ def month_key_to_month_slug(month_key: str) -> str:
     return MONTH_NUM_TO_NAME[m]
 
 
-MONTH_WORD_TO_NUM = {
-    "january": 1, "jan": 1, "february": 2, "feb": 2, "march": 3, "mar": 3,
-    "april": 4, "apr": 4, "may": 5, "june": 6, "jun": 6, "july": 7, "jul": 7,
-    "august": 8, "aug": 8, "september": 9, "sep": 9, "sept": 9,
-    "october": 10, "oct": 10, "november": 11, "nov": 11, "december": 12, "dec": 12,
-}
-
-
-def doc_name_to_as_of(doc_name: str) -> str | None:
-    m = DATE_IN_NAME_RE.search(doc_name or "")
-    if not m:
-        return None
-    day, mon_word, year = int(m.group(1)), m.group(2).lower(), int(m.group(3))
-    month = MONTH_WORD_TO_NUM.get(mon_word)
-    if not month:
-        return None
-    return f"{year}-{month:02d}-{day:02d}"
+def doc_name_to_as_of(*parts: str) -> str | None:
+    return first_iso(*parts)
 
 
 def file_download_url(file_row: dict) -> str:
@@ -213,8 +195,9 @@ def flatten_fortnight_reports(
         doc_name = str(f.get("doc_name") or "").strip()
         month_slug = str(f.get("month") or "").strip().lower()
         fy = str(f.get("_financial_year") or "").strip()
-        row_as_of = doc_name_to_as_of(doc_name)
-        if as_of and row_as_of != as_of:
+        path = str(f.get("file_path") or "")
+        open_url = str(f.get("open_file_url") or "")
+        if as_of and not dates_match_as_of(doc_name, path, open_url, as_of=as_of):
             continue
         for mk in month_keys:
             if month_key_to_fy(mk) != fy:

@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .common import (
     SchemePortfolio,
+    assert_zip_readable,
     disclosure_type_from_path,
     extract_as_of,
     extract_scheme_name_cams,
@@ -164,6 +165,7 @@ def _dedupe_by_shortcode(portfolios: list[SchemePortfolio]) -> list[SchemePortfo
 
 
 def _expand_zip(path: Path, dest: Path) -> list[Path]:
+    assert_zip_readable(path)
     out: list[Path] = []
     with zipfile.ZipFile(path) as zf:
         for info in zf.infolist():

@@ -73,6 +73,45 @@ export function resolvePortfolioId(meta, catalogLookup) {
 /**
  * @returns {Map<string, { portfolio_id: string, local_path: string, meta: object, members: string[] }>}
  */
+/**
+ * Defense-in-depth: reject source workbooks that clearly belong to another
+ * cadence/slice (e.g. 31-Jul monthly equity packs stamped as_of=15).
+ * Agents must still LLM-review new Excel files before publish — see docs.
+ */
+export function sourceFileMatchesAsOfCadence(meta, asOf, cadence) {
+  const src = String(meta?.source_file || meta?.source || "");
+  if (!src || !AS_OF_RE.test(String(asOf || ""))) return true;
+  const day = Number(String(asOf).slice(8, 10));
+  const lower = src.toLowerCase();
+
+  if (cadence === "fortnightly" && day === 15) {
+    if (
+      /(?:^|[^0-9])31[-_./ ]?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)|(?:january|february|march|april|may|june|july|august|september|october|november|december)[-_./ ]*31(?:st)?/i.test(
+        src,
+      ) &&
+      !/\b15\b|15th|15[-_./ ]/.test(lower)
+    ) {
+      return false;
+    }
+    if (
+      /in_mf_monthly_|monthly-portfolio-|monthly portfolio|equity exposure/i.test(
+        lower,
+      )
+    ) {
+      return false;
+    }
+    // Fortnightly month-end packs (…July312026…) belong under YYYY-MM-31, not -15.
+    if (
+      /fortnightlyportfolio(?:of)?july31|fortnightly.*31[-_ ]?jul|31st[-_ ]july.*fortnight/i.test(
+        lower,
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function collectAsOfPortfolios({
   root,
   cadence,
@@ -100,6 +139,7 @@ export function collectAsOfPortfolios({
       const meta = payload?.meta || {};
       const fileAsOf = String(meta.as_of || meta.as_of || "").slice(0, 10);
       if (fileAsOf !== asOf) continue;
+      if (!sourceFileMatchesAsOfCadence(meta, asOf, cadence)) continue;
       const id = resolvePortfolioId(meta, catalogLookup);
       if (!/^\d{4,8}$/.test(id)) continue;
 
