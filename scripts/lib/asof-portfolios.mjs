@@ -331,11 +331,15 @@ export function pruneOrphanAsOfPortfolios(
   const dir = join(outDir, "portfolios", "asof", asOf);
   if (!existsSync(dir)) return 0;
   const keep = new Set([...keepIds].map((id) => `${id}.json`));
+  const keepIdSet = new Set([...keepIds].map((id) => String(id)));
   const parentIds = catalog ? parentPortfolioIds(catalog) : null;
   let removed = 0;
   for (const name of readdirSync(dir)) {
     if (!name.endsWith(".json")) continue;
     const id = name.replace(/\.json$/, "");
+    // Never prune ids we just synced — new schemes may be absent from a
+    // stale amfi-lookup and would otherwise look like child-AMFI duplicates.
+    if (keepIdSet.has(id)) continue;
     const isChildDuplicate = parentIds?.size && !parentIds.has(id);
     const isOrphan = !mergeExisting && !keep.has(name);
     if (isOrphan || isChildDuplicate) {
