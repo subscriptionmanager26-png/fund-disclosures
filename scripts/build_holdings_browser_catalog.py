@@ -96,8 +96,27 @@ def validate_lookup_nav_fields(lookup: dict[str, dict]) -> None:
 
 
 def main() -> int:
-    funds = json.loads((ROOT / "data/amfi/funds_asof_2026-07-31.json").read_text())
-    schemes = json.loads((ROOT / "data/amfi/schemes_asof_2026-07-31.json").read_text())
+    # Prefer the largest dated AMFI snapshot (partial regenerations can leave a
+    # smaller newer file that would shrink the catalog).
+    asof_candidates = sorted(ROOT.glob("data/amfi/schemes_asof_*.json"))
+    schemes_path = ROOT / "data/amfi/schemes_asof_2026-07-31.json"
+    funds_path = ROOT / "data/amfi/funds_asof_2026-07-31.json"
+    best_n = -1
+    for sp in asof_candidates:
+        try:
+            n = len(json.loads(sp.read_text()))
+        except Exception:
+            continue
+        if n > best_n:
+            best_n = n
+            schemes_path = sp
+            funds_path = ROOT / "data/amfi" / sp.name.replace("schemes_asof_", "funds_asof_")
+    if not funds_path.exists():
+        funds_path = ROOT / "data/amfi/funds_asof_2026-07-31.json"
+        schemes_path = ROOT / "data/amfi/schemes_asof_2026-07-31.json"
+    funds = json.loads(funds_path.read_text())
+    schemes = json.loads(schemes_path.read_text())
+    print(f"catalog AMFI snapshot: {funds_path.name} ({len(funds)} funds) + {schemes_path.name} ({len(schemes)} schemes)")
     amcs_reg = json.loads((ROOT / "registry/amcs.json").read_text())["amcs"]
     manifest = json.loads((ROOT / "data/parsed/b2_holdings_manifest.json").read_text())
     global_map = json.loads(MAP_PATH.read_text())

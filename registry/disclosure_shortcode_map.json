@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Durable disclosure key → AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
+  "note": "Durable disclosure key \u2192 AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
   "entries": [
     {
       "amc_id": "360-one-mutual-fund",
@@ -1757,7 +1757,7 @@
       "aliases": [],
       "canonical_amfi_code": "135764",
       "amfi_base_name": "Axis Children's Fund - No Lock in",
-      "disclosure_label": "Axis Children’s Fund",
+      "disclosure_label": "Axis Children\u2019s Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -6361,7 +6361,7 @@
       "aliases": [],
       "canonical_amfi_code": "153115",
       "amfi_base_name": "Edelweiss CRISIL IBX AAA Financial Services - Jan 2028 Index Fund",
-      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond – Jan 2028 Index Fund",
+      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond \u2013 Jan 2028 Index Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -6478,14 +6478,18 @@
     {
       "amc_id": "edelweiss-mutual-fund",
       "shortcode": "EDLDUF",
-      "aliases": [],
+      "aliases": [
+        "Edelweiss Ultra Short to Short Term Fund",
+        "EDELWEISS ULTRA SHORT TO SHORT TERM FUND"
+      ],
       "canonical_amfi_code": "153416",
-      "amfi_base_name": "Edelweiss Low Duration Fund",
-      "disclosure_label": "Edelweiss Low Duration Fund",
+      "amfi_base_name": "Edelweiss Ultra Short to Short Term Fund",
+      "disclosure_label": "EDELWEISS ULTRA SHORT TO SHORT TERM FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": "Formerly disclosed / mapped as Edelweiss Low Duration Fund; sheet code EDLDUF retained."
     },
     {
       "amc_id": "edelweiss-mutual-fund",
@@ -6522,6 +6526,22 @@
       "source": "shortcode",
       "first_seen_period": "2026-06",
       "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "edelweiss-mutual-fund",
+      "shortcode": "EDUSTF",
+      "aliases": [
+        "EDELWEISS ULTRA SHORT TERM FUND",
+        "Edelweiss Ultra Short Term Fund"
+      ],
+      "canonical_amfi_code": "154620",
+      "amfi_base_name": "Edelweiss Ultra Short Term Fund",
+      "disclosure_label": "EDELWEISS ULTRA SHORT TERM FUND",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "2026-08",
+      "last_verified_period": "latest",
+      "notes": "New scheme; first seen in Aug 2026 fortnightly pack (sheet EDUSTF)."
     },
     {
       "amc_id": "edelweiss-mutual-fund",
@@ -11353,11 +11373,11 @@
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
-      "shortcode": "ICICI Prudential Children’s Fund",
+      "shortcode": "ICICI Prudential Children\u2019s Fund",
       "aliases": [],
       "canonical_amfi_code": "120579",
       "amfi_base_name": "ICICI Prudential Children's Fund",
-      "disclosure_label": "ICICI Prudential Children’s Fund",
+      "disclosure_label": "ICICI Prudential Children\u2019s Fund",
       "confidence": "seeded",
       "source": "name_match",
       "first_seen_period": "latest",
@@ -15191,7 +15211,7 @@
       "aliases": [],
       "canonical_amfi_code": "120285",
       "amfi_base_name": "LIC MF Children's Fund",
-      "disclosure_label": "LIC MF CHILDREN’S FUND",
+      "disclosure_label": "LIC MF CHILDREN\u2019S FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
