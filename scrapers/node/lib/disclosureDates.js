@@ -126,7 +126,7 @@ export function extractDisclosureDates(...parts) {
     if (mon) add(validDate(Number(m[3]), mon, Number(m[1])));
   }
 
-  for (const m of blob.matchAll(/(?<!\d)(\d{1,2})[-/.](\d{1,2})[-/.](\d{2}|\d{4})(?!\d)/g)) {
+  for (const m of blob.matchAll(/(?<!\d)(\d{1,2})[-_/.](\d{1,2})[-_/.](\d{2}|\d{4})(?!\d)/g)) {
     const a = Number(m[1]);
     const b = Number(m[2]);
     const y = expandYear(m[3]);
@@ -174,6 +174,16 @@ export function extractAllYearMonths(...parts) {
     const month = MONTH_NUM[m[1].toLowerCase()];
     if (!month || !monthYearTokenOk(m[2], m[3], blob, m.index + m[0].length)) continue;
     add(expandYear(m[3]), month);
+  }
+
+  // Mirae: sml250_aug2026.xlsx / largecap_aug2026.xlsx
+  const monthYearGlued = new RegExp(
+    `(?<![A-Za-z])(${MONTH_TOKEN})(20\\d{2})(?!\\d)`,
+    "gi",
+  );
+  for (const m of blob.matchAll(monthYearGlued)) {
+    const month = MONTH_NUM[m[1].toLowerCase()];
+    if (month) add(Number(m[2]), month);
   }
 
   return found;

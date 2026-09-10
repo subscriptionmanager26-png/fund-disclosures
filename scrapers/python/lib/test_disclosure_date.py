@@ -140,6 +140,36 @@ class DisclosureDateTests(unittest.TestCase):
         self.assertTrue(blob_matches_year_month(name, year=2026, month=7))
         self.assertTrue(file_matches_asof_strict(name, name, "2026-07-31"))
 
+    def test_axis_underscore_numeric_dates(self):
+        for name, want, as_of, other in [
+            (
+                "Fortnightly_Portfolio15_08_2026_c7937ef7a3.xlsx",
+                date(2026, 8, 15),
+                "2026-08-15",
+                "2026-08-31",
+            ),
+            (
+                "Fortnightly_Portfolio_31_08_2026_42db1d7f47.xlsx",
+                date(2026, 8, 31),
+                "2026-08-31",
+                "2026-08-15",
+            ),
+        ]:
+            self.assertEqual(extract_dates(name)[0], want)
+            self.assertTrue(dates_match_as_of(name, as_of=as_of))
+            self.assertFalse(dates_match_as_of(name, as_of=other))
+            self.assertTrue(blob_matches_year_month(name, year=2026, month=8))
+
+    def test_mirae_glued_month_year(self):
+        for name in (
+            "sml250_aug2026.xlsx",
+            "largecap_aug2026.xlsx",
+            "macif_aug2026.xlsx",
+        ):
+            self.assertEqual(extract_all_year_months(name), [(2026, 8)])
+            self.assertTrue(blob_matches_year_month(name, year=2026, month=8))
+            self.assertTrue(file_matches_asof_strict(name, name, "2026-08-31"))
+
 
 if __name__ == "__main__":
     unittest.main()
