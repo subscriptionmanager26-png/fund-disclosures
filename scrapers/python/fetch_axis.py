@@ -40,9 +40,12 @@ MONTH_NAMES = {
 
 FILE_EXT_RE = re.compile(r"\.(pdf|xls|xlsx|xlsb)(\?.*)?$", re.I)
 
-# Combined workbook title/filename (no space before hyphen). Per-scheme rows use "Monthly Portfolio - Axis …".
-CONSOLIDATED_TITLE_RE = re.compile(
+# Combined workbook title/filename. Per-scheme rows use "Monthly Portfolio - Axis …".
+CONSOLIDATED_TITLE_LEGACY_RE = re.compile(
     r"(?i)^Monthly\s+Portfolio-(\d{1,2})\s+(\d{2})\s+(\d{2})$"
+)
+CONSOLIDATED_TITLE_ISO_RE = re.compile(
+    r"(?i)^Monthly\s+Portfolio\s+(\d{1,2})-(\d{2})-(20\d{2})$"
 )
 
 
@@ -114,10 +117,16 @@ def is_consolidated_monthly_workbook(
     for candidate in (title, base_core):
         if not candidate:
             continue
-        m = CONSOLIDATED_TITLE_RE.match(candidate.strip())
+        cand = candidate.strip()
+        m = CONSOLIDATED_TITLE_LEGACY_RE.match(cand) or CONSOLIDATED_TITLE_ISO_RE.match(
+            cand
+        )
         if not m:
             continue
-        file_mm, file_yy = m.group(2), m.group(3)
+        if CONSOLIDATED_TITLE_ISO_RE.match(cand):
+            file_mm, file_yy = m.group(2), str(int(m.group(3)) % 100).zfill(2)
+        else:
+            file_mm, file_yy = m.group(2), m.group(3)
         if file_mm == want_mm and file_yy == want_yy:
             return True
     return False

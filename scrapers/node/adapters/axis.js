@@ -13,9 +13,12 @@ const SD = {
   fortnightly: "sdFortnightlyPortfolio",
 };
 
-/** "Monthly Portfolio-31 07 26" */
-const MONTHLY_CONSOLIDATED_RE =
+/** Legacy: "Monthly Portfolio-31 07 26" */
+const MONTHLY_CONSOLIDATED_LEGACY_RE =
   /^Monthly\s+Portfolio-(\d{1,2})\s+(\d{2})\s+(\d{2})$/i;
+/** Current CMS: "Monthly Portfolio 31-08-2026" */
+const MONTHLY_CONSOLIDATED_ISO_RE =
+  /^Monthly\s+Portfolio\s+(\d{1,2})-(\d{2})-(20\d{2})$/i;
 
 /** "Fortnightly Portfolio - 31-07-2026" */
 const FN_CONSOLIDATED_RE =
@@ -152,16 +155,21 @@ async function listYearMonthDocs(ctx) {
     if (!url || !/\.(xlsx?|xlsb)(\?|$)/i.test(url)) continue;
 
     if (ctx.type === "monthly") {
-      const m = MONTHLY_CONSOLIDATED_RE.exec(title);
+      const legacy = MONTHLY_CONSOLIDATED_LEGACY_RE.exec(title);
+      const iso = MONTHLY_CONSOLIDATED_ISO_RE.exec(title);
+      const m = legacy || iso;
       if (!m) continue;
-      if (m[2] !== wantMm || m[3] !== wantYy) continue;
+      const fileMm = legacy ? m[2] : m[2];
+      const fileYy = legacy ? m[3] : String(Number(m[3]) % 100).padStart(2, "0");
+      const fileYyyy = legacy ? `20${m[3]}` : m[3];
+      if (fileMm !== wantMm || fileYy !== wantYy || fileYyyy !== wantYyyy) continue;
       if (seen.has(url)) continue;
       seen.add(url);
       files.push({
         url,
         filename: filenameFromUrl(
           url,
-          `Monthly_Portfolio_${m[1].padStart(2, "0")}_${wantMm}_20${wantYy}.xlsx`
+          `Monthly_Portfolio_${m[1].padStart(2, "0")}_${wantMm}_${fileYyyy}.xlsx`
         ),
       });
       break;
