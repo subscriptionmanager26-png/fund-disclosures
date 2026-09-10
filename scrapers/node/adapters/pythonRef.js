@@ -120,8 +120,10 @@ export function createPythonRefAdapter(cfg) {
 
       const baseArgs = ["--months", ctx.period, "--root", stagingRoot, ...extra];
 
-      // Hosts with broken TLS need python to materialize files (Node fetch fails).
-      const forceRealFetch = ["fetch_unifi.py"].includes(cfg.script);
+      // Hosts where Node fetch fails (TLS) or Akamai blocks plain HTTP (Edelweiss CDN).
+      const forceRealFetch = ["fetch_unifi.py", "fetch_edelweiss.py"].includes(
+        cfg.script,
+      );
 
       // Prefer dry-run if the script supports it (unless we must stage files)
       let result = runWithArgFallback(cfg.script, baseArgs, forceRealFetch);
