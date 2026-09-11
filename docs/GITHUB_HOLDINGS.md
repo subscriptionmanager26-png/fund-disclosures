@@ -38,7 +38,8 @@ collapse onto the same id (legacy plan codes).
 
 ```text
 portfolios/asof/{yyyy-mm-dd}/{portfolio_id}.json
-catalog/amfi-lookup.json
+catalog/amfi-lookup.json          full pipeline fields (internal / holdings resolve)
+catalog/amfi-public.json          slim public catalog (API + lightweight clients)
 catalog/filings.json
 meta.json
 ```

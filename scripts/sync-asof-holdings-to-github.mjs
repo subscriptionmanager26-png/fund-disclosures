@@ -39,6 +39,7 @@ import {
   loadRepoCatalog,
 } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
+import { publicCatalogFromLookup } from "./lib/catalog-public.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -174,6 +175,10 @@ function refreshFilings(catalog, { baselineCatalog = null } = {}) {
     syncedDates: [asof],
   });
   writeJson(join(outDir, "catalog/amfi-lookup.json"), withDates);
+  writeJson(
+    join(outDir, "catalog/amfi-public.json"),
+    publicCatalogFromLookup(withDates),
+  );
 
   const doc = buildFilingsFromAsOfDirs(outDir, withDates);
   writeJson(join(outDir, "catalog/filings.json"), doc);

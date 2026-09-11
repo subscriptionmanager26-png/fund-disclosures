@@ -34,7 +34,8 @@ and [PIPELINE.md](./PIPELINE.md)).
 
 ```text
 portfolios/asof/{YYYY-MM-DD}/{portfolio_id}.json   ← sole portfolio store
-catalog/amfi-lookup.json                           per-scheme latest_as_of + available_as_of
+catalog/amfi-lookup.json                           full per-scheme row (pipeline / resolve)
+catalog/amfi-public.json                           slim API catalog (4 fields per scheme)
 catalog/filings.json                               deduped counts per as-of date
 meta.json
 ```

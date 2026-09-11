@@ -27,6 +27,7 @@ import {
   loadRepoCatalog,
 } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
+import { publicCatalogFromLookup } from "./lib/catalog-public.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -152,6 +153,10 @@ if (dryRun) {
 }
 
 writeJson(catalogPath, withDates);
+writeJson(
+  join(outDir, "catalog/amfi-public.json"),
+  publicCatalogFromLookup(withDates),
+);
 writeJson(join(outDir, "catalog/filings.json"), filingsDoc);
 
 const coverage = assertCatalogPortfolioCoverage(outDir, withDates);
