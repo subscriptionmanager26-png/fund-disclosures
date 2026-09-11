@@ -200,7 +200,7 @@ async function fetchOneAmc(amc) {
 
 const envAmcTimeout = Number(process.env.AMC_TIMEOUT_MS);
 const AMC_TIMEOUT_MS =
-  Number.isFinite(envAmcTimeout) && envAmcTimeout > 0 ? envAmcTimeout : 90_000;
+  Number.isFinite(envAmcTimeout) && envAmcTimeout > 0 ? envAmcTimeout : 360_000;
 
 async function fetchOneAmcWithTimeout(amc, idx) {
   let timerId;

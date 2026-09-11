@@ -81,16 +81,38 @@ export async function downloadDisclosureFile(args) {
     return { outPath, skipped: false, bytes: undefined, status: "ok_local" };
   }
 
-  const { res, buf } = await fetchBuffer(url, {
-    headers: { referer: new URL(url).origin + "/" },
-  });
+  let res, buf;
+  let lastErr = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      ({ res, buf } = await fetchBuffer(url, {
+        headers: { referer: new URL(url).origin + "/" },
+      }));
+      lastErr = null;
+      break;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < 2) {
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    }
+  }
 
-  if (!res.ok) {
+  if (lastErr) {
     return {
       outPath,
       skipped: true,
       bytes: 0,
-      status: `http_${res.status}`,
+      status: `error: ${lastErr.message || lastErr}`,
+    };
+  }
+
+  if (!res || !res.ok) {
+    return {
+      outPath,
+      skipped: true,
+      bytes: 0,
+      status: `http_${res ? res.status : "unknown"}`,
     };
   }
 

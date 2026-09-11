@@ -8,7 +8,7 @@ const UA =
 export async function httpFetch(url, opts = {}) {
   const envTimeout = Number(process.env.FETCH_TIMEOUT_MS);
   const defaultTimeout =
-    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 45_000;
+    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 180_000;
   const { timeoutMs = defaultTimeout, headers, insecure, signal, ...rest } = opts;
   const prev = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   if (insecure) process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -35,7 +35,7 @@ export async function httpFetch(url, opts = {}) {
 export async function fetchText(url, opts = {}) {
   const envTimeout = Number(process.env.FETCH_TIMEOUT_MS);
   const timeoutMs =
-    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 45_000;
+    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 180_000;
   const controller = new AbortController();
   const timer = setTimeout(
     () => controller.abort(new Error(`fetchText timeout of ${timeoutMs}ms exceeded`)),
@@ -53,7 +53,7 @@ export async function fetchText(url, opts = {}) {
 export async function fetchBuffer(url, opts = {}) {
   const envTimeout = Number(process.env.FETCH_TIMEOUT_MS);
   const timeoutMs =
-    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 45_000;
+    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 180_000;
   const controller = new AbortController();
   const timer = setTimeout(
     () => controller.abort(new Error(`fetchBuffer timeout of ${timeoutMs}ms exceeded`)),
