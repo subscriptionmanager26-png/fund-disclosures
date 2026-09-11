@@ -5218,14 +5218,20 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "10YGF",
-      "aliases": [],
+      "aliases": [
+        "DSP 10 year Constant Maturity Gilt Fund",
+        "10 year Constant Maturity Gilt Fund",
+        "DSP 10 year Constant Maturity Gilt Fund (Ex: DSP 10Y G-Sec Fund )",
+        "DSP 10Y G-Sec Fund"
+      ],
       "canonical_amfi_code": "131301",
       "amfi_base_name": "DSP 10Y G - Sec Fund",
       "disclosure_label": "DSP 10Y G-Sec Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
@@ -5278,14 +5284,20 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "BOND",
-      "aliases": [],
+      "aliases": [
+        "DSP Medium Term Fund",
+        "Medium Term Fund",
+        "DSP Medium Term Fund (Ex:DSP Bond Fund)",
+        "DSP Bond Fund"
+      ],
       "canonical_amfi_code": "118924",
       "amfi_base_name": "DSP Bond Fund",
       "disclosure_label": "DSP Bond Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
@@ -5458,14 +5470,20 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "FLOATER",
-      "aliases": [],
+      "aliases": [
+        "DSP Floating Interest Rates Fund",
+        "Floating Interest Rates Fund",
+        "DSP Floating Interest Rates Fund(Ex: DSP Floater Fund)",
+        "DSP Floater Fund"
+      ],
       "canonical_amfi_code": "148771",
       "amfi_base_name": "DSP Floater Fund",
       "disclosure_label": "DSP Floater Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
@@ -5626,26 +5644,38 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "LDF",
-      "aliases": [],
+      "aliases": [
+        "DSP Ultra Short to Short Term Fund",
+        "Ultra Short to Short Term Fund",
+        "DSP Ultra Short to Short Term Fund(Ex:DSP Low Duration Fund )",
+        "DSP Low Duration Fund"
+      ],
       "canonical_amfi_code": "133925",
       "amfi_base_name": "DSP Low Duration Fund",
       "disclosure_label": "DSP Low Duration Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "LIQUID",
-      "aliases": [],
+      "aliases": [
+        "DSP Liquid Fund",
+        "Liquid Fund",
+        "DSP Liquid Fund (Ex: DSP Liquidity Fund)",
+        "DSP Liquidity Fund"
+      ],
       "canonical_amfi_code": "119125",
       "amfi_base_name": "DSP Liquidity Fund",
       "disclosure_label": "DSP Liquidity Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
@@ -6082,26 +6112,37 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "REGULARSAVINGS",
-      "aliases": [],
+      "aliases": [
+        "DSP Conservative Hybrid Fund",
+        "Conservative Hybrid Fund",
+        "DSP Conservative Hybrid Fund(Ex:DSP Regular Savings Fund )",
+        "DSP Regular Savings Fund"
+      ],
       "canonical_amfi_code": "118994",
       "amfi_base_name": "DSP Regular Savings Fund",
       "disclosure_label": "DSP Regular Savings Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08"
     },
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "SAVINGS",
-      "aliases": [],
+      "aliases": [
+        "DSP Money Market Fund",
+        "Money Market Fund",
+        "DSP Money Market Fund(Ex:DSP Savings Fund )",
+        "DSP Savings Fund"
+      ],
       "canonical_amfi_code": "100087",
       "amfi_base_name": "DSP Savings Fund",
       "disclosure_label": "DSP Savings Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
@@ -6178,14 +6219,20 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "STR",
-      "aliases": [],
+      "aliases": [
+        "DSP Dynamic Term Fund",
+        "Dynamic Term Fund",
+        "DSP Dynamic Term Fund(Ex:DSP Strategic Bond Fund )",
+        "DSP Strategic Bond Fund"
+      ],
       "canonical_amfi_code": "119239",
       "amfi_base_name": "DSP Strategic Bond Fund",
       "disclosure_label": "DSP Strategic Bond Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
@@ -6214,14 +6261,20 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "ULTRA",
-      "aliases": [],
+      "aliases": [
+        "DSP Ultra Short Term Fund",
+        "Ultra Short Term Fund",
+        "DSP Ultra Short Term Fund(Ex: DSP Ultra Short Fund)",
+        "DSP Ultra Short Fund"
+      ],
       "canonical_amfi_code": "119205",
       "amfi_base_name": "DSP Ultra Short Fund",
       "disclosure_label": "DSP Ultra Short Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "dsp-mutual-fund",
@@ -24549,14 +24602,19 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "103",
-      "aliases": [],
+      "aliases": [
+        "UTI Medium to Long Term Fund",
+        "Medium to Long Term Fund",
+        "UTI - Medium to Long Term Fund"
+      ],
       "canonical_amfi_code": "120689",
       "amfi_base_name": "UTI Medium to Long Duration Fund",
       "disclosure_label": "UTI Medium to Long Duration Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -24626,14 +24684,19 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "154",
-      "aliases": [],
+      "aliases": [
+        "UTI Short Term Fund",
+        "Short Term Fund",
+        "UTI - Short Term Fund"
+      ],
       "canonical_amfi_code": "120718",
       "amfi_base_name": "UTI Short Duration Fund",
       "disclosure_label": "UTI Short Duration Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -24710,14 +24773,20 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "165",
-      "aliases": [],
+      "aliases": [
+        "UTI Ultra Short to Short Term Fund",
+        "Ultra Short to Short Term Fund",
+        "UTI - Ultra Short to Short Term Fund",
+        "UTI Low Term Fund"
+      ],
       "canonical_amfi_code": "120735",
       "amfi_base_name": "UTI Low Duration Fund",
       "disclosure_label": "UTI Low Duration Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -24734,14 +24803,19 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "176",
-      "aliases": [],
+      "aliases": [
+        "UTI Ultra Short Term Fund",
+        "Ultra Short Term Fund",
+        "UTI - Ultra Short Term Fund"
+      ],
       "canonical_amfi_code": "120746",
       "amfi_base_name": "UTI Ultra Short Duration Fund",
       "disclosure_label": "UTI Ultra Short Duration Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -24878,14 +24952,19 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "340",
-      "aliases": [],
+      "aliases": [
+        "UTI Dynamic Term Fund",
+        "Dynamic Term Fund",
+        "UTI - Dynamic Term Fund"
+      ],
       "canonical_amfi_code": "120762",
       "amfi_base_name": "UTI Dynamic Bond Fund",
       "disclosure_label": "Dynamic Bond Fund.",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -24902,26 +24981,37 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "446",
-      "aliases": [],
+      "aliases": [
+        "UTI Banking & PSU Debt Fund",
+        "UTI Banking and PSU Debt Fund",
+        "Banking & PSU Debt Fund",
+        "UTI - Banking & PSU Debt Fund"
+      ],
       "canonical_amfi_code": "126940",
       "amfi_base_name": "UTI Banking & PSU Fund",
       "disclosure_label": "UTI Banking & PSU Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "540",
-      "aliases": [],
+      "aliases": [
+        "UTI Medium Term Fund",
+        "Medium Term Fund",
+        "UTI - Medium Term Fund"
+      ],
       "canonical_amfi_code": "134503",
       "amfi_base_name": "UTI Medium Duration Fund",
       "disclosure_label": "UTI Medium Duration Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -24998,14 +25088,20 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "713",
-      "aliases": [],
+      "aliases": [
+        "UTI Floating Interest Rates Fund",
+        "Floating Interest Rates Fund",
+        "UTI - Floating Interest Rates Fund",
+        "UTI Floater Fund"
+      ],
       "canonical_amfi_code": "145295",
       "amfi_base_name": "UTI - Floater Fund",
       "disclosure_label": "Floater Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -25106,14 +25202,19 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "757",
-      "aliases": [],
+      "aliases": [
+        "UTI 10 year Constant Maturity Gilt Fund",
+        "10 year Constant Maturity Gilt Fund",
+        "UTI - 10 year Constant Maturity Gilt Fund"
+      ],
       "canonical_amfi_code": "150410",
       "amfi_base_name": "UTI Gilt Fund with 10 year Constant Duration",
       "disclosure_label": "UTI Gilt Fund with 10 year Constant Duration",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",
@@ -25214,14 +25315,19 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "767",
-      "aliases": [],
+      "aliases": [
+        "UTI Long Term Fund",
+        "Long Term Fund",
+        "UTI - Long Term Fund"
+      ],
       "canonical_amfi_code": "151523",
       "amfi_base_name": "UTI Long Duration Fund",
       "disclosure_label": "UTI Long Duration Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": " Aug 2026 SEBI pack renamed Duration\u2192Term (and similar)."
     },
     {
       "amc_id": "uti-mutual-fund",

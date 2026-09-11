@@ -1,0 +1,13 @@
+[
+  {
+    "month": "2026-08",
+    "title": "Consolidated Portfolio August 2026",
+    "category": "Consolidate portfolio disclosure",
+    "api_month": "August",
+    "api_year": "2026",
+    "query_url": "https://www.utimf.com/api/get-consolidate-portfolio-disclosure?year=2026&month=august",
+    "download_url": "https://d3ce1o48hc5oli.cloudfront.net/s3fs-public/2026-09/fw_uti_mf_scheme_portfolios_31.08.2026_revised_final.zip?VersionId=EhSzHSoKCBkh0BsN76FmUi65sUKxPLs9",
+    "saved_as": "fw_uti_mf_scheme_portfolios_31.08.2026_revised_final.zip",
+    "sha256": "8e938ad0ab0fd14f315dc8f8657e718e13170039cdb36aec9864c5c5d8ee90b4"
+  }
+]
