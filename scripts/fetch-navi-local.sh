@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 # Run on a residential IP (your laptop). Fetches Navi Aug 2026 monthly xlsx
-# and commits them onto branch cursor/uti-navi-dsp-aug2026-195b for the cloud agent.
+# via the wp-json/nv/v1/documents API and pushes them onto
+# cursor/uti-navi-dsp-aug2026-195b for the cloud agent.
+#
+# Usage:
+#   bash scripts/fetch-navi-local.sh              # default 2026-08
+#   bash scripts/fetch-navi-local.sh 2026-08
+#
+# Optional (if CF still challenges the Python bootstrap):
+#   export NAVI_WP_NONCE='…'   # from request header wp-nonce
+#   export NAVI_COOKIE='…'     # from browser Cookie header
 set -euo pipefail
 MONTH="${1:-2026-08}"
 REPO_URL="${REPO_URL:-https://github.com/subscriptionmanager26-png/fund-disclosures.git}"
@@ -23,10 +32,10 @@ echo "→ downloaded $count spreadsheet(s) under $STAGE"
 ls -la "$STAGE" | head -40
 if [[ "$count" -lt 1 ]]; then
   echo "ERROR: no files downloaded — check https://navi.com/mutual-fund/downloads/portfolio" >&2
+  echo "Tip: export NAVI_WP_NONCE and NAVI_COOKIE from your browser XHR, then re-run." >&2
   exit 1
 fi
 
-# Staging is gitignored — force-add the month folder so the cloud agent can pull it.
 git add -f "$STAGE"
 git -c user.email="navi-local-fetch@users.noreply.github.com" -c user.name="navi-local-fetch" \
   commit -m "chore: stage Navi monthly $MONTH portfolios (residential fetch)"
