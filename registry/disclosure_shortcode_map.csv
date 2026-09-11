@@ -1988,7 +1988,7 @@ union-mutual-fund,Childrens Fund,,152219,Union Children's Fund,UNION CHILDREN'S 
 union-mutual-fund,Consumption Fund,,154020,Union Consumption Fund,UNION CONSUMPTION FUND^^,seeded,shortcode,latest,latest
 union-mutual-fund,Corporate Bond,,143241,Union Corporate Bond Fund,UNION CORPORATE BOND FUND,seeded,shortcode,latest,latest
 union-mutual-fund,DEF,,153824,Union Diversified Equity All Cap Active FOF,UNION DIVERSIFIED EQUITY ALL CAP ACTIVE FOF,seeded,shortcode,2026-06,latest
-union-mutual-fund,Dynamic Bond Fund,,119311,Union Dynamic Bond Fund,UNION DYNAMIC BOND FUND,seeded,shortcode,latest,latest
+union-mutual-fund,Dynamic Bond Fund,Dynamic Term Fund|UNION DYNAMIC TERM FUND|UNION DYNAMIC TERM FUND (FORMERLY UNION DYNAMIC BOND FUND),119311,Union Dynamic Bond Fund,UNION DYNAMIC BOND FUND,seeded,shortcode,latest,2026-08
 union-mutual-fund,ELSS Tax Saver,,119307,Union ELSS Tax Saver Fund,UNION ELSS TAX SAVER FUND,seeded,shortcode,latest,latest
 union-mutual-fund,Equity Savings,,144312,Union Equity Savings Fund,UNION EQUITY SAVINGS FUND,seeded,shortcode,latest,latest
 union-mutual-fund,FOD,,153575,Union Income Plus Arbitrage Active FOF,UNION INCOME PLUS ARBITRAGE ACTIVE FOF,seeded,shortcode,2026-06,latest
@@ -2000,13 +2000,13 @@ union-mutual-fund,Innovation & Opportunities,,151905,Union Innovation & Opportun
 union-mutual-fund,LARGECAP,,141248,Union Largecap Fund,UNION LARGECAP FUND,seeded,shortcode,2026-06,latest
 union-mutual-fund,Large & Midcap,,147750,Union Large & Midcap Fund,UNION LARGE & MIDCAP FUND,seeded,shortcode,latest,latest
 union-mutual-fund,Liquid Scheme,,119303,Union Liquid Fund,UNION LIQUID FUND,seeded,shortcode,latest,latest
-union-mutual-fund,Low Duration,,153654,Union Low Duration Fund,UNION LOW DURATION FUND,seeded,shortcode,latest,latest
+union-mutual-fund,Low Duration,Ultra Short to Short Term|UNION ULTRA SHORT TO SHORT TERM FUND|UNION ULTRA SHORT TO SHORT TERM FUND (FORMERLY UNION LOW DURATION FUND),153654,Union Low Duration Fund,UNION LOW DURATION FUND,seeded,shortcode,latest,2026-08
 union-mutual-fund,MIDCAP,,148073,Union Midcap Fund,UNION MIDCAP FUND,seeded,shortcode,2026-06,latest
 union-mutual-fund,Money Market,,149117,Union Money Market Fund,UNION MONEY MARKET FUND,seeded,shortcode,2026-07,2026-07
 union-mutual-fund,Multi Asset Allocation,,152787,Union Multi Asset Allocation Fund,UNION MULTI ASSET ALLOCATION FUND,seeded,shortcode,latest,latest
 union-mutual-fund,Multicap Fund,,150858,Union Multicap Fund,UNION MULTICAP FUND,seeded,shortcode,latest,latest
 union-mutual-fund,Overnight Fund,,147003,Union Overnight Fund,UNION OVERNIGHT FUND^^,seeded,shortcode,latest,latest
-union-mutual-fund,Short Duration,,153242,Union Short Duration Fund,UNION SHORT DURATION FUND,seeded,shortcode,latest,latest
+union-mutual-fund,Short Duration,Short Term|UNION SHORT TERM FUND|UNION SHORT TERM FUND (FORMERLY UNION SHORT DURATION FUND),153242,Union Short Duration Fund,UNION SHORT DURATION FUND,seeded,shortcode,latest,2026-08
 union-mutual-fund,Small Cap,,129649,Union Small Cap Fund,UNION SMALL CAP FUND,seeded,shortcode,latest,latest
 union-mutual-fund,Union Gilt Fund,,150407,Union Gilt Fund,UNION GILT FUND,seeded,shortcode,latest,latest
 union-mutual-fund,Union Retirement Fund,,150554,Union Retirement Fund,UNION RETIREMENT FUND,seeded,shortcode,latest,latest

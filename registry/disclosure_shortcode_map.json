@@ -24154,14 +24154,19 @@
     {
       "amc_id": "union-mutual-fund",
       "shortcode": "Dynamic Bond Fund",
-      "aliases": [],
+      "aliases": [
+        "Dynamic Term Fund",
+        "UNION DYNAMIC TERM FUND",
+        "UNION DYNAMIC TERM FUND (FORMERLY UNION DYNAMIC BOND FUND)"
+      ],
       "canonical_amfi_code": "119311",
       "amfi_base_name": "Union Dynamic Bond Fund",
       "disclosure_label": "UNION DYNAMIC BOND FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": "Aug 2026 disclosure renamed to Union Dynamic Term Fund (formerly Dynamic Bond)."
     },
     {
       "amc_id": "union-mutual-fund",
@@ -24301,14 +24306,19 @@
     {
       "amc_id": "union-mutual-fund",
       "shortcode": "Low Duration",
-      "aliases": [],
+      "aliases": [
+        "Ultra Short to Short Term",
+        "UNION ULTRA SHORT TO SHORT TERM FUND",
+        "UNION ULTRA SHORT TO SHORT TERM FUND (FORMERLY UNION LOW DURATION FUND)"
+      ],
       "canonical_amfi_code": "153654",
       "amfi_base_name": "Union Low Duration Fund",
       "disclosure_label": "UNION LOW DURATION FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": "Aug 2026 disclosure renamed to Union Ultra Short to Short Term Fund (formerly Low Duration)."
     },
     {
       "amc_id": "union-mutual-fund",
@@ -24376,14 +24386,19 @@
     {
       "amc_id": "union-mutual-fund",
       "shortcode": "Short Duration",
-      "aliases": [],
+      "aliases": [
+        "Short Term",
+        "UNION SHORT TERM FUND",
+        "UNION SHORT TERM FUND (FORMERLY UNION SHORT DURATION FUND)"
+      ],
       "canonical_amfi_code": "153242",
       "amfi_base_name": "Union Short Duration Fund",
       "disclosure_label": "UNION SHORT DURATION FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "2026-08",
+      "notes": "Aug 2026 disclosure renamed to Union Short Term Fund (formerly Short Duration)."
     },
     {
       "amc_id": "union-mutual-fund",
