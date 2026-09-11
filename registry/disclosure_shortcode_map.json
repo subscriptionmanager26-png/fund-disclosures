@@ -6118,9 +6118,9 @@
         "DSP Conservative Hybrid Fund(Ex:DSP Regular Savings Fund )",
         "DSP Regular Savings Fund"
       ],
-      "canonical_amfi_code": "118994",
-      "amfi_base_name": "DSP Regular Savings Fund",
-      "disclosure_label": "DSP Regular Savings Fund",
+      "canonical_amfi_code": "102448",
+      "amfi_base_name": "DSP Conservative Hybrid Fund",
+      "disclosure_label": "DSP Conservative Hybrid Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
