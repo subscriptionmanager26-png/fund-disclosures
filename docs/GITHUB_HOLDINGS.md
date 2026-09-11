@@ -56,7 +56,7 @@ See also [DATA_LAYOUT.md](./DATA_LAYOUT.md) for local ↔ CDN folder conventions
 }
 ```
 
-### Catalog row (excerpt)
+### Catalog row (CDN `catalog/amfi-lookup.json` — full pipeline fields)
 
 ```json
 {
@@ -69,6 +69,21 @@ See also [DATA_LAYOUT.md](./DATA_LAYOUT.md) for local ↔ CDN folder conventions
   "available_as_of": ["2026-07-31", "2026-07-15"],
   "portfolio_key": "portfolios/asof/2026-07-31/152310.json",
   "portfolio_url": "https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/portfolios/asof/2026-07-31/152310.json"
+}
+```
+
+### Catalog API row (`GET /api/v1/catalog` — public OpenFin)
+
+Only four fields per scheme (full CDN catalog is not exposed):
+
+```json
+{
+  "152309": {
+    "amfi_code": "152309",
+    "parent_name": "Aditya Birla Sun Life Large & Mid Cap Fund",
+    "latest_as_of": "2026-08-31",
+    "available_as_of": ["2026-08-31", "2026-07-31", "2026-06-30"]
+  }
 }
 ```
 
@@ -106,7 +121,7 @@ A free Vercel/holdings-browser route can wrap the two hops:
 
 | Route | Behavior |
 |--------|----------|
-| `GET /v1/catalog` | catalog (or redirect to CDN) |
+| `GET /v1/catalog` | slim AMFI lookup: `amfi_code`, `parent_name`, `available_as_of`, `latest_as_of` only |
 | `GET /v1/holdings/:amfi` | resolve catalog → portfolio → return shaped for that AMFI |
 | `GET /v1/holdings/:amfi?as_of=` | historical book for that calendar date |
 | `GET /v1/filings` | published as-of dates (monthly + fortnightly) |
