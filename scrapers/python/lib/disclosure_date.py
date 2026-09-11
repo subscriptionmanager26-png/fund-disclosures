@@ -205,6 +205,16 @@ def extract_dates(*parts: str) -> list[date]:
     for m in _COMPACT.finditer(blob):
         add(_valid(int(m.group(3)), int(m.group(2)), int(m.group(1))))
 
+    # LIC CDN paths: .../portfolio/monthly/2026/8/LEFE3009-....xlsx
+    for m in re.finditer(
+        r"(?:^|[/\\])monthly[/\\](20\d{2})[/\\](\d{1,2})(?:[/\\]|$)",
+        blob,
+        re.I,
+    ):
+        year, month = int(m.group(1)), int(m.group(2))
+        if 1 <= month <= 12:
+            add(_valid(year, month, last_day(year, month)))
+
     return sorted(found.values())
 
 
@@ -245,6 +255,15 @@ def extract_all_year_months(*parts: str) -> list[tuple[int, int]]:
         mon = MONTH_NUM.get(m.group(1).lower())
         if mon:
             add(int(m.group(2)), mon)
+
+    for m in re.finditer(
+        r"(?:^|[/\\])monthly[/\\](20\d{2})[/\\](\d{1,2})(?:[/\\]|$)",
+        blob,
+        re.I,
+    ):
+        month = int(m.group(2))
+        if 1 <= month <= 12:
+            add(int(m.group(1)), month)
 
     return found
 

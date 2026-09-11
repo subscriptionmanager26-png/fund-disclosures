@@ -204,12 +204,14 @@ async function fetchOneAmcInner(amc) {
     );
     const rawFiles = listed.files ?? [];
     const listedRejected = Array.isArray(listed.rejected) ? listed.rejected : [];
+    const fetchCfg = amc.fetch?.[type] || {};
     const { kept: files, rejected: sliceRejected } = filterFilesWithReport(
       rawFiles,
       {
         type,
         period: { year: parsed.year, month: parsed.month },
         storageKey,
+        trustAdapterPeriod: Boolean(fetchCfg.trust_adapter_period),
       },
     );
     const rejected = [

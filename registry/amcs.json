@@ -928,7 +928,8 @@
           "script": "fetch_invesco.py",
           "python_slug": "invesco-mutual-fund",
           "extra_args": [],
-          "notes": "via reference/python-fetchers (AMC-direct)"
+          "trust_adapter_period": true,
+          "notes": "Sitefinity API filters by month; per-scheme filenames lack dates"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1006,7 +1007,8 @@
           "script": "fetch_jio_blackrock.py",
           "python_slug": "jio-blackrock-mutual-fund",
           "extra_args": [],
-          "notes": "via reference/python-fetchers (AMC-direct)"
+          "trust_adapter_period": true,
+          "notes": "Next.js server action filters by month; CMS filenames lack dates"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1166,7 +1168,8 @@
           "extra_args": [
             "--insecure-ssl"
           ],
-          "notes": "via reference/python-fetchers (AMC-direct)"
+          "trust_adapter_period": true,
+          "notes": "POST filter by month; filenames carry upload timestamp not as-of"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1207,7 +1210,8 @@
           "script": "fetch_mahindra_manulife.py",
           "python_slug": "mahindra-manulife-mutual-fund",
           "extra_args": [],
-          "notes": "investorapi preLogin/downloads AES decrypt"
+          "trust_adapter_period": true,
+          "notes": "investorapi preLogin/downloads AES decrypt; UUID filenames"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1351,7 +1355,8 @@
           "script": "fetch_navi.py",
           "python_slug": "navi-mutual-fund",
           "extra_args": [],
-          "notes": "via reference/python-fetchers (AMC-direct)"
+          "trust_adapter_period": true,
+          "notes": "WP REST API filters by month; curl_cffi for Akamai"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1649,7 +1654,8 @@
           "script": "fetch_quantum.py",
           "python_slug": "quantum-mutual-fund",
           "extra_args": [],
-          "notes": "via reference/python-fetchers (AMC-direct)"
+          "trust_adapter_period": true,
+          "notes": "Combined portfolio page filters by month"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1795,7 +1801,8 @@
           "script": "fetch_sundaram.py",
           "python_slug": "sundaram-mutual-fund",
           "extra_args": [],
-          "notes": "via reference/python-fetchers (AMC-direct)"
+          "trust_adapter_period": true,
+          "notes": "AJAX Catid=Monthly filters by title month; hashed filenames"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1911,7 +1918,8 @@
           "script": "fetch_trust.py",
           "python_slug": "trust-mutual-fund",
           "extra_args": [],
-          "notes": "via reference/python-fetchers (AMC-direct)"
+          "trust_adapter_period": true,
+          "notes": "Disclosure API filters by month; timestamped filenames"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -1985,7 +1993,8 @@
           "script": "fetch_union.py",
           "python_slug": "union-mutual-fund",
           "extra_args": [],
-          "notes": "HTML scrape of monthly-portfolio page (API often stale)"
+          "trust_adapter_period": true,
+          "notes": "HTML/API scoped to month folder; curl_cffi for TLS"
         },
         "fortnightly": {
           "adapter": "python_ref",
@@ -2057,6 +2066,7 @@
           "script": "fetch_wealth_company.py",
           "python_slug": "the-wealth-company-mutual-fund",
           "extra_args": [],
+          "trust_adapter_period": true,
           "notes": "monthly via dedicated python fetcher (label↔upload pairing)"
         },
         "fortnightly": {

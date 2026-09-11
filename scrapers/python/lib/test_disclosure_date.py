@@ -170,6 +170,14 @@ class DisclosureDateTests(unittest.TestCase):
             self.assertTrue(blob_matches_year_month(name, year=2026, month=8))
             self.assertTrue(file_matches_asof_strict(name, name, "2026-08-31"))
 
+    def test_lic_monthly_path_over_upload_timestamp(self):
+        url = (
+            "https://www.licmf.com/assets/downloads/portfolio/monthly/2026/8/"
+            "LEFE3009-09-2026-09_58_30.xlsx"
+        )
+        self.assertTrue(blob_matches_year_month(url, year=2026, month=8))
+        self.assertTrue(file_matches_asof_strict(url, url, "2026-08-31"))
+
 
 if __name__ == "__main__":
     unittest.main()

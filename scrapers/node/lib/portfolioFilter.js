@@ -44,7 +44,12 @@ function baseName(url) {
  * @returns {{ keep: boolean, reason: string, detail?: string }}
  */
 export function classifyDisclosureFile(file, opts = {}) {
-  const { type = "monthly", period = null, storageKey = null } = opts;
+  const {
+    type = "monthly",
+    period = null,
+    storageKey = null,
+    trustAdapterPeriod = false,
+  } = opts;
   const { url, filename, blob } = fileBlob(file);
 
   if (!FILE_EXT.test(url) && !FILE_EXT.test(filename)) {
@@ -58,6 +63,12 @@ export function classifyDisclosureFile(file, opts = {}) {
   const base = baseName(url) || filename;
   if (/weekly/i.test(base) && !/monthly|fortnight/i.test(base)) {
     return { keep: false, reason: "weekly_not_portfolio" };
+  }
+
+  // python_ref / API adapters already scoped rows to YYYY-MM; filenames may be
+  // scheme slugs (Invesco), upload timestamps (LIC), or CMS hashes (Jio).
+  if (trustAdapterPeriod) {
+    return { keep: true, reason: "adapter_period" };
   }
 
   const dates = extractDisclosureDates(blob);

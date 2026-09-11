@@ -139,6 +139,15 @@ export function extractDisclosureDates(...parts) {
     add(validDate(Number(m[3]), Number(m[2]), Number(m[1])));
   }
 
+  // LIC CDN paths: .../portfolio/monthly/2026/8/LEFE3009-....xlsx
+  for (const m of blob.matchAll(/(?:^|[/\\])monthly[/\\](20\d{2})[/\\](\d{1,2})(?:[/\\]|$)/gi)) {
+    const year = Number(m[1]);
+    const month = Number(m[2]);
+    if (month >= 1 && month <= 12) {
+      add(validDate(year, month, lastDayOfMonth(year, month)));
+    }
+  }
+
   return [...found.values()].sort((x, y) => dateKey(x).localeCompare(dateKey(y)));
 }
 
@@ -184,6 +193,12 @@ export function extractAllYearMonths(...parts) {
   for (const m of blob.matchAll(monthYearGlued)) {
     const month = MONTH_NUM[m[1].toLowerCase()];
     if (month) add(Number(m[2]), month);
+  }
+
+  const pathYm = /(?:^|[/\\])monthly[/\\](20\d{2})[/\\](\d{1,2})(?:[/\\]|$)/gi;
+  for (const m of blob.matchAll(pathYm)) {
+    const month = Number(m[2]);
+    if (month >= 1 && month <= 12) add(Number(m[1]), month);
   }
 
   return found;

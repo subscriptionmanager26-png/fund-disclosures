@@ -60,3 +60,32 @@ test("rejects undated spreadsheet when as-of storage key is set", () => {
   assert.equal(v.keep, false);
   assert.equal(v.reason, "undated_no_month");
 });
+
+test("trust_adapter_period keeps API-filtered undated per-scheme files", () => {
+  const file = {
+    filename: "large-cap28cefe07eee8616aaa28ff00007d74af.xlsx",
+    url: "https://cdn.example/large-cap28cefe07eee8616aaa28ff00007d74af.xlsx",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "monthly",
+    period: { year: 2026, month: 8 },
+    storageKey: "2026-08-31",
+    trustAdapterPeriod: true,
+  });
+  assert.equal(v.keep, true);
+  assert.equal(v.reason, "adapter_period");
+});
+
+test("LIC monthly path month beats upload timestamp in filename", () => {
+  const file = {
+    filename: "LEFE3009-09-2026-09_58_30.xlsx",
+    url: "https://www.licmf.com/assets/downloads/portfolio/monthly/2026/8/LEFE3009-09-2026-09_58_30.xlsx",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "monthly",
+    period: { year: 2026, month: 8 },
+    storageKey: "2026-08-31",
+  });
+  assert.equal(v.keep, true);
+  assert.match(v.reason, /as_of_slice|month_in_name/);
+});
