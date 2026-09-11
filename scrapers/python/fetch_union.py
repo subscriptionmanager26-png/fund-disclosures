@@ -67,6 +67,35 @@ DATE_TAIL_RE = re.compile(
     re.I,
 )
 
+HTTP_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+}
+
+
+def _http_get(url: str, *, referer: str, accept: str = "*/*") -> bytes:
+    try:
+        from curl_cffi import requests as creq  # type: ignore
+
+        r = creq.get(
+            url,
+            headers={**HTTP_HEADERS, "Accept": accept, "Referer": referer},
+            impersonate="chrome131",
+            timeout=120,
+        )
+        r.raise_for_status()
+        return r.content
+    except Exception:
+        req = Request(
+            url,
+            headers={**HTTP_HEADERS, "Accept": accept, "Referer": referer},
+        )
+        with urlopen(req, timeout=120) as resp:
+            return resp.read()
+
 
 def month_key_to_path_segment(month_key: str) -> str:
     parts = month_key.strip().split("-")
@@ -103,16 +132,11 @@ def safe_filename(url_path: str) -> str:
 
 
 def load_page_docs(page_url: str, url_re: re.Pattern[str]) -> list[dict]:
-    req = Request(
+    html = _http_get(
         page_url,
-        headers={
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "text/html,application/xhtml+xml,*/*",
-            "Referer": BASE,
-        },
-    )
-    with urlopen(req, timeout=120) as resp:
-        html = resp.read().decode("utf-8", "ignore")
+        referer=BASE,
+        accept="text/html,application/xhtml+xml,*/*",
+    ).decode("utf-8", "ignore")
     docs: list[dict] = []
     seen: set[str] = set()
     for m in url_re.finditer(html):
@@ -145,16 +169,12 @@ def load_fortnightly_docs(as_of: str | None) -> list[dict]:
 
 
 def load_api_docs() -> list[dict]:
-    req = Request(
+    raw = _http_get(
         API_URL,
-        headers={
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "application/json, text/plain, */*",
-            "Referer": REFERER,
-        },
-    )
-    with urlopen(req, timeout=120) as resp:
-        data = json.loads(resp.read().decode("utf-8", "ignore"))
+        referer=REFERER,
+        accept="application/json, text/plain, */*",
+    ).decode("utf-8", "ignore")
+    data = json.loads(raw)
     val = data.get("value") if isinstance(data, dict) else None
     if not isinstance(val, list):
         raise RuntimeError("Unexpected API shape")
@@ -223,12 +243,7 @@ def derive_docs_from_reference_month(
 
 
 def download(url: str, referer: str = REFERER) -> bytes:
-    req = Request(
-        url,
-        headers={"User-Agent": "Mozilla/5.0", "Accept": "*/*", "Referer": REFERER},
-    )
-    with urlopen(req, timeout=120) as resp:
-        return resp.read()
+    return _http_get(url, referer=referer, accept="*/*")
 
 
 def main() -> None:

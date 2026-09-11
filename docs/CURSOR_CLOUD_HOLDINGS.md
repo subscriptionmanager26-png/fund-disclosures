@@ -91,6 +91,55 @@ Optional env (defaults are fine):
 
 `empty` is not a bug. Most AMCs publish month-end monthly 3–7 days after month close.
 
+## Troubleshooting fetch rejections (agent playbook)
+
+When `fetch-period` reports `rejectedCount > 0` or monthly files land but never sync, check the rejection `reason` in the fetch JSON / stderr.
+
+### `undated_no_month` on API-filtered monthly hubs
+
+**Symptom:** Python adapter returns dozens of files, but Node rejects them all as `undated_no_month` (Invesco per-scheme slugs, Jio CMS hashes, Mahindra UUIDs, Sundaram `monthlyportfolio_*` hashes).
+
+**Cause:** `portfolioFilter.js` rejects spreadsheets with no parseable month when a concrete `storageKey` (e.g. `2026-08-31`) is set. API adapters already filter rows to the target `YYYY-MM`.
+
+**Fix:** Set `"trust_adapter_period": true` on that AMC's `fetch.monthly` entry in `registry/amcs.json`. The filter then keeps adapter-scoped files (still drops PRC / half-yearly via `EXCLUDE`).
+
+### `wrong_month` — LIC upload timestamp vs folder month
+
+**Symptom:** LIC files under `/portfolio/monthly/2026/8/` rejected as `wrong_month` because filenames embed upload time (`09-09-2026`).
+
+**Cause:** Filename parser reads the upload stamp as September; the real disclosure month is in the URL path.
+
+**Fix:** `disclosureDates.js` / `disclosure_date.py` now parse `/monthly/YYYY/M/` path segments. Also set `trust_adapter_period: true` for LIC as a belt-and-suspenders guard.
+
+### Akamai / Cloudflare / TLS blocks (`HTTP 403`, `SSL: UNEXPECTED_EOF`)
+
+**Symptom:** `fetch_navi.py` 403 on nonce bootstrap (Cloudflare *Just a moment…* page); `fetch_union.py` SSL EOF on HTML/API; Edelweiss CDN 403 from Node download.
+
+**Fix pattern:**
+
+1. Use `curl_cffi` with Chrome impersonation in the Python fetcher (`impersonate="chrome131"`).
+2. Add the script to `forceRealFetch` in `scrapers/node/adapters/pythonRef.js` so Node stages files via Python instead of re-fetching URLs.
+
+**If curl_cffi still 403/SSL from a Cloud Agent VM:** Navi (`navi.com`) and Union (`www.unionmf.com`) may block datacenter IPs at the edge. The fetcher code is correct; run a one-off fetch from a residential/non-cloud IP (or wait for the block to lift) and stage files under `data/staging/python/amcs/<slug>/<YYYY-MM>/`. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
+
+### Stale title regex / date formats (Axis, Mirae)
+
+**Symptom:** Adapter returns `empty` despite files on the disclosure page.
+
+**Checks:**
+
+- Axis CMS titles changed format (`Monthly Portfolio 31-08-2026` vs older patterns) — update adapter regex.
+- Underscore dates (`15_08_2026`) or glued month-year (`aug2026`) — extend `disclosureDates.js` + tests in `scrapers/python/lib/test_disclosure_date.py`.
+
+### Transient `error` vs structural `empty`
+
+| Pattern | Action |
+|---------|--------|
+| Single AMC `error` with timeout / 5xx | Retry next run; optionally lower `FETCH_CONCURRENCY` |
+| AMC `empty` early in month | Normal — wait for publication |
+| AMC `empty` after month-end + peers published | Investigate adapter (API change, TLS, regex) |
+| Files fetched but `rejectedCount` high | See rejection reasons above; do **not** bypass with `--allow-regression` |
+
 ## Slack / Cloud Agent prompt
 
 Keep the prompt short. After setup:
