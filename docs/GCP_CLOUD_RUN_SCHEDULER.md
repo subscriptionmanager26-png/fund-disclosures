@@ -8,11 +8,11 @@ Complete guide for deploying, scheduling, and automating the Indian Mutual Fund 
 
 ```mermaid
 flowchart LR
-    A[Cloud Scheduler\nCron: 11th of Month] -->|Trigger POST :run| B[Cloud Run Job\nIngestion Container]
-    B -->|1. Fetch & Download| C[AMC Statutory Portals]
-    B -->|2. Extract & Parse| D[Portfolio Parsers]
-    B -->|3. Map AMFI IDs| E[Enrichment Engine]
-    B -->|4. Upload| F[(Google Cloud Storage\nRaw + Normalized Parquet)]
+    A["Cloud Scheduler\nCron: 11th of Month"] -->|Trigger POST :run| B["Cloud Run Job\nIngestion Container"]
+    B -->|1. Fetch & Download| C["AMC Statutory Portals"]
+    B -->|2. Extract & Parse| D["Portfolio Parsers"]
+    B -->|3. Map AMFI IDs| E["Enrichment Engine"]
+    B -->|4. Upload| F["(Google Cloud Storage\nRaw + Normalized Parquet)"]
 ```
 
 ---
