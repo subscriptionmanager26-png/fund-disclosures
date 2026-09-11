@@ -1,92 +1,35 @@
-# Fund Disclosures
+# Fund Disclosures Ingestion Sub-System
 
-Open-source toolkit for **Indian mutual fund portfolio disclosures**: fetch AMC Excel packs, parse holdings, map them to AMFI scheme codes, and serve a public holdings API.
+Automated multi-cloud ingestion pipeline for scraping, parsing, normalizing, and exporting monthly mutual fund portfolio disclosures across 57 AMC entries currently defined in registry/amcs.json as of the documentation verification date.
 
-Live API: [https://fund-holdings-browser.vercel.app](https://fund-holdings-browser.vercel.app)
+---
 
-```text
-GET /api/amfi/{amfi_code}
-GET /api/amfi/{amfi_code}?as_of=2026-07-31
+## 1. Ingestion Pipeline Workflow
+
+```mermaid
+graph LR
+    A["Scrape AMC Websites (Node.js)"] --> B["Parse Portfolios (Python)"]
+    B --> C["Enrich AMFI Codes (enrich_holdings_identifiers.py)"]
+    C --> D["Export Parquet to GCS (gcp_exporter.py)"]
+    D --> E["Validate Parquet Integrity (validate_gcp_output.py)"]
 ```
 
-Every holding uses the same JSON keys. `meta.market_value_unit` is `INR_LAKH`. Previous/next filing links are on each response; missing periods return `"No Data Found"`.
+---
 
-This is research software, not investment advice. Source files are AMC statutory disclosures.
+## 2. Ingestion Execution Stages
 
-## Pillars
+| Stage | Script | Purpose |
+|---|---|---|
+| **1. Fetch** | `scrapers/node/fetch-period.js` | Downloads monthly portfolio sheets (Excel / PDF / CSV) from AMC investor relations portals. |
+| **2. Parse** | `parsers/run_amc_parser.py` | Normalizes irregular AMC spreadsheet layouts into standard JSON portfolios. |
+| **3. Enrich** | `scripts/enrich_holdings_identifiers.py` | Maps fund disclosures to official AMFI scheme codes and creates `b2_holdings_manifest.json`. |
+| **4. Export** | `scripts/gcp/gcp_exporter.py` | Converts JSON portfolios to compressed columnar Parquet and uploads to `gs://investmentflow-market-data/fund_holdings/normalized/as_of=YYYY-MM-DD/{amfi_code}.parquet`. |
+| **5. Validate** | `scripts/gcp/validate_gcp_output.py` | Verifies column schemas, total asset percentages, and ISIN integrity in GCS. |
 
-1. **AMC fetch** (monthly + fortnightly) — `scrapers/`
-2. **Excel → holdings parsers** — `parsers/`
-3. **Disclosure ↔ AMFI maps** — `data/sources/` + `exports/`
-4. **AMFI universe** — `amfi/`
-5. **Matching** — `matching/`
-6. **Holdings API / browser** — `holdings-browser/`
+---
 
-Also: **QC** (`qc/`), **registry** (`registry/`), **pipeline docs** (`docs/PIPELINE.md`).
-
-## Quick start
+## 3. Running Locally / Testing via Docker
 
 ```bash
-git clone https://github.com/subscriptionmanager26-png/fund-disclosures.git
-cd fund-disclosures
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-
-npm run list -- --stats
-npm run fetch -- --type=monthly --period=2026-07 --list-only
-npm run parse:amc -- --list
+docker run --rm   -e CLOUD_PROVIDER=gcp   -e GCS_BUCKET=investmentflow-market-data   -e TYPE=monthly   -e PARQUET_ONLY=true   -e AMC=quant-mutual-fund   fund-disclosures-test:latest
 ```
-
-Node ≥ 20. Full month-end loop: [docs/PIPELINE.md](docs/PIPELINE.md).
-
-Local holdings browser (after a parse + catalog build):
-
-```bash
-npm run holdings:catalog
-npm run holdings:browse   # http://127.0.0.1:8777
-```
-
-## Public holdings API
-
-| | |
-|---|---|
-| Latest | `GET https://fund-holdings-browser.vercel.app/api/amfi/122639` |
-| By date | `GET https://fund-holdings-browser.vercel.app/api/amfi/122639?as_of=2026-07-31` |
-
-CORS is open. Holdings JSON is stored in object storage; this repo keeps parsers, maps, and the API code.
-
-Dated uploads use:
-
-`fund-disclosures/holdings/{YYYY-MM-DD}/{amc_id}/{amfi}/portfolio.json`
-
-## Layout
-
-```text
-registry/           AMC registry, parser families, shortcode map
-scrapers/           node fetch CLI + python AMC fetchers
-parsers/            AMC Excel parsers
-holdings-browser/   public API + scheme search UI
-amfi/               NAVAll / as-of / populate-scheme
-matching/           disclosure ↔ AMFI match
-qc/                 holdings compare
-exports/            mapping workbooks
-data/               disclosures/ and parsed/ are gitignored (regenerate locally)
-docs/               runbooks
-```
-
-## Policy
-
-- **AMC-direct only** (no Advisorkhoj as primary source).
-- In scope: fortnightly + monthly. Semi-annual deferred.
-- Edelweiss fetch needs `EDELWEISS_API_SECRET` in the environment. Do not commit secrets.
-- Holdings API object storage uses `B2_KEY_ID` / `B2_APPLICATION_KEY` (see `holdings-browser/.env.example`).
-
-## Mapping status (baseline)
-
-Frozen under `exports/baseline/` after Aug 2026 QC:
-
-- Disclosure rows mapped ≈ **2386 / 2387** (Taurus IE pool ignored)
-- Shortcode map: `registry/disclosure_shortcode_map.json`
-
-## License
-
-[MIT](LICENSE)

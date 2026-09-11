@@ -122,19 +122,28 @@ export async function downloadDisclosureFile(args) {
     return { outPath, skipped: false, bytes: undefined, status: "ok_local" };
   }
 
-  const maxAttempts = looksLikeZipName(safe) ? 2 : 1;
+  const maxAttempts = looksLikeZipName(safe) ? 2 : 2;
   let lastStatus = "error";
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const { res, buf } = await fetchBuffer(url, {
-      headers: { referer: new URL(url).origin + "/" },
-    });
-
-    if (!res.ok) {
-      lastStatus = `http_${res.status}`;
+    let res, buf;
+    try {
+      ({ res, buf } = await fetchBuffer(url, {
+        headers: { referer: new URL(url).origin + "/" },
+      }));
+    } catch (err) {
+      lastStatus = `error: ${err.message || err}`;
+      if (attempt < maxAttempts) {
+        await new Promise((r) => setTimeout(r, 1000));
+      }
       continue;
     }
 
-    const contentLength = Number(res.headers.get("content-length") || 0);
+    if (!res || !res.ok) {
+      lastStatus = `http_${res ? res.status : "unknown"}`;
+      continue;
+    }
+
+    const contentLength = Number(res.headers?.get?.("content-length") || 0);
     if (contentLength > 0 && buf.length < contentLength) {
       lastStatus = "truncated_content_length";
       continue;

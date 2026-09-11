@@ -1,0 +1,73 @@
+name: Auto Update Changelog on PR Merge
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches:
+      - main
+      - master
+      - dev
+
+jobs:
+  update-changelog:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update CHANGELOG.md
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+        run: |
+          python3 -c "
+          import os
+
+          pr_number = os.environ.get('PR_NUMBER', '')
+          pr_title = os.environ.get('PR_TITLE', '').strip()
+          pr_author = os.environ.get('PR_AUTHOR', '')
+          pr_url = os.environ.get('PR_URL', '')
+          head_branch = os.environ.get('HEAD_BRANCH', '')
+          base_branch = os.environ.get('BASE_BRANCH', '')
+
+          entry = f'- {pr_title} ([#{pr_number}]({pr_url})) by @{pr_author}'
+
+          with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
+              content = f.read()
+
+          # Avoid duplicate entries for the same PR number
+          if f'[#{pr_number}]' in content:
+              print(f'PR #{pr_number} already recorded in CHANGELOG.md, skipping.')
+              exit(0)
+
+          target = '## [Unreleased]'
+          if target in content:
+              parts = content.split(target, 1)
+              updated = parts[0] + target + '\n\n' + entry + parts[1]
+          else:
+              updated = content + '\n\n' + target + '\n\n' + entry + '\n'
+
+          with open('CHANGELOG.md', 'w', encoding='utf-8') as f:
+              f.write(updated)
+          print(f'Successfully added entry for PR #{pr_number} into CHANGELOG.md ({head_branch} -> {base_branch})')
+          "
+
+      - name: Commit and Push Changelog
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "docs(changelog): auto-update for PR #${{ github.event.pull_request.number }} [skip ci]"
+          file_pattern: "CHANGELOG.md"
+          branch: ${{ github.event.pull_request.base.ref }}
+

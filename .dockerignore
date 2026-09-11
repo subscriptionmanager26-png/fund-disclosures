@@ -1,0 +1,41 @@
+# Exclude heavy local data directories
+data/
+data/disclosures/
+data/parsed/
+data/staging/
+data/amfi/
+data/probes/
+data/sources/
+
+# Exclude virtual environments & cache
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+
+# Exclude git & dev tools
+.git/
+.gitignore
+.github/
+.agents/
+.gemini/
+.tmp/
+scratch/
+artifacts/
+docs/
+exports/
+qc/
+tests/
+holdings-browser/
+*.md
+
+# Exclude node & logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

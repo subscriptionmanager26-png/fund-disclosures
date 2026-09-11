@@ -8,11 +8,12 @@ const UA =
 export async function httpFetch(url, opts = {}) {
   const envTimeout = Number(process.env.FETCH_TIMEOUT_MS);
   const defaultTimeout =
-    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 120_000;
-  const { timeoutMs = defaultTimeout, headers, insecure, ...rest } = opts;
+    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 180_000;
+  const { timeoutMs = defaultTimeout, headers, insecure, signal, ...rest } = opts;
   const prev = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
   if (insecure) process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
+    const fetchSignal = signal || AbortSignal.timeout(timeoutMs);
     const res = await fetch(url, {
       ...rest,
       headers: {
@@ -20,7 +21,7 @@ export async function httpFetch(url, opts = {}) {
         accept: "*/*",
         ...headers,
       },
-      signal: AbortSignal.timeout(timeoutMs),
+      signal: fetchSignal,
     });
     return res;
   } finally {
@@ -32,15 +33,39 @@ export async function httpFetch(url, opts = {}) {
 }
 
 export async function fetchText(url, opts = {}) {
-  const res = await httpFetch(url, opts);
-  const text = await res.text();
-  return { res, text, url: res.url };
+  const envTimeout = Number(process.env.FETCH_TIMEOUT_MS);
+  const timeoutMs =
+    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 180_000;
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(new Error(`fetchText timeout of ${timeoutMs}ms exceeded`)),
+    timeoutMs,
+  );
+  try {
+    const res = await httpFetch(url, { ...opts, signal: controller.signal, timeoutMs });
+    const text = await res.text();
+    return { res, text, url: res.url };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function fetchBuffer(url, opts = {}) {
-  const res = await httpFetch(url, opts);
-  const buf = Buffer.from(await res.arrayBuffer());
-  return { res, buf, url: res.url };
+  const envTimeout = Number(process.env.FETCH_TIMEOUT_MS);
+  const timeoutMs =
+    Number.isFinite(envTimeout) && envTimeout > 0 ? envTimeout : 180_000;
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(new Error(`fetchBuffer timeout of ${timeoutMs}ms exceeded`)),
+    timeoutMs,
+  );
+  try {
+    const res = await httpFetch(url, { ...opts, signal: controller.signal, timeoutMs });
+    const buf = Buffer.from(await res.arrayBuffer());
+    return { res, buf, url: res.url };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export function absUrl(href, base) {

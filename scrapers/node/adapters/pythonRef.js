@@ -26,8 +26,8 @@ function runPython(script, args) {
   const proc = spawnSync(pythonBin(), [scriptPath, ...args], {
     cwd: root,
     encoding: "utf8",
-    // Helios / slow AMC pages: allow retries inside the Python script within this budget.
-    timeout: Number(process.env.PYTHON_REF_TIMEOUT_MS) || 420_000,
+    // Slow AMC pages: allow retries inside the Python script within this budget.
+    timeout: Number(process.env.PYTHON_REF_TIMEOUT_MS) || 120_000,
     env: { ...process.env, PYTHONUNBUFFERED: "1" },
   });
   return {
