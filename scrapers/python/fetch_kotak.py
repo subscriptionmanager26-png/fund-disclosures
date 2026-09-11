@@ -325,6 +325,94 @@ def prefer_monthly_consolidated(rows: list[tuple[str, str, str]]) -> list[tuple[
     return out
 
 
+def _month_end_day(year: int, month: int) -> int:
+    import calendar
+
+    return calendar.monthrange(year, month)[1]
+
+
+def consolidated_sebi_candidate_urls(month_key: str) -> list[str]:
+    """Guess Kotak S3 URLs when forms API lists only fortnightly for a month.
+
+    Aug 2026 landed under FormsDownloads before the API/FAD listing caught up.
+    """
+    try:
+        y, m = month_key.split("-")
+        year, month = int(y), int(m)
+    except ValueError:
+        return []
+    if month < 1 or month > 12:
+        return []
+    month_name = datetime(year, month, 1).strftime("%B")  # August
+    day = _month_end_day(year, month)
+    file_bases = [
+        f"ConsolidatedSEBIPortfolio{month_name}{year}.xlsx",
+        f"ConsolidatedSebiPortfolio{month_name}{year}.xlsx",
+        f"ConsolidatedSEBIPortfolio{month_name}{day}{year}.xlsx",
+    ]
+    folder_bases = [
+        f"Consolidated-SEBI-Portfolio-as-on-{month_name}-{day},-{year}",
+        f"Consolidated-Portfolio-as-on-{month_name}-{day},-{year}",
+        f"Consolidated-SEBI-Portfolio-as-on-{month_name}-{year}",
+        f"Consolidated-Portfolio-as-on-{month_name}-{year}",
+    ]
+    roots = (
+        "https://vatseelabs-s3.kotakmf.com/FAD/Portfolios",
+        "https://vatseelabs-s3.kotakmf.com/FormsDownloads/Portfolios",
+    )
+    urls: list[str] = []
+    for root in roots:
+        for folder in folder_bases:
+            for fname in file_bases:
+                urls.append(f"{root}/{folder}/{fname}")
+    return urls
+
+
+def probe_url_exists(
+    opener: urllib.request.OpenerDirector,
+    url: str,
+    *,
+    extra_headers: dict[str, str] | None = None,
+) -> bool:
+    """Return True if GET yields spreadsheet bytes (S3 often 403s missing keys)."""
+    try:
+        data = download(opener, url, extra_headers=extra_headers)
+    except Exception:
+        return False
+    if not data or len(data) < 1000:
+        return False
+    # xlsx/zip or legacy OLE xls
+    if data[:2] == b"PK" or data[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+        return True
+    return False
+
+
+def fill_missing_consolidated_sebi(
+    opener: urllib.request.OpenerDirector,
+    rows: list[tuple[str, str, str]],
+    month_keys: list[str],
+    *,
+    extra_headers: dict[str, str] | None = None,
+) -> list[tuple[str, str, str]]:
+    """Probe known S3 paths for months that still lack a Consolidated SEBI row."""
+    have_sebi = {
+        mk
+        for mk, url, lab in rows
+        if mk in month_keys and is_consolidated_sebi_row(url, lab)
+    }
+    out = list(rows)
+    for mk in month_keys:
+        if mk in have_sebi:
+            continue
+        for url in consolidated_sebi_candidate_urls(mk):
+            if probe_url_exists(opener, url, extra_headers=extra_headers):
+                label = f"Consolidated SEBI Portfolio (probed) {mk}"
+                out.append((mk, url, label))
+                print(f"  … probed consolidated SEBI for {mk}: {safe_filename(url)}", flush=True)
+                break
+    return out
+
+
 def doc_tuple_from_blob(
     blob: str,
     url: str,
@@ -937,6 +1025,16 @@ def main() -> None:
                 "(consolidated SEBI over fortnightly)",
                 flush=True,
             )
+        # Forms API can lag S3: Aug 2026 SEBI lived under FormsDownloads while API
+        # only listed fortnightly. Probe known paths for requested months missing SEBI.
+        rows = fill_missing_consolidated_sebi(
+            opener,
+            rows,
+            args.months,
+            extra_headers=dl_extra or None,
+        )
+        rows = dedupe_rows(rows)
+        rows = prefer_monthly_consolidated(rows)
     print(f"Total {len(rows)} monthly-portfolio file link(s) after merge/dedupe", flush=True)
 
     by_month: dict[str, list[tuple[str, str]]] = {k: [] for k in args.months}
