@@ -246,6 +246,7 @@ def export_gcp(
     raw_base = ROOT / "data" / "disclosures" / cadence
     raw_count = 0
     raw_skipped = 0
+    new_raw_uploads = []
     if not parquet_only and raw_base.exists():
         for date_dir in [d for d in raw_base.iterdir() if d.is_dir() and period in d.name]:
             as_of = date_dir.name
@@ -258,7 +259,6 @@ def export_gcp(
                     blob_path = f"fund_holdings/raw/{cadence}/{as_of}/{amc_dir.name}/{file_path.name}"
                     if blob_path in existing_raw_blobs:
                         raw_skipped += 1
-                        print(f"  [GCS Raw] Skipped: gs://{bucket_name}/{blob_path} (already exists)")
                         continue
 
                     sha256 = compute_sha256(file_path)
@@ -273,7 +273,8 @@ def export_gcp(
                     }
                     blob.upload_from_filename(str(file_path))
                     raw_count += 1
-                    print(f"  [GCS Raw] Uploaded: gs://{bucket_name}/{blob_path}")
+                    new_raw_uploads.append(blob_path)
+                    print(f"  [GCS Raw] [NEW] Uploaded: gs://{bucket_name}/{blob_path}")
     elif parquet_only:
         print("  [GCS Raw] Skipped raw file upload (parquet-only mode enabled)")
 
@@ -282,6 +283,7 @@ def export_gcp(
     norm_count = 0
     norm_skipped = 0
     total_holdings = 0
+    new_parquet_uploads = []
     if parsed_base.exists():
         for date_dir in [d for d in parsed_base.iterdir() if d.is_dir() and period in d.name]:
             for amc_dir in date_dir.iterdir():
@@ -303,13 +305,13 @@ def export_gcp(
                     blob_path = f"fund_holdings/normalized/as_of={as_of}/{amfi_code}.parquet"
                     if blob_path in existing_parquet_blobs:
                         norm_skipped += 1
-                        print(f"  [GCS Parquet] Skipped: gs://{bucket_name}/{blob_path} (already exists)")
                         continue
 
                     shaped_holdings = [shape_holding_row(h) for h in raw_holdings]
                     df = pd.DataFrame(shaped_holdings)
+                    scheme_name = meta.get("amfi_name") or meta.get("scheme_name") or "unknown"
                     df["amfi_code"] = amfi_code
-                    df["amfi_name"] = meta.get("amfi_name") or meta.get("scheme_name")
+                    df["amfi_name"] = scheme_name
                     df["amc_id"] = meta.get("amc_id") or amc_dir.name
                     df["as_of"] = as_of
                     df["source_file"] = meta.get("source_file")
@@ -329,7 +331,14 @@ def export_gcp(
                     blob.upload_from_file(buffer, content_type="application/octet-stream")
                     norm_count += 1
                     total_holdings += len(df)
-                    print(f"  [GCS Parquet] Uploaded: gs://{bucket_name}/{blob_path} ({len(df)} rows)")
+                    new_parquet_uploads.append({
+                        "amfi_code": amfi_code,
+                        "scheme_name": scheme_name,
+                        "amc_id": amc_dir.name,
+                        "rows": len(df),
+                        "blob_path": blob_path,
+                    })
+                    print(f"  [GCS Parquet] [NEW] Uploaded: gs://{bucket_name}/{blob_path} ({len(df)} rows, AMFI: {amfi_code})")
 
     # 3. Export Scheme Catalog Mappings (if available)
     catalog_files = [
@@ -343,7 +352,18 @@ def export_gcp(
             catalog_blob.upload_from_filename(str(path), content_type="application/json")
             print(f"  [GCS Catalog] Uploaded: gs://{bucket_name}/fund_holdings/catalog/{filename}")
 
-    print(f"\n[GCP Result] Raw Uploaded: {raw_count} (Skipped: {raw_skipped}), Parquet Schemes Uploaded: {norm_count} (Skipped: {norm_skipped}), Total Holdings Ingested: {total_holdings}")
+    print(f"\n=================================================================")
+    print(f" [GCP Export Summary]")
+    print(f"   Raw Files:             {raw_count} new uploaded, {raw_skipped} already existing (skipped)")
+    print(f"   Parquet Schemes:       {norm_count} new uploaded, {norm_skipped} already existing (skipped)")
+    print(f"   Total Holdings Added:  {total_holdings} rows")
+    if new_parquet_uploads:
+        print(f"\n --- Newly Ingested Schemes ({len(new_parquet_uploads)}) ---")
+        for u in new_parquet_uploads:
+            print(f"   + [{u['amfi_code']}] {u['scheme_name']} ({u['amc_id']}, {u['rows']} holdings)")
+    else:
+        print(f"\n --- All {norm_skipped} scanned schemes already existed in GCS. Zero new files needed upload. ---")
+    print(f"=================================================================\n")
 
 
 def main() -> int:
