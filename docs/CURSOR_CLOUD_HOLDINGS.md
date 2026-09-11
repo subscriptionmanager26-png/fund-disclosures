@@ -122,6 +122,14 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 
 **If curl_cffi still 403/SSL from a Cloud Agent VM:** Navi (`navi.com`) and Union (`www.unionmf.com`) may block datacenter IPs at the edge. The fetcher code is correct; run a one-off fetch from a residential/non-cloud IP (or wait for the block to lift) and stage files under `data/staging/python/amcs/<slug>/<YYYY-MM>/`. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
 
+### `excluded_non_portfolio` — Kotak Consolidated SEBI monthly
+
+**Symptom:** Kotak monthly fetch keeps only `FortnightlyPortfolio*312026.xlsx` (~24 debt schemes); `ConsolidatedSEBIPortfolio*.xlsx` is rejected.
+
+**Cause:** `portfolioFilter.js` treated `\bsebi\b` in the S3 path (`Consolidated-SEBI-Portfolio`) as a regulatory non-portfolio pack. Monthly jobs also kept fortnightly debt packs when the full consolidated SEBI workbook exists.
+
+**Fix:** Allow `consolidated … sebi … portfolio` filenames/paths in the filter. `fetch_kotak.py` prefers consolidated SEBI rows for monthly (`--fortnightly` unchanged for FN cadence).
+
 ### Stale title regex / date formats (Axis, Mirae)
 
 **Symptom:** Adapter returns `empty` despite files on the disclosure page.

@@ -256,10 +256,9 @@
     ]
   },
   "kotak-mahindra-mutual-fund": {
-    "notes": "sebi_title",
+    "notes": "sebi_title — monthly is Consolidated SEBI Portfolio (not fortnightly debt pack)",
     "monthly": [
-      "data/disclosures/monthly/latest/kotak-mahindra-mutual-fund/FortnightlyPortfolioJuly312026.xlsx",
-      "data/disclosures/monthly/latest/kotak-mahindra-mutual-fund/FortnightlyPortfolioJuly152026.xlsx"
+      "data/disclosures/monthly/latest/kotak-mahindra-mutual-fund/ConsolidatedSEBIPortfolioJuly2026.xlsx"
     ],
     "fortnightly": [
       "data/disclosures/fortnightly/latest/kotak-mahindra-mutual-fund/FortnightlyPortfolioJuly312026.xlsx",

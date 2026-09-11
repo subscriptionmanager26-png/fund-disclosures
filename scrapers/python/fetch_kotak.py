@@ -87,6 +87,10 @@ MONTHLY_HINT = re.compile(
 
 FORTNIGHTLY_HINT = re.compile(r"(?i)fortnight(ly)?")
 
+CONSOLIDATED_SEBI_HINT = re.compile(
+    r"(?i)consolidated[\s_-]*sebi[\s_-]*portfolio|consolidatedsebiportfolio"
+)
+
 A_TAG_RE = re.compile(
     r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>',
     re.I,
@@ -279,6 +283,45 @@ def dedupe_rows(rows: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]:
             continue
         seen.add(key)
         out.append((mk, url, lab))
+    return out
+
+
+def _row_blob(url: str, label: str) -> str:
+    return f"{url} {label}"
+
+
+def is_consolidated_sebi_row(url: str, label: str) -> bool:
+    return bool(CONSOLIDATED_SEBI_HINT.search(_row_blob(url, label)))
+
+
+def is_fortnightly_row(url: str, label: str) -> bool:
+    return bool(FORTNIGHTLY_HINT.search(_row_blob(url, label)))
+
+
+def prefer_monthly_consolidated(rows: list[tuple[str, str, str]]) -> list[tuple[str, str, str]]:
+    """Monthly fetch: keep consolidated SEBI packs; drop fortnightly when SEBI exists."""
+    by_month: dict[str, list[tuple[str, str, str]]] = {}
+    for mk, url, label in rows:
+        by_month.setdefault(mk, []).append((mk, url, label))
+    out: list[tuple[str, str, str]] = []
+    for batch in by_month.values():
+        consolidated = [
+            row for row in batch if is_consolidated_sebi_row(row[1], row[2])
+        ]
+        if consolidated:
+            out.extend(consolidated)
+            continue
+        # No consolidated monthly yet — keep non-fortnightly rows and month-end fortnightly.
+        for mk, url, label in batch:
+            blob = _row_blob(url, label)
+            if not is_fortnightly_row(url, label):
+                out.append((mk, url, label))
+                continue
+            if re.search(
+                r"(?i)(?:\b31(?:st)?\b|\b30(?:th)?\b|as[- ]on[- ].*(?:31|30))",
+                blob,
+            ):
+                out.append((mk, url, label))
     return out
 
 
@@ -885,6 +928,15 @@ def main() -> None:
             all_rows.extend(extract_link_rows(html, base_url=base_for_links))
 
     rows = dedupe_rows(all_rows)
+    if not args.fortnightly:
+        before = len(rows)
+        rows = prefer_monthly_consolidated(rows)
+        if before != len(rows):
+            print(
+                f"  … monthly preference kept {len(rows)}/{before} row(s) "
+                "(consolidated SEBI over fortnightly)",
+                flush=True,
+            )
     print(f"Total {len(rows)} monthly-portfolio file link(s) after merge/dedupe", flush=True)
 
     by_month: dict[str, list[tuple[str, str]]] = {k: [] for k in args.months}
