@@ -76,6 +76,21 @@ test("trust_adapter_period keeps API-filtered undated per-scheme files", () => {
   assert.equal(v.reason, "adapter_period");
 });
 
+test("keeps Kotak consolidated SEBI monthly (SEBI in path is not regulatory junk)", () => {
+  const file = {
+    filename: "ConsolidatedSEBIPortfolioJuly2026.xlsx",
+    url:
+      "https://vatseelabs-s3.kotakmf.com/FAD/Portfolios/Consolidated-SEBI-Portfolio-as-on-July-31,-2026/ConsolidatedSEBIPortfolioJuly2026.xlsx",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "monthly",
+    period: { year: 2026, month: 7 },
+    storageKey: "2026-07-31",
+  });
+  assert.equal(v.keep, true);
+  assert.match(v.reason, /as_of_slice|month_in_name/);
+});
+
 test("LIC monthly path month beats upload timestamp in filename", () => {
   const file = {
     filename: "LEFE3009-09-2026-09_58_30.xlsx",
