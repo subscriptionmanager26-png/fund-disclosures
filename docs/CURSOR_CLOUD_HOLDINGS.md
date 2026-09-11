@@ -130,6 +130,8 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 
 **Fix:** Allow `consolidated … sebi … portfolio` filenames/paths in the filter. `fetch_kotak.py` prefers consolidated SEBI rows for monthly (`--fortnightly` unchanged for FN cadence).
 
+**Follow-up (Aug 2026):** Forms API listed only `FortnightlyPortfolioAugust312026.xlsx` while `ConsolidatedSEBIPortfolioAugust2026.xlsx` was already on S3 under `FormsDownloads/Portfolios/…` (not `FAD/…`). Monthly jobs then published ~105 debt schemes. `fetch_kotak.py` now probes known FAD + FormsDownloads Consolidated SEBI URL patterns when a requested month lacks a SEBI row.
+
 ### Stale title regex / date formats (Axis, Mirae)
 
 **Symptom:** Adapter returns `empty` despite files on the disclosure page.
