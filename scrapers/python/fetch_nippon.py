@@ -22,8 +22,12 @@ import re
 import ssl
 import urllib.error
 import urllib.request
+import sys
 from pathlib import Path
 from urllib.parse import unquote, urljoin, urlparse
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from disclosure_date import extract_year_month
 
 BASE = "https://mf.nipponindiaim.com"
 LISTING_URL = (
@@ -37,21 +41,6 @@ HEADERS = {
     ),
     "Accept": "text/html,application/xhtml+xml,*/*",
 }
-
-MONTH_NAMES_EN = (
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-)
 
 LI_BLOCK_RE = re.compile(r"<li[^>]*>([\s\S]*?)</li>", re.I)
 LHS_LBL_RE = re.compile(r'<label class="lhsLbl">([^<]+)</label>', re.I)
@@ -77,52 +66,9 @@ def normalize_label(s: str) -> str:
     return re.sub(r"\s+", " ", s).strip()
 
 
-def canon_month_name(token: str) -> str | None:
-    t = token.strip().title()
-    aliases = {
-        "Sept": "September",
-        "Sep": "September",
-    }
-    t = aliases.get(t, t)
-    if t in MONTH_NAMES_EN:
-        return t
-    return None
-
-
-def label_to_year_month(label: str) -> tuple[int, int] | None:
-    """Return (year, month) from human label, or None."""
-    lab = normalize_label(label)
-    # "Monthly portfolio for the month of February 2026"
-    m = re.search(
-        r"month\s+of\s+([A-Za-z]+)\s+(\d{4})",
-        lab,
-        re.I,
-    )
-    if m:
-        mon = canon_month_name(m.group(1))
-        if mon:
-            return int(m.group(2)), MONTH_NAMES_EN.index(mon) + 1
-    # "Monthly portfolio as on 30th September 2025" / "31st July 2025"
-    m = re.search(
-        r"as\s+on\s+\d{1,2}(?:st|nd|rd|th)\s+([A-Za-z]+)\s+(\d{4})",
-        lab,
-        re.I,
-    )
-    if m:
-        mon = canon_month_name(m.group(1))
-        if mon:
-            return int(m.group(2)), MONTH_NAMES_EN.index(mon) + 1
-    # "Monthly portfolio for the month end 31st July 2019"
-    m = re.search(
-        r"month\s+end\s+\d{1,2}(?:st|nd|rd|th)\s+([A-Za-z]+)\s+(\d{4})",
-        lab,
-        re.I,
-    )
-    if m:
-        mon = canon_month_name(m.group(1))
-        if mon:
-            return int(m.group(2)), MONTH_NAMES_EN.index(mon) + 1
-    return None
+def label_to_year_month(*parts: str) -> tuple[int, int] | None:
+    """Return (year, month) from a listing label and/or file href."""
+    return extract_year_month(*(normalize_label(p) if p else "" for p in parts))
 
 
 def fetch_listing_html(*, ctx: ssl.SSLContext) -> str:
@@ -164,7 +110,7 @@ def parse_portfolio_index(
                 continue
         elif "monthly portfolio" not in low:
             continue
-        ym = label_to_year_month(lab)
+        ym = label_to_year_month(lab, href)
         if ym is None:
             continue
         url = href.strip()

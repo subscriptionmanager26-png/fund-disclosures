@@ -2,6 +2,23 @@ import { fetchText, httpFetch, absUrl } from "../lib/http.js";
 import { parsePeriod, periodMatchers } from "../lib/period.js";
 import { isPeriodPortfolioFile } from "../lib/portfolioFilter.js";
 
+async function fetchTextRetry(url, attempts = 3) {
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const out = await fetchText(url);
+      if (out.res.ok) return out;
+      lastErr = new Error(`http_${out.res.status}`);
+    } catch (e) {
+      lastErr = e;
+    }
+    if (i < attempts - 1) {
+      await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+    }
+  }
+  throw lastErr || new Error("fetch failed");
+}
+
 /**
  * Baroda BNP — HTML + CSRF paginated POST /ajax-load-more-documents
  * Mid-month (fortnightly) category id = 23; monthly uses slug/category from page.
@@ -20,8 +37,14 @@ export const barodaAdapter = {
     const p = parsePeriod(ctx.period);
     const matchers = periodMatchers(p);
 
-    const { res, text, url } = await fetchText(pageUrl);
-    if (!res.ok) return { files: [], notes: `http_${res.status}` };
+    let res;
+    let text;
+    let url;
+    try {
+      ({ res, text, url } = await fetchTextRetry(pageUrl));
+    } catch (e) {
+      return { files: [], notes: String(e.message || e) };
+    }
 
     const csrf =
       text.match(
@@ -39,7 +62,7 @@ export const barodaAdapter = {
       if (!u || seen.has(u)) return;
       const blob = `${u} ${title || ""}`;
       // Opaque URLs (YR##.xlsx) rarely contain dates — rely on title text.
-      if (!isPeriodPortfolioFile(u, title || "", matchers, ctx.type)) {
+      if (!isPeriodPortfolioFile(u, title || "", matchers, ctx.type, p)) {
         // For fortnightly midmonth page, accept period match on title alone
         if (!(title && matchers.periodRe.test(title))) return;
         if (ctx.type === "fortnightly") {
@@ -77,7 +100,9 @@ export const barodaAdapter = {
     collect(text);
 
     // Prefer documented ajax field names for midmonth (send_category=23)
-    for (let page = 1; page <= 20; page++) {
+    const maxPages = ctx.type === "fortnightly" ? 12 : 20;
+    let stalePages = 0;
+    for (let page = 1; page <= maxPages; page++) {
       const body = new URLSearchParams();
       body.set("csrf_test_name", csrf || "");
       body.set("send_year", String(p.year));
@@ -119,7 +144,10 @@ export const barodaAdapter = {
       }
       const before = files.length;
       collect(html);
-      if (page > 1 && files.length === before && page > 5) break;
+      if (files.length === before) stalePages++;
+      else stalePages = 0;
+      if (stalePages >= 2) break;
+      if (ctx.type === "fortnightly" && files.length >= 12 && stalePages >= 1) break;
     }
 
     return {

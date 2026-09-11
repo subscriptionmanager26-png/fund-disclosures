@@ -19,14 +19,23 @@ data/parsed/{cadence}/{YYYY-MM-DD}/{amc}/{fund}/   parsed holdings
 **Legacy:** older runs used `YYYY-MM` folders (e.g. `2026-07`). Parsers/sync still scan
 those as fallbacks, but new fetches should use **`YYYY-MM-DD` only**.
 
+**YYYY-MM shorthand:** `npm run fetch -- --type=fortnightly --period=2026-08` expands to
+**both** `2026-08-15` and `2026-08-31` (daily cloud job does the same explicitly). Monthly
+`YYYY-MM` still maps to month-end only.
+
 Sync to GitHub filters on `meta.as_of`, not the folder name — so a Jul-15 portfolio can
 temporarily sit under `fortnightly/2026-07/` until re-fetched into `fortnightly/2026-07-15/`.
+**Do not trust that alone:** month-end or equity packs can be mis-stamped `as_of=YYYY-MM-15`.
+After every fetch, an **LLM cadence gate** must confirm each Excel/ZIP belongs in its
+`{cadence}/{YYYY-MM-DD}` folder before parse/publish (see [CURSOR_CLOUD_HOLDINGS.md](./CURSOR_CLOUD_HOLDINGS.md)
+and [PIPELINE.md](./PIPELINE.md)).
 
 ## GitHub CDN (`fund-holdings-data`)
 
 ```text
 portfolios/asof/{YYYY-MM-DD}/{portfolio_id}.json   ← sole portfolio store
-catalog/amfi-lookup.json                           per-scheme latest_as_of + available_as_of
+catalog/amfi-lookup.json                           full per-scheme row (pipeline / resolve)
+catalog/amfi-public.json                           slim API catalog (4 fields per scheme)
 catalog/filings.json                               deduped counts per as-of date
 meta.json
 ```

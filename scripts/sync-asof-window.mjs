@@ -86,6 +86,7 @@ for (const { asof, cadence } of specs) {
     SYNC,
     `--asof=${asof}`,
     `--cadence=${cadence}`,
+    ...(hasFlag("merge") ? ["--merge"] : []),
     ...(dryRun ? ["--dry-run"] : []),
     ...(doPush ? ["--push"] : []),
   ];

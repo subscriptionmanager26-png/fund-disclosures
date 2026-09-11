@@ -1,5 +1,7 @@
 # Fund disclosures month-end pipeline
 
+> **Repos:** Parser lives on both `kushagra-agarwal-a/fund-disclosures` and `subscriptionmanager26-png/fund-disclosures`. Holdings publish **only** to `kushagra-agarwal-a/fund-holdings-data`. See [ARCHITECTURE.md](./ARCHITECTURE.md).
+
 Canonical layout:
 
 ```text
@@ -21,6 +23,12 @@ From repo root (`fund-disclosures/`):
 # 1) Fetch AMC packs for a period
 npm run fetch -- --type=monthly --period=2026-07
 npm run fetch -- --type=fortnightly --period=2026-07
+
+# 1b) LLM cadence gate (required) — before parse/sync
+# Inspect every new file under data/disclosures/{monthly|fortnightly}/{YYYY-MM-DD}/.
+# Confirm it belongs in that folder (mid-month FN vs month-end monthly).
+# Move misfiled Excel/ZIP to the correct cadence/date folder; do not publish them.
+# Write a short keep/move/drop note under data/probes/.
 
 # 2) Parse holdings (family parsers)
 # Resume is ON by default: re-running after a kill only parses missing/stale files.

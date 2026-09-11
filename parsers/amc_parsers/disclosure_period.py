@@ -14,16 +14,26 @@ def month_end_iso(year: int, month: int) -> str:
     return f"{year:04d}-{month:02d}-{last:02d}"
 
 
-def disclosure_storage_key(period: str, disclosure_type: str) -> str:
-    """Folder key for a fetch/parse period argument."""
+def disclosure_storage_keys(period: str, disclosure_type: str) -> list[str]:
+    """Folder keys for a fetch/parse period argument.
+
+    Fortnightly YYYY-MM expands to both mid-month (15) and month-end so parsers
+    and daily jobs never miss packs that only appear on the 31st.
+    """
     if AS_OF_RE.match(period):
-        return period
+        return [period]
     if PERIOD_RE.match(period):
         y, m = map(int, period.split("-"))
+        end = month_end_iso(y, m)
         if disclosure_type == "fortnightly":
-            return f"{period}-15"
-        return month_end_iso(y, m)
-    return period
+            return [f"{period}-15", end]
+        return [end]
+    return [period]
+
+
+def disclosure_storage_key(period: str, disclosure_type: str) -> str:
+    """Primary folder key (first of disclosure_storage_keys)."""
+    return disclosure_storage_keys(period, disclosure_type)[0]
 
 
 def disclosure_period_candidates(as_of: str, disclosure_type: str) -> list[str]:
@@ -46,8 +56,7 @@ def disclosure_search_keys(period: str, disclosure_type: str) -> list[str]:
             keys.append(ym)
         return keys
     if PERIOD_RE.match(period):
-        sk = disclosure_storage_key(period, disclosure_type)
-        out = [sk]
+        out = list(disclosure_storage_keys(period, disclosure_type))
         if period not in out:
             out.append(period)
         return out

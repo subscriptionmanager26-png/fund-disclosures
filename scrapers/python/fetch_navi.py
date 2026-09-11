@@ -127,10 +127,33 @@ def safe_filename(name: str) -> str:
     return s[:220] or "navi_monthly_portfolio.xlsx"
 
 
+def _curl_session():
+    try:
+        from curl_cffi import requests as creq  # type: ignore
+
+        return creq
+    except ImportError as e:
+        raise SystemExit(
+            "curl_cffi required:  .venv/bin/pip install curl_cffi\n" + str(e)
+        ) from e
+
+
 def fetch_text(url: str, *, ctx: ssl.SSLContext) -> str:
-    req = urllib.request.Request(url, headers=HEADERS, method="GET")
-    with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
-        return resp.read().decode("utf-8", errors="ignore")
+    try:
+        creq = _curl_session()
+        r = creq.get(
+            url,
+            headers=HEADERS,
+            impersonate="chrome131",
+            timeout=180,
+            verify=not ctx.check_hostname is False,
+        )
+        r.raise_for_status()
+        return r.text
+    except Exception:
+        req = urllib.request.Request(url, headers=HEADERS, method="GET")
+        with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
+            return resp.read().decode("utf-8", errors="ignore")
 
 
 def fetch_nonce(*, ctx: ssl.SSLContext) -> str:
@@ -197,8 +220,28 @@ def fetch_rows_for_month(
                 "WP-NONCE": nonce,
             },
         )
-        with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
-            raw = resp.read().decode("utf-8", errors="ignore")
+        try:
+            creq = _curl_session()
+            r = creq.post(
+                API_URL,
+                data=payload,
+                headers={
+                    **HEADERS,
+                    "Accept": "application/json, text/plain, */*",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "Origin": BASE,
+                    "Referer": PAGE_URL,
+                    "WP-NONCE": nonce,
+                },
+                impersonate="chrome131",
+                timeout=180,
+                verify=not ctx.check_hostname is False,
+            )
+            r.raise_for_status()
+            raw = r.text
+        except Exception:
+            with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
+                raw = resp.read().decode("utf-8", errors="ignore")
         obj = json.loads(raw)
         if not obj.get("success"):
             continue
@@ -241,13 +284,25 @@ def row_url(row: dict) -> list[str]:
 
 
 def download(url: str, *, ctx: ssl.SSLContext) -> bytes:
-    req = urllib.request.Request(
-        url,
-        headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
-        method="GET",
-    )
-    with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
-        return resp.read()
+    try:
+        creq = _curl_session()
+        r = creq.get(
+            url,
+            headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
+            impersonate="chrome131",
+            timeout=180,
+            verify=not ctx.check_hostname is False,
+        )
+        r.raise_for_status()
+        return r.content
+    except Exception:
+        req = urllib.request.Request(
+            url,
+            headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
+            method="GET",
+        )
+        with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
+            return resp.read()
 
 
 def main() -> None:

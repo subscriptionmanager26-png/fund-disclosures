@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .common import (
     SchemePortfolio,
+    assert_zip_readable,
     disclosure_type_from_path,
     extract_as_of,
     extract_scheme_name_cams,
@@ -164,6 +165,7 @@ def _dedupe_by_shortcode(portfolios: list[SchemePortfolio]) -> list[SchemePortfo
 
 
 def _expand_zip(path: Path, dest: Path) -> list[Path]:
+    assert_zip_readable(path)
     out: list[Path] = []
     with zipfile.ZipFile(path) as zf:
         for info in zf.infolist():
@@ -283,12 +285,38 @@ def parse_file(
                 # skip empty junk tabs
                 if not holdings and len(scheme_sheets) > 1:
                     continue
+                # Single-scheme packs (e.g. HDFC) often leave only a shortcode on-sheet
+                # while the filename has the real fund name — prefer the filename then.
+                scheme_final = scheme or sheet_name or wb_path.stem
+                stem_name = re.sub(
+                    r"(?i)^(?:monthly|fortnightly)\s+",
+                    "",
+                    wb_path.stem or "",
+                ).strip()
+                stem_name = re.sub(
+                    r"(?i)\s*[-_ ]+\d{1,2}(?:st|nd|rd|th)?\s+"
+                    r"(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|"
+                    r"jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|"
+                    r"oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+\d{4}\s*$",
+                    "",
+                    stem_name,
+                ).strip(" -_")
+                if (
+                    stem_name
+                    and len(stem_name) > 8
+                    and scheme_final
+                    and (
+                        scheme_final.upper() == (shortcode or "").upper()
+                        or re.fullmatch(r"[A-Z0-9]{3,12}", scheme_final or "")
+                    )
+                ):
+                    scheme_final = stem_name
                 out.append(
                     SchemePortfolio(
                         amc_id=amc_id,
                         disclosure_type=dtype,
                         period=period,
-                        scheme_name=scheme or sheet_name or wb_path.stem,
+                        scheme_name=scheme_final,
                         shortcode=shortcode,
                         as_of=extract_as_of(rows, filename=path.name)
                         or extract_as_of(rows, filename=wb_path.name),

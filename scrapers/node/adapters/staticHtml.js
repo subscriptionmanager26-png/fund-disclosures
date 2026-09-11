@@ -90,7 +90,7 @@ export const staticHtmlAdapter = {
     if (FILE_EXT.test(pageUrl)) {
       const p = parsePeriod(ctx.period);
       const matchers = periodMatchers(p);
-      if (isPeriodPortfolioFile(pageUrl, "", matchers, ctx.type)) {
+      if (isPeriodPortfolioFile(pageUrl, "", matchers, ctx.type, p)) {
         return {
           files: [
             {
@@ -121,7 +121,7 @@ export const staticHtmlAdapter = {
     ];
     for (const link of candidates) {
       if (seen.has(link.url)) continue;
-      if (!isPeriodPortfolioFile(link.url, link.text, matchers, ctx.type))
+      if (!isPeriodPortfolioFile(link.url, link.text, matchers, ctx.type, p))
         continue;
       seen.add(link.url);
       let filename = (link.text || "").slice(0, 120);

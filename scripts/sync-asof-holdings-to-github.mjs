@@ -38,6 +38,8 @@ import {
   assertNoHoldingsRegression,
   loadRepoCatalog,
 } from "./lib/holdings-guard.mjs";
+import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
+import { publicCatalogFromLookup } from "./lib/catalog-public.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -77,11 +79,24 @@ const asof = normalizeAsOf(argValue("asof", ""));
 const cadence = argValue("cadence", "");
 const sourcePeriod =
   argValue("source-period", "") || (asof ? sourcePeriodFromAsOf(asof) : "");
-const outDir = argValue("out", join(ROOT, ".tmp/fund-holdings-data"));
+const outDir = argValue("out", defaultHoldingsOutDir(ROOT));
 const lookupPath = argValue(
   "lookup",
   join(ROOT, "holdings-browser/api/amfi-lookup.json"),
 );
+const keepIdsPath = argValue("keep-ids", "");
+const noMerge = hasFlag("no-merge");
+
+function loadKeepIds(path) {
+  if (!path) return null;
+  const raw = JSON.parse(readFileSync(path, "utf8"));
+  if (Array.isArray(raw)) return new Set(raw.map(String));
+  if (Array.isArray(raw.keep_ids)) return new Set(raw.keep_ids.map(String));
+  if (Array.isArray(raw.keep)) {
+    return new Set(raw.keep.map((r) => String(r.id || r.portfolio_id || r)));
+  }
+  throw new Error(`--keep-ids must be a JSON array or {keep_ids|keep: [...]}`);
+}
 
 if (!asof) {
   console.error("Required: --asof=YYYY-MM-DD");
@@ -160,6 +175,10 @@ function refreshFilings(catalog, { baselineCatalog = null } = {}) {
     syncedDates: [asof],
   });
   writeJson(join(outDir, "catalog/amfi-lookup.json"), withDates);
+  writeJson(
+    join(outDir, "catalog/amfi-public.json"),
+    publicCatalogFromLookup(withDates),
+  );
 
   const doc = buildFilingsFromAsOfDirs(outDir, withDates);
   writeJson(join(outDir, "catalog/filings.json"), doc);
@@ -248,9 +267,17 @@ const collected = collectAsOfPortfolios({
   asOf: asof,
   catalogLookup: lookup,
 });
+const keepIds = loadKeepIds(keepIdsPath);
 let entries = [...collected.values()].sort((a, b) =>
   a.portfolio_id.localeCompare(b.portfolio_id),
 );
+if (keepIds) {
+  const before = entries.length;
+  entries = entries.filter((e) => keepIds.has(e.portfolio_id));
+  console.log(
+    `keep-ids filter: ${before} → ${entries.length} (from ${keepIdsPath})`,
+  );
+}
 if (limit > 0) entries = entries.slice(0, limit);
 
 console.log(
@@ -261,6 +288,7 @@ console.log(
       source_period: sourcePeriod,
       portfolios_found: collected.size,
       syncing: entries.length,
+      keep_ids: Boolean(keepIds),
       update_latest: updateLatest,
       dry_run: dryRun,
       push: doPush,
@@ -278,6 +306,11 @@ if (dryRun) {
     );
   }
   if (entries.length > 10) console.log(`  … ${entries.length - 10} more`);
+  process.exit(0);
+}
+
+if (entries.length === 0) {
+  console.log("skip: no local portfolios for this slice (nothing to push)");
   process.exit(0);
 }
 
@@ -329,9 +362,11 @@ const pruned = pruneOrphanAsOfPortfolios(
   lookup,
   {
   mergeExisting:
-    hasFlag("merge") ||
+    !noMerge &&
+    !keepIds &&
+    (hasFlag("merge") ||
     cadence === "fortnightly" ||
-    (isMonthEndAsOf(asof) && !hasFlag("no-merge")),
+    (isMonthEndAsOf(asof) && !hasFlag("no-merge"))),
   },
 );
 if (pruned) {

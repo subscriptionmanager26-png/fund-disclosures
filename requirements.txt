@@ -9,3 +9,4 @@ cryptography>=42.0
 curl_cffi>=0.7.0
 pandas>=2.0
 pyarrow>=15.0
+

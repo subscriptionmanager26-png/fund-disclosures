@@ -5,6 +5,11 @@ import calendar
 import re
 from typing import Literal
 
+try:
+    from .disclosure_date import dates_match_as_of, extract_dates, year_month_key
+except ImportError:
+    from disclosure_date import dates_match_as_of, extract_dates, year_month_key
+
 AS_OF_RE = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
 
 MONTH_NAMES = [
@@ -208,18 +213,16 @@ def canonical_as_of_for_folder(
     extract_mid = ed <= 15
     if folder_mid != extract_mid:
         return folder_period
-    return extracted
+    # Same half of the month: keep the canonical slice (14 Aug → 15).
+    return folder_period
 
 
 def doc_name_to_as_of(doc_name: str) -> str | None:
-    m = DATE_IN_NAME_RE.search(doc_name or "")
-    if not m:
-        return None
-    day, mon_word, year = int(m.group(1)), m.group(2).lower(), int(m.group(3))
-    month = MONTH_WORD_TO_NUM.get(mon_word)
-    if not month:
-        return None
-    return f"{year}-{month:02d}-{day:02d}"
+    try:
+        from .disclosure_date import first_iso
+    except ImportError:
+        from disclosure_date import first_iso
+    return first_iso(doc_name or "")
 
 
 
@@ -229,23 +232,20 @@ def file_matches_asof_strict(
     url: str,
     as_of: str,
 ) -> bool:
-    """Positive date match for AMC index pages that list many historical files."""
+    """Keep disclosure-page spreadsheets; drop only a clear wrong as-of/month."""
     if not AS_OF_RE.match(as_of):
         return True
-    meta = _month_meta(as_of)
-    if not meta:
+    if dates_match_as_of(filename, url, as_of=as_of):
         return True
-    blob = f"{filename} {url}".lower()
-    if re.search(r"monthly portfolio", blob):
+    dates = extract_dates(filename, url)
+    if dates:
         return False
-    is_mid = meta["day"] <= 15
-    d, mm, year = meta["day"], meta["mm"], meta["year"]
-    numeric = [
-        re.compile(rf"(?<!\d){d:02d}[-_./]{mm}[-_./]{year}(?!\d)", re.I),
-        re.compile(rf"(?<!\d){d}[-_./]{mm}[-_./]{year}(?!\d)", re.I),
-    ]
-    hints = (_mid_month_patterns(meta) if is_mid else _month_end_patterns(meta)) + numeric
-    return any(p.search(blob) for p in hints)
+    mk = year_month_key(filename, url)
+    if mk == as_of[:7]:
+        return True
+    if mk:
+        return False
+    return True
 
 def filename_matches_asof(url_or_name: str, as_of: str) -> bool:
     """Strict positive match used when scraping AMC pages with full history."""

@@ -7,7 +7,6 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { filterFilesForStorageKey } from "../lib/asofFileFilter.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const scriptsDir = join(root, "scrapers/python");
@@ -27,7 +26,8 @@ function runPython(script, args) {
   const proc = spawnSync(pythonBin(), [scriptPath, ...args], {
     cwd: root,
     encoding: "utf8",
-    timeout: 60_000,
+    // Slow AMC pages: allow retries inside the Python script within this budget.
+    timeout: Number(process.env.PYTHON_REF_TIMEOUT_MS) || 120_000,
     env: { ...process.env, PYTHONUNBUFFERED: "1" },
   });
   return {
@@ -120,8 +120,13 @@ export function createPythonRefAdapter(cfg) {
 
       const baseArgs = ["--months", ctx.period, "--root", stagingRoot, ...extra];
 
-      // Hosts with broken TLS need python to materialize files (Node fetch fails).
-      const forceRealFetch = ["fetch_unifi.py"].includes(cfg.script);
+      // Hosts where Node fetch fails (TLS) or Akamai blocks plain HTTP (Edelweiss CDN).
+      const forceRealFetch = [
+        "fetch_unifi.py",
+        "fetch_edelweiss.py",
+        "fetch_navi.py",
+        "fetch_union.py",
+      ].includes(cfg.script);
 
       // Prefer dry-run if the script supports it (unless we must stage files)
       let result = runWithArgFallback(cfg.script, baseArgs, forceRealFetch);
@@ -167,17 +172,9 @@ export function createPythonRefAdapter(cfg) {
         }
       }
 
-      // Scripts receive --fortnightly and already scope results; filter by as-of day when known.
-      let out = filterFilesForStorageKey(files, ctx.storageKey, ctx.type);
-      if (out.length < files.length) {
-        return {
-          files: out,
-          notes: `python ${cfg.script} (${ctx.type}) · filtered ${files.length - out.length} wrong as-of`,
-        };
-      }
       return {
-        files: out,
-        notes: out.length
+        files,
+        notes: files.length
           ? `python ${cfg.script} (${ctx.type})`
           : `python ok but empty (${cfg.script}, ${ctx.type})`,
       };

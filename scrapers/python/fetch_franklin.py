@@ -21,10 +21,13 @@ import argparse
 import hashlib
 import json
 import re
-from datetime import datetime
+import sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from disclosure_date import extract_dates
 
 API_URL = "https://www.franklintempletonindia.com/api/literature/v1/responseLitJson?type=report"
 PAGE_REF = "https://www.franklintempletonindia.com/investor/reports?firstFilter-12"
@@ -32,7 +35,6 @@ BASE = "https://www.franklintempletonindia.com"
 
 MONTHLY_CATEGORY_ID = "MONTHLY-PORTFOLIO-DSCLR"
 FORTNIGHTLY_CATEGORY_ID = "FORTNIGHT-PORTFOLIO-DEBT-SCHEMES"
-DATE_IN_TITLE_RE = re.compile(r"(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})")
 
 
 def safe_filename(url: str) -> str:
@@ -44,22 +46,17 @@ def safe_filename(url: str) -> str:
     return re.sub(r"[^\w.\-() ]", "_", base).strip()[:200] or "download.xlsx"
 
 
-def parse_title_date(title: str) -> tuple[str, str] | None:
+def parse_title_date(*parts: str) -> tuple[str, str] | None:
     """
-    Return (month_key YYYY-MM, full_date YYYY-MM-DD) parsed from title.
+    Return (month_key YYYY-MM, full_date YYYY-MM-DD) from title and/or href.
     Example: "ISIN as on 27 February 2026" -> ("2026-02", "2026-02-27")
+    Also accepts Fortnightly-Portfolio-ISIN-14-Aug-2026.xlsx.
     """
-    m = DATE_IN_TITLE_RE.search((title or "").strip())
-    if not m:
+    dates = extract_dates(*parts)
+    if not dates:
         return None
-    d, mon, y = m.group(1), m.group(2), m.group(3)
-    for fmt in ("%d %B %Y", "%d %b %Y"):
-        try:
-            dt = datetime.strptime(f"{d} {mon} {y}", fmt)
-            return f"{dt.year:04d}-{dt.month:02d}", dt.strftime("%Y-%m-%d")
-        except ValueError:
-            continue
-    return None
+    dt = dates[0]
+    return f"{dt.year:04d}-{dt.month:02d}", dt.strftime("%Y-%m-%d")
 
 
 def fetch_report_json() -> dict:
@@ -112,32 +109,11 @@ def select_for_months(
     seen_href: dict[str, set[str]] = {mk: set() for mk in month_keys}
     for row in rows:
         title = str(row.get("dctermsTitle") or "").strip()
-        parsed = parse_title_date(title)
+        href = str(row.get("literatureHref") or "")
+        parsed = parse_title_date(title, href)
         if not parsed:
-            # Fall back to filename date (e.g. Fortnightly-Portfolio-ISIN-15-July-2026.xlsx)
-            href = str(row.get("literatureHref") or "")
-            m = re.search(
-                r"(\d{1,2})[-_\s]+(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
-                r"jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
-                r"[-_\s]+(20\d{2})",
-                href,
-                re.I,
-            )
-            if not m:
-                continue
-            try:
-                dt = datetime.strptime(
-                    f"{m.group(1)} {m.group(2)} {m.group(3)}",
-                    "%d %B %Y" if len(m.group(2)) > 3 else "%d %b %Y",
-                )
-            except ValueError:
-                try:
-                    dt = datetime.strptime(f"{m.group(1)} {m.group(2)} {m.group(3)}", "%d %b %Y")
-                except ValueError:
-                    continue
-            mk, full_date = f"{dt.year:04d}-{dt.month:02d}", dt.strftime("%Y-%m-%d")
-        else:
-            mk, full_date = parsed
+            continue
+        mk, full_date = parsed
         if mk not in want:
             continue
         href = str(row.get("literatureHref") or "").strip()

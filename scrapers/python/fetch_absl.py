@@ -149,14 +149,52 @@ def fetch_rows_for_year(year: int, *, ctx: ssl.SSLContext, accordion_id: str) ->
     return [r for r in rows if isinstance(r, dict)]
 
 
-def download(url: str, *, ctx: ssl.SSLContext) -> bytes:
-    req = urllib.request.Request(
-        url,
-        headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
-        method="GET",
-    )
-    with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
-        return resp.read()
+def _assert_complete_zip(body: bytes) -> None:
+    import io
+    import zipfile
+
+    if not body or body[:2] != b"PK":
+        raise zipfile.BadZipFile("not a zip (bad magic)")
+    with zipfile.ZipFile(io.BytesIO(body)) as zf:
+        bad = zf.testzip()
+        if bad is not None:
+            raise zipfile.BadZipFile(f"corrupt member {bad}")
+        if not zf.namelist():
+            raise zipfile.BadZipFile("empty zip")
+
+
+def download(url: str, *, ctx: ssl.SSLContext, expect_zip: bool = False) -> bytes:
+    """Download with retries; ABSL packs often truncate mid-transfer."""
+    import time
+    import zipfile
+
+    last_err: Exception | None = None
+    for attempt in range(1, 4):
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
+                method="GET",
+            )
+            with urllib.request.urlopen(req, timeout=300, context=ctx) as resp:
+                body = resp.read()
+                cl = resp.headers.get("Content-Length")
+                if cl and cl.isdigit() and len(body) < int(cl):
+                    raise RuntimeError(
+                        f"truncated download ({len(body)} < Content-Length {cl})"
+                    )
+            if expect_zip:
+                _assert_complete_zip(body)
+            return body
+        except (urllib.error.URLError, TimeoutError, OSError, zipfile.BadZipFile, RuntimeError) as e:
+            last_err = e
+            if attempt >= 3:
+                break
+            wait = 5 * attempt
+            print(f"  retry {attempt}/3 after {type(e).__name__}: {e} (sleep {wait}s)", flush=True)
+            time.sleep(wait)
+    assert last_err is not None
+    raise last_err
 
 
 def main() -> None:
@@ -248,12 +286,22 @@ def main() -> None:
                 manifest.append({**rec, "sha256": "", "dry_run": True})
                 continue
             try:
-                body = download(url, ctx=ctx)
+                body = download(url, ctx=ctx, expect_zip=fn.lower().endswith(".zip"))
+                if not body:
+                    raise RuntimeError("empty download body")
                 h = hashlib.sha256(body).hexdigest()
-                (out_dir / fn).write_bytes(body)
+                dest = out_dir / fn
+                dest.write_bytes(body)
                 manifest.append({**rec, "sha256": h})
                 print(f"  OK {fn} ({len(body)} bytes)", flush=True)
             except Exception as e:
+                # Never leave a truncated zip for the parser to trip on.
+                dest = out_dir / fn
+                if dest.exists() and fn.lower().endswith(".zip"):
+                    try:
+                        dest.unlink()
+                    except OSError:
+                        pass
                 manifest.append({**rec, "sha256": "", "error": str(e)})
                 print(f"  ERR {fn}: {e}", flush=True)
 

@@ -5,11 +5,14 @@ via **jsDelivr**. No card-on-file cloud.
 
 ## Accounts / repo
 
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full split.
+
 | Role | Value |
 |------|--------|
-| Data account | `subscriptionmanager26-png` |
-| Data repo | [`fund-holdings-data`](https://github.com/subscriptionmanager26-png/fund-holdings-data) (public) |
-| Pipeline repo | [`subscriptionmanager26-png/fund-disclosures`](https://github.com/subscriptionmanager26-png/fund-disclosures) |
+| **Data (OpenFin CDN)** | [`kushagra-agarwal-a/fund-holdings-data`](https://github.com/kushagra-agarwal-a/fund-holdings-data) — **only** copy |
+| **Parser** | [`kushagra-agarwal-a/fund-disclosures`](https://github.com/kushagra-agarwal-a/fund-disclosures) + [`subscriptionmanager26-png/fund-disclosures`](https://github.com/subscriptionmanager26-png/fund-disclosures) (mirrored) |
+
+Do **not** use `subscriptionmanager26-png/fund-holdings-data` — deprecated stale mirror.
 
 ## Dedup model (important)
 
@@ -35,7 +38,8 @@ collapse onto the same id (legacy plan codes).
 
 ```text
 portfolios/asof/{yyyy-mm-dd}/{portfolio_id}.json
-catalog/amfi-lookup.json
+catalog/amfi-lookup.json          full pipeline fields (internal / holdings resolve)
+catalog/amfi-public.json          slim public catalog (API + lightweight clients)
 catalog/filings.json
 meta.json
 ```
@@ -53,7 +57,7 @@ See also [DATA_LAYOUT.md](./DATA_LAYOUT.md) for local ↔ CDN folder conventions
 }
 ```
 
-### Catalog row (excerpt)
+### Catalog row (CDN `catalog/amfi-lookup.json` — full pipeline fields)
 
 ```json
 {
@@ -65,7 +69,22 @@ See also [DATA_LAYOUT.md](./DATA_LAYOUT.md) for local ↔ CDN folder conventions
   "latest_as_of": "2026-07-31",
   "available_as_of": ["2026-07-31", "2026-07-15"],
   "portfolio_key": "portfolios/asof/2026-07-31/152310.json",
-  "portfolio_url": "https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/portfolios/asof/2026-07-31/152310.json"
+  "portfolio_url": "https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/portfolios/asof/2026-07-31/152310.json"
+}
+```
+
+### Catalog API row (`GET /api/v1/catalog` — public OpenFin)
+
+Only four fields per scheme (full CDN catalog is not exposed):
+
+```json
+{
+  "152309": {
+    "amfi_code": "152309",
+    "parent_name": "Aditya Birla Sun Life Large & Mid Cap Fund",
+    "latest_as_of": "2026-08-31",
+    "available_as_of": ["2026-08-31", "2026-07-31", "2026-06-30"]
+  }
 }
 ```
 
@@ -76,7 +95,7 @@ See also [DATA_LAYOUT.md](./DATA_LAYOUT.md) for local ↔ CDN folder conventions
 1. Fetch catalog (cache aggressively):
 
 ```text
-https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/catalog/amfi-lookup.json
+https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/catalog/amfi-lookup.json
 ```
 
 2. Look up AMFI code → `portfolio_id` / `portfolio_url`.
@@ -84,14 +103,14 @@ https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/ca
 3. Fetch the shared portfolio:
 
 ```text
-https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/portfolios/latest/{portfolio_id}.json
+https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/portfolios/latest/{portfolio_id}.json
 ```
 
 Historical (day-level as-of):
 
 ```text
-https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/portfolios/asof/2026-07-15/{portfolio_id}.json
-https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/catalog/filings.json
+https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/portfolios/asof/2026-07-15/{portfolio_id}.json
+https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/catalog/filings.json
 ```
 4. Overlay the requesting scheme’s name/NAV from the catalog row onto the payload
    if you need share-class-specific fields (the portfolio object carries the
@@ -103,7 +122,7 @@ A free Vercel/holdings-browser route can wrap the two hops:
 
 | Route | Behavior |
 |--------|----------|
-| `GET /v1/catalog` | catalog (or redirect to CDN) |
+| `GET /v1/catalog` | slim AMFI lookup: `amfi_code`, `parent_name`, `available_as_of`, `latest_as_of` only |
 | `GET /v1/holdings/:amfi` | resolve catalog → portfolio → return shaped for that AMFI |
 | `GET /v1/holdings/:amfi?as_of=` | historical book for that calendar date |
 | `GET /v1/filings` | published as-of dates (monthly + fortnightly) |
@@ -145,11 +164,11 @@ Regression: `.venv/bin/python3 amfi/test_nav_history_parse.py`.
 ## Smoke test
 
 ```bash
-curl -sS 'https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/meta.json'
-curl -sS 'https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/catalog/filings.json'
+curl -sS 'https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/meta.json'
+curl -sS 'https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/catalog/filings.json'
 # pick a child AMFI from catalog, read portfolio_id, then:
-curl -sS 'https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/portfolios/latest/152310.json' | head -c 400
-curl -sS 'https://cdn.jsdelivr.net/gh/subscriptionmanager26-png/fund-holdings-data@main/portfolios/asof/2026-06-30/152310.json' | head -c 200
+curl -sS 'https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/portfolios/latest/152310.json' | head -c 400
+curl -sS 'https://cdn.jsdelivr.net/gh/kushagra-agarwal-a/fund-holdings-data@main/portfolios/asof/2026-06-30/152310.json' | head -c 200
 ```
 
 ## Quotas

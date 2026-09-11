@@ -22,8 +22,12 @@ import re
 import ssl
 import urllib.error
 import urllib.request
+import sys
 from pathlib import Path
 from urllib.parse import unquote, urlparse
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
+from disclosure_date import extract_dates, extract_year_month
 
 BASE = "https://www.quantumamc.com"
 LISTING_URL = f"{BASE}/portfolio/combined/-1/1/0/0"
@@ -91,24 +95,15 @@ def month_key_to_parts(month_key: str) -> tuple[int, int]:
 
 
 def label_to_year_month(label: str) -> tuple[int, int] | None:
-    m = LABEL_MONTH_RE.match(label.strip())
-    if not m:
-        return None
-    mon_name, y_s = m.group(1).title(), m.group(2)
-    if mon_name not in MONTH_NAMES_EN:
-        return None
-    mi = MONTH_NAMES_EN.index(mon_name) + 1
-    return int(y_s), mi
+    return extract_year_month(label)
 
 
 def label_to_as_of(label: str) -> tuple[int, int, int] | None:
-    m = LABEL_FORTNIGHTLY_RE.match(label.strip())
-    if not m:
+    dates = extract_dates(label)
+    if not dates:
         return None
-    day, mon_name, y_s = int(m.group(1)), m.group(2).title(), m.group(3)
-    if mon_name not in MONTH_NAMES_EN:
-        return None
-    return int(y_s), MONTH_NAMES_EN.index(mon_name) + 1, day
+    d = dates[0]
+    return d.year, d.month, d.day
 
 
 def parse_as_of(as_of: str) -> tuple[int, int, int] | None:

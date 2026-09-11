@@ -26,6 +26,8 @@ import {
   assertNoHoldingsRegression,
   loadRepoCatalog,
 } from "./lib/holdings-guard.mjs";
+import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
+import { publicCatalogFromLookup } from "./lib/catalog-public.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -46,7 +48,7 @@ function hasFlag(name) {
 const dryRun = hasFlag("dry-run");
 const doPush = hasFlag("push");
 const allowRegression = hasFlag("allow-regression");
-const outDir = argValue("out", join(ROOT, ".tmp/fund-holdings-data"));
+const outDir = argValue("out", defaultHoldingsOutDir(ROOT));
 
 function ensureDir(p) {
   mkdirSync(p, { recursive: true });
@@ -151,6 +153,10 @@ if (dryRun) {
 }
 
 writeJson(catalogPath, withDates);
+writeJson(
+  join(outDir, "catalog/amfi-public.json"),
+  publicCatalogFromLookup(withDates),
+);
 writeJson(join(outDir, "catalog/filings.json"), filingsDoc);
 
 const coverage = assertCatalogPortfolioCoverage(outDir, withDates);
