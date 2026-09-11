@@ -27,7 +27,7 @@ function runPython(script, args) {
   const proc = spawnSync(pythonBin(), [scriptPath, ...args], {
     cwd: root,
     encoding: "utf8",
-    timeout: 300_000,
+    timeout: 60_000,
     env: { ...process.env, PYTHONUNBUFFERED: "1" },
   });
   return {

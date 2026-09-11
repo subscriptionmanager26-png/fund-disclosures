@@ -27,7 +27,7 @@ echo "================================================================="
 if [ -n "$AMC" ]; then
   node scrapers/node/fetch-period.js --type="$TYPE" --period="$PERIOD" --amc="$AMC"
 else
-  node scrapers/node/fetch-period.js --type="$TYPE" --period="$PERIOD"
+  node scrapers/node/fetch-period.js --type="$TYPE" --period="$PERIOD" --concurrency="${CONCURRENCY:-5}"
 fi
 
 # 2. Parse
