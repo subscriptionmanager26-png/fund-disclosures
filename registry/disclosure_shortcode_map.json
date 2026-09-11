@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Durable disclosure key \u2192 AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
+  "note": "Durable disclosure key → AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
   "entries": [
     {
       "amc_id": "360-one-mutual-fund",
@@ -1757,7 +1757,7 @@
       "aliases": [],
       "canonical_amfi_code": "135764",
       "amfi_base_name": "Axis Children's Fund - No Lock in",
-      "disclosure_label": "Axis Children\u2019s Fund",
+      "disclosure_label": "Axis Children’s Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -6361,7 +6361,7 @@
       "aliases": [],
       "canonical_amfi_code": "153115",
       "amfi_base_name": "Edelweiss CRISIL IBX AAA Financial Services - Jan 2028 Index Fund",
-      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond \u2013 Jan 2028 Index Fund",
+      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond – Jan 2028 Index Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -11373,11 +11373,11 @@
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
-      "shortcode": "ICICI Prudential Children\u2019s Fund",
+      "shortcode": "ICICI Prudential Children’s Fund",
       "aliases": [],
       "canonical_amfi_code": "120579",
       "amfi_base_name": "ICICI Prudential Children's Fund",
-      "disclosure_label": "ICICI Prudential Children\u2019s Fund",
+      "disclosure_label": "ICICI Prudential Children’s Fund",
       "confidence": "seeded",
       "source": "name_match",
       "first_seen_period": "latest",
@@ -13983,6 +13983,18 @@
     },
     {
       "amc_id": "kotak-mahindra-mutual-fund",
+      "shortcode": "DOO",
+      "aliases": [],
+      "canonical_amfi_code": "154574",
+      "amfi_base_name": "Kotak Diversified Equity All Cap Omni FOF",
+      "disclosure_label": "Kotak Diversified Equity All Cap Omni FOF",
+      "confidence": "manual",
+      "source": "manual",
+      "first_seen_period": "2026-08",
+      "last_verified_period": "2026-08"
+    },
+    {
+      "amc_id": "kotak-mahindra-mutual-fund",
       "shortcode": "DYF",
       "aliases": [],
       "canonical_amfi_code": "154097",
@@ -14679,6 +14691,18 @@
     },
     {
       "amc_id": "kotak-mahindra-mutual-fund",
+      "shortcode": "NBI",
+      "aliases": [],
+      "canonical_amfi_code": "154571",
+      "amfi_base_name": "Kotak Nifty Bank Index Fund",
+      "disclosure_label": "Kotak Nifty Bank Index Fund",
+      "confidence": "manual",
+      "source": "manual",
+      "first_seen_period": "2026-08",
+      "last_verified_period": "2026-08"
+    },
+    {
+      "amc_id": "kotak-mahindra-mutual-fund",
       "shortcode": "NCI",
       "aliases": [],
       "canonical_amfi_code": "153353",
@@ -15211,7 +15235,7 @@
       "aliases": [],
       "canonical_amfi_code": "120285",
       "amfi_base_name": "LIC MF Children's Fund",
-      "disclosure_label": "LIC MF CHILDREN\u2019S FUND",
+      "disclosure_label": "LIC MF CHILDREN’S FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",

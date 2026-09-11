@@ -67,6 +67,18 @@
       "shortcode": "UTI Nifty 1D Rate Liquid ETF - Growth",
       "canonical_amfi_code": "154466",
       "label": "UTI Nifty 1D Rate Liquid ETF - Growth"
+    },
+    {
+      "amc_id": "kotak-mahindra-mutual-fund",
+      "shortcode": "DOO",
+      "canonical_amfi_code": "154574",
+      "label": "Kotak Diversified Equity All Cap Omni FOF"
+    },
+    {
+      "amc_id": "kotak-mahindra-mutual-fund",
+      "shortcode": "NBI",
+      "canonical_amfi_code": "154571",
+      "label": "Kotak Nifty Bank Index Fund"
     }
   ],
   "aliases": {
@@ -84,6 +96,12 @@
     "120784": "100646",
     "103131": "103130",
     "119130": "103130",
-    "119131": "103130"
+    "119131": "103130",
+    "154575": "154574",
+    "154576": "154574",
+    "154573": "154574",
+    "154569": "154571",
+    "154572": "154571",
+    "154570": "154571"
   }
 }
