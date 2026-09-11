@@ -3,13 +3,19 @@
 The live API at `openfin.pocketedge.in/api/v1/catalog` is implemented in
 [`subscriptionmanager26-png/pocketedge`](https://github.com/subscriptionmanager26-png/pocketedge).
 
-## Deploy
+## Deploy (required for `/api/v1/catalog` to slim down)
 
-1. Copy `api/_lib/fundHoldingsCdn.ts` and `api/v1/catalog.ts` into the pocketedge repo.
-2. Deploy pocketedge to Vercel (production).
+The slim file is already on CDN (`catalog/amfi-public.json`). The live API still
+serves the old shape until pocketedge is updated:
 
-The catalog endpoint serves `catalog/amfi-public.json` from fund-holdings-data
-(four fields per scheme). Holdings resolution still uses full `amfi-lookup.json`.
+1. Copy `vendor/openfin-api/api/_lib/fundHoldingsCdn.ts` → `pocketedge/api/_lib/fundHoldingsCdn.ts`
+2. Copy `vendor/openfin-api/api/v1/catalog.ts` → `pocketedge/api/v1/catalog.ts`
+3. Commit and deploy pocketedge to Vercel (production).
+
+After deploy, `GET /api/v1/catalog` proxies `catalog/amfi-public.json` (four fields).
+Holdings resolution still uses full `catalog/amfi-lookup.json`.
+
+**Interim:** clients may fetch the slim CDN file directly (same four fields).
 
 ## Fields
 
