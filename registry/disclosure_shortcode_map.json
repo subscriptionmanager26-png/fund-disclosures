@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Durable disclosure key \u2192 AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
+  "note": "Durable disclosure key → AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
   "entries": [
     {
       "amc_id": "360-one-mutual-fund",
@@ -1757,7 +1757,7 @@
       "aliases": [],
       "canonical_amfi_code": "135764",
       "amfi_base_name": "Axis Children's Fund - No Lock in",
-      "disclosure_label": "Axis Children\u2019s Fund",
+      "disclosure_label": "Axis Children’s Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -6361,7 +6361,7 @@
       "aliases": [],
       "canonical_amfi_code": "153115",
       "amfi_base_name": "Edelweiss CRISIL IBX AAA Financial Services - Jan 2028 Index Fund",
-      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond \u2013 Jan 2028 Index Fund",
+      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond – Jan 2028 Index Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -7265,15 +7265,20 @@
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
-      "shortcode": "FICDF",
-      "aliases": [],
+      "shortcode": "FICBF",
+      "aliases": [
+        "FICDF",
+        "Franklin India Corporate Debt Fund",
+        "Franklin India Corporate Bond Fund (Formerly known as Franklin India Corporate Debt Fund)"
+      ],
       "canonical_amfi_code": "118569",
       "amfi_base_name": "Franklin India Corporate Debt Fund",
-      "disclosure_label": "Franklin India Corporate Debt Fund",
+      "disclosure_label": "Franklin India Corporate Bond Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→new labels."
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
@@ -7361,27 +7366,37 @@
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
-      "shortcode": "FIFRF",
-      "aliases": [],
+      "shortcode": "FIFIRF",
+      "aliases": [
+        "FIFRF",
+        "Franklin India Floating Rate Fund",
+        "Franklin India Floating Interest Rates Fund (Formerly known as Franklin India Floating Rate Fund)"
+      ],
       "canonical_amfi_code": "118508",
       "amfi_base_name": "Franklin India Floating Rate Fund",
-      "disclosure_label": "Franklin India Floating Rate Fund",
+      "disclosure_label": "Franklin India Floating Interest Rates Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→new labels."
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
-      "shortcode": "FIGSF",
-      "aliases": [],
+      "shortcode": "FIGF",
+      "aliases": [
+        "FIGSF",
+        "Franklin India Government Securities Fund",
+        "Franklin India Gilt Fund (Formerly known as Franklin India Government Securities Fund)"
+      ],
       "canonical_amfi_code": "118498",
       "amfi_base_name": "Franklin India Government Securities Fund",
-      "disclosure_label": "Franklin India Government Securities Fund",
+      "disclosure_label": "Franklin India Gilt Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→new labels."
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
@@ -7433,27 +7448,37 @@
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
-      "shortcode": "FILNGDF",
-      "aliases": [],
+      "shortcode": "FILTF",
+      "aliases": [
+        "FILNGDF",
+        "Franklin India Long Duration Fund",
+        "Franklin India Long Term Fund (Formerly known as Franklin India Long Duration Fund)"
+      ],
       "canonical_amfi_code": "153102",
       "amfi_base_name": "Franklin India Long Duration Fund",
-      "disclosure_label": "Franklin India Long Duration Fund",
+      "disclosure_label": "Franklin India Long Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→new labels."
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
-      "shortcode": "FILWD",
-      "aliases": [],
+      "shortcode": "FIUSST",
+      "aliases": [
+        "FILWD",
+        "Franklin India Low Duration Fund",
+        "Franklin India Ultra Short to Short Term Fund (Formerly known as Franklin India Low Duration Fund)"
+      ],
       "canonical_amfi_code": "153368",
       "amfi_base_name": "Franklin India Low Duration Fund",
-      "disclosure_label": "Franklin India Low Duration Fund",
+      "disclosure_label": "Franklin India Ultra Short to Short Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→new labels."
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
@@ -7505,15 +7530,20 @@
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
-      "shortcode": "FIMLDF",
-      "aliases": [],
+      "shortcode": "FIMLTF",
+      "aliases": [
+        "FIMLDF",
+        "Franklin India Medium to Long Duration Fund",
+        "Franklin India Medium to Long Term Fund (Formerly known as Franklin India Medium to Long Duration Fund)"
+      ],
       "canonical_amfi_code": "152851",
       "amfi_base_name": "Franklin India Medium to Long Duration Fund",
-      "disclosure_label": "Franklin India Medium to Long Duration Fund",
+      "disclosure_label": "Franklin India Medium to Long Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→new labels."
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
@@ -7637,15 +7667,20 @@
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
-      "shortcode": "FIUSDF",
-      "aliases": [],
+      "shortcode": "FIUSTF",
+      "aliases": [
+        "FIUSDF",
+        "Franklin India Ultra Short Duration Fund",
+        "Franklin India Ultra Short Term Fund (Formerly known as Franklin India Ultra Short Duration Fund)"
+      ],
       "canonical_amfi_code": "152825",
       "amfi_base_name": "Franklin India Ultra Short Duration Fund",
-      "disclosure_label": "Franklin India Ultra Short Duration Fund",
+      "disclosure_label": "Franklin India Ultra Short Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→new labels."
     },
     {
       "amc_id": "franklin-templeton-mutual-fund",
@@ -11373,11 +11408,11 @@
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
-      "shortcode": "ICICI Prudential Children\u2019s Fund",
+      "shortcode": "ICICI Prudential Children’s Fund",
       "aliases": [],
       "canonical_amfi_code": "120579",
       "amfi_base_name": "ICICI Prudential Children's Fund",
-      "disclosure_label": "ICICI Prudential Children\u2019s Fund",
+      "disclosure_label": "ICICI Prudential Children’s Fund",
       "confidence": "seeded",
       "source": "name_match",
       "first_seen_period": "latest",
@@ -13443,15 +13478,21 @@
     },
     {
       "amc_id": "jm-financial-mutual-fund",
-      "shortcode": "JM Dynamic Bond Fund",
-      "aliases": [],
+      "shortcode": "JM Dynamic Term Fund",
+      "aliases": [
+        "JM Dynamic Bond Fund",
+        "Dynamic Bond Fund",
+        "Dynamic Term Fund",
+        "Portfolio- JM Dynamic Term Fund"
+      ],
       "canonical_amfi_code": "120435",
       "amfi_base_name": "JM Dynamic Bond Fund",
-      "disclosure_label": "JM Dynamic Bond Fund",
+      "disclosure_label": "JM Dynamic Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→Term."
     },
     {
       "amc_id": "jm-financial-mutual-fund",
@@ -13527,27 +13568,39 @@
     },
     {
       "amc_id": "jm-financial-mutual-fund",
-      "shortcode": "JM Low Duration Fund",
-      "aliases": [],
+      "shortcode": "JM Ultra Short to Short Term",
+      "aliases": [
+        "JM Low Duration Fund",
+        "JM Ultra Short to Short Term Fund",
+        "Ultra Short to Short Term Fund",
+        "Portfolio- JM Ultra Short to Short Term Fund"
+      ],
       "canonical_amfi_code": "143612",
       "amfi_base_name": "JM Low Duration Fund",
-      "disclosure_label": "JM Low Duration Fund",
+      "disclosure_label": "JM Ultra Short to Short Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→Term."
     },
     {
       "amc_id": "jm-financial-mutual-fund",
-      "shortcode": "JM Medium to Long Duration Fund",
-      "aliases": [],
+      "shortcode": "JM Medium to Long Term Fund",
+      "aliases": [
+        "JM Medium to Long Duration Fund",
+        "Medium to Long Duration Fund",
+        "Medium to Long Term Fund",
+        "Portfolio- JM Medium to Long Term Fund"
+      ],
       "canonical_amfi_code": "120430",
       "amfi_base_name": "JM Medium to Long Duration Fund",
-      "disclosure_label": "JM Medium to Long Duration Fund",
+      "disclosure_label": "JM Medium to Long Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→Term."
     },
     {
       "amc_id": "jm-financial-mutual-fund",
@@ -13587,15 +13640,21 @@
     },
     {
       "amc_id": "jm-financial-mutual-fund",
-      "shortcode": "JM Short Duration Fund",
-      "aliases": [],
+      "shortcode": "JM Short Term Fund",
+      "aliases": [
+        "JM Short Duration Fund",
+        "Short Duration Fund",
+        "Short Term Fund",
+        "Portfolio- JM Short Term Fund"
+      ],
       "canonical_amfi_code": "150545",
       "amfi_base_name": "JM Short Duration Fund",
-      "disclosure_label": "JM Short Duration Fund",
+      "disclosure_label": "JM Short Term Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 SEBI pack renamed Duration→Term / Bond→Term."
     },
     {
       "amc_id": "jm-financial-mutual-fund",
@@ -15211,7 +15270,7 @@
       "aliases": [],
       "canonical_amfi_code": "120285",
       "amfi_base_name": "LIC MF Children's Fund",
-      "disclosure_label": "LIC MF CHILDREN\u2019S FUND",
+      "disclosure_label": "LIC MF CHILDREN’S FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
