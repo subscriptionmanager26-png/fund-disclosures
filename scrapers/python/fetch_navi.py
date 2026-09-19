@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
-Navi Mutual Fund - download monthly portfolio files for YYYY-MM.
+Navi Mutual Fund — download monthly portfolio files for YYYY-MM.
 
 Source page:
   https://navi.com/mutual-fund/downloads/portfolio
 
-Data source:
+Browser XHR (captured):
   POST https://navi.com/wp-json/nv/v1/documents
-  with category=884, type=Monthly, order=DESC, financial year + month value.
+  content-type: application/x-www-form-urlencoded
+  headers: wp-nonce, x-requested-with: XMLHttpRequest
+  body: financial_year=YYYY-YYYY&value=MonthName&category=884&type=Monthly&order=DESC
+
+Residential egress is required — Cloudflare blocks datacenter IPs.
+Optional overrides: NAVI_WP_NONCE, NAVI_COOKIE.
 """
 from __future__ import annotations
 
@@ -15,6 +20,7 @@ import argparse
 import hashlib
 import html
 import json
+import os
 import re
 import ssl
 import urllib.error
@@ -28,13 +34,16 @@ PAGE_URL = f"{BASE}/mutual-fund/downloads/portfolio"
 API_URL = f"{BASE}/wp-json/nv/v1/documents"
 MONTHLY_CATEGORY = "884"
 FORTNIGHTLY_CATEGORY = "885"
+
 HEADERS = {
     "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
     ),
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9,hi;q=0.8",
 }
+
 MONTH_NUM_TO_NAME = {
     1: "January",
     2: "February",
@@ -49,7 +58,7 @@ MONTH_NUM_TO_NAME = {
     11: "November",
     12: "December",
 }
-# Last day of month used in Navi fortnight dropdown values (non-leap Feb = 28).
+
 FORTNIGHT_MONTH_END = {
     1: 31,
     2: 28,
@@ -64,6 +73,7 @@ FORTNIGHT_MONTH_END = {
     11: 30,
     12: 31,
 }
+
 TITLE_YM_RE = re.compile(
     r"\b\d{1,2}(?:st|nd|rd|th)\s*[–-]\s*"
     r"\d{1,2}(?:st|nd|rd|th)\s+"
@@ -72,6 +82,7 @@ TITLE_YM_RE = re.compile(
     r"\s+(\d{4})\b",
     re.I,
 )
+
 MONTHS = {
     "jan": 1,
     "january": 1,
@@ -139,45 +150,82 @@ def _curl_session():
 
 
 def fetch_text(url: str, *, ctx: ssl.SSLContext) -> str:
+    headers = dict(HEADERS)
+    cookie = (os.environ.get("NAVI_COOKIE") or "").strip()
+    if cookie:
+        headers["Cookie"] = cookie
     try:
         creq = _curl_session()
         r = creq.get(
             url,
-            headers=HEADERS,
+            headers=headers,
             impersonate="chrome131",
             timeout=180,
-            verify=not ctx.check_hostname is False,
+            verify=ctx.verify_mode != ssl.CERT_NONE,
         )
         r.raise_for_status()
         return r.text
     except Exception:
-        req = urllib.request.Request(url, headers=HEADERS, method="GET")
+        req = urllib.request.Request(url, headers=headers, method="GET")
         with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
             return resp.read().decode("utf-8", errors="ignore")
 
 
 def fetch_nonce(*, ctx: ssl.SSLContext) -> str:
+    env_nonce = (os.environ.get("NAVI_WP_NONCE") or "").strip()
+    if env_nonce:
+        return env_nonce
     html_text = fetch_text(PAGE_URL, ctx=ctx)
-    m = re.search(r'"nonce":"([a-f0-9]+)"', html_text)
-    if not m:
-        raise RuntimeError("Could not locate nonce on source page")
-    return m.group(1)
+    for pat in (
+        r'"nonce"\s*:\s*"([a-f0-9]+)"',
+        r'wpApiSettings\s*=\s*\{[^}]*?"nonce"\s*:\s*"([a-f0-9]+)"',
+        r'wp-nonce["\']?\s*[:=]\s*["\']([a-f0-9]+)',
+        r'name="wp-nonce"\s+value="([a-f0-9]+)"',
+    ):
+        m = re.search(pat, html_text, re.I | re.S)
+        if m:
+            return m.group(1)
+    raise RuntimeError(
+        "Could not locate wp-nonce on portfolio page. "
+        "Pass NAVI_WP_NONCE (and optionally NAVI_COOKIE) from a browser session."
+    )
 
 
 def fiscal_year_for_month(year: int, month: int) -> str:
-    # Indian financial year runs Apr-Mar.
+    # Indian financial year runs Apr–Mar.
     if month >= 4:
         return f"{year}-{year + 1}"
     return f"{year - 1}-{year}"
 
 
 def fortnight_values_for_month(year: int, month: int) -> list[str]:
-    """Dropdown values like 'July 1-15' / 'July 16-31' (Feb end 28/29)."""
     name = MONTH_NUM_TO_NAME[month]
     end = FORTNIGHT_MONTH_END[month]
     if month == 2 and year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
         end = 29
     return [f"{name} 1-15", f"{name} 16-{end}"]
+
+
+def _api_headers(nonce: str) -> dict[str, str]:
+    headers = {
+        **HEADERS,
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "Origin": BASE,
+        "Referer": PAGE_URL,
+        "wp-nonce": nonce,
+        "X-Requested-With": "XMLHttpRequest",
+        "sec-ch-ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+    }
+    cookie = (os.environ.get("NAVI_COOKIE") or "").strip()
+    if cookie:
+        headers["Cookie"] = cookie
+    return headers
 
 
 def fetch_rows_for_month(
@@ -198,6 +246,7 @@ def fetch_rows_for_month(
         doc_type = "Monthly"
 
     rows: list[dict] = []
+    api_headers = _api_headers(nonce)
     for value in values:
         payload = {
             "financial_year": fiscal_year_for_month(year, month),
@@ -211,31 +260,17 @@ def fetch_rows_for_month(
             API_URL,
             data=data,
             method="POST",
-            headers={
-                **HEADERS,
-                "Accept": "application/json, text/plain, */*",
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Origin": BASE,
-                "Referer": PAGE_URL,
-                "WP-NONCE": nonce,
-            },
+            headers=api_headers,
         )
         try:
             creq = _curl_session()
             r = creq.post(
                 API_URL,
                 data=payload,
-                headers={
-                    **HEADERS,
-                    "Accept": "application/json, text/plain, */*",
-                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                    "Origin": BASE,
-                    "Referer": PAGE_URL,
-                    "WP-NONCE": nonce,
-                },
+                headers=api_headers,
                 impersonate="chrome131",
                 timeout=180,
-                verify=not ctx.check_hostname is False,
+                verify=ctx.verify_mode != ssl.CERT_NONE,
             )
             r.raise_for_status()
             raw = r.text
@@ -258,7 +293,6 @@ def parse_month_from_title(title: str) -> tuple[int, int] | None:
         month = MONTHS.get(m.group(1).lower())
         if month:
             return int(m.group(2)), month
-    # Fortnightly titles: "Navi Liquid Fund 1st – 15th July 2026"
     m2 = re.search(
         r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
         r"jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
@@ -274,7 +308,7 @@ def parse_month_from_title(title: str) -> tuple[int, int] | None:
     return int(m2.group(2)), month
 
 
-def row_url(row: dict) -> list[str]:
+def row_urls(row: dict) -> list[str]:
     raw = row.get("url")
     if isinstance(raw, str):
         return [raw]
@@ -284,45 +318,42 @@ def row_url(row: dict) -> list[str]:
 
 
 def download(url: str, *, ctx: ssl.SSLContext) -> bytes:
+    headers = {**HEADERS, "Accept": "*/*", "Referer": PAGE_URL}
+    cookie = (os.environ.get("NAVI_COOKIE") or "").strip()
+    if cookie:
+        headers["Cookie"] = cookie
     try:
         creq = _curl_session()
         r = creq.get(
             url,
-            headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
+            headers=headers,
             impersonate="chrome131",
             timeout=180,
-            verify=not ctx.check_hostname is False,
+            verify=ctx.verify_mode != ssl.CERT_NONE,
         )
         r.raise_for_status()
         return r.content
     except Exception:
-        req = urllib.request.Request(
-            url,
-            headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
-            method="GET",
-        )
+        req = urllib.request.Request(url, headers=headers, method="GET")
         with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
             return resp.read()
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch Navi monthly portfolio files")
-    parser.add_argument("--months", nargs="+", default=["2026-01", "2026-02"], help="YYYY-MM")
+    parser.add_argument("--months", nargs="+", default=["2026-08"], help="YYYY-MM")
     parser.add_argument(
         "--root",
         type=Path,
-        default=Path(__file__).resolve().parent.parent,
+        default=Path(__file__).resolve().parents[2] / "data" / "staging" / "python",
+        help="Staging root (amcs/<amc>/<YYYY-MM>/ written underneath)",
     )
-    parser.add_argument(
-        "--insecure-ssl",
-        action="store_true",
-        help="Disable TLS verification if your Python lacks CA certs",
-    )
-    parser.add_argument("--fortnightly", action="store_true", help="Fetch fortnightly debt portfolios when supported")
+    parser.add_argument("--insecure-ssl", action="store_true")
+    parser.add_argument("--fortnightly", action="store_true")
     args = parser.parse_args()
 
     ctx = _ssl_context(args.insecure_ssl)
-    amc_dir = args.root / "amcs" / "navi-mutual-fund"
+    amc_dir = Path(args.root) / "amcs" / "navi-mutual-fund"
     targets = {month_key_to_ym(mk): mk for mk in args.months}
 
     print(f"GET {PAGE_URL} (nonce bootstrap)", flush=True)
@@ -331,7 +362,7 @@ def main() -> None:
     except urllib.error.URLError as e:
         if not args.insecure_ssl and "CERTIFICATE_VERIFY_FAILED" in str(e).upper():
             raise SystemExit(
-                f"{e}\n\nRetry with:  python3 scripts/fetch_navi.py ... --insecure-ssl"
+                f"{e}\n\nRetry with:  python3 scrapers/python/fetch_navi.py ... --insecure-ssl"
             ) from e
         raise
     print(f"  nonce={nonce}", flush=True)
@@ -343,7 +374,7 @@ def main() -> None:
             if p.is_file():
                 p.unlink()
 
-        print(f"\n{mk}: querying {API_URL}", flush=True)
+        print(f"\n{mk}: POST {API_URL}", flush=True)
         rows = fetch_rows_for_month(
             ctx=ctx,
             nonce=nonce,
@@ -355,23 +386,20 @@ def main() -> None:
         for row in rows:
             title = str(row.get("title") or "")
             parsed = parse_month_from_title(title)
-            if parsed == ym or args.fortnightly:
-                # Fortnightly API already scoped by month value; keep all rows.
-                if args.fortnightly or parsed == ym:
-                    selected.append(row)
+            if args.fortnightly or parsed == ym:
+                selected.append(row)
         if args.fortnightly:
-            # de-dupe by url
-            seen = set()
-            uniq = []
+            seen: set[tuple[str, ...]] = set()
+            uniq: list[dict] = []
             for row in selected:
-                urls = tuple(row_url(row))
+                urls = tuple(row_urls(row))
                 if urls in seen:
                     continue
                 seen.add(urls)
                 uniq.append(row)
             selected = uniq
 
-        print(f"  {len(selected)} row(s) matched title month filter", flush=True)
+        print(f"  {len(selected)} row(s) matched", flush=True)
         manifest: list[dict] = []
         if not selected:
             (out_dir / "manifest.json").write_text("[]\n", encoding="utf-8")
@@ -382,7 +410,7 @@ def main() -> None:
         seen_urls: set[str] = set()
         for row in selected:
             title = html.unescape(str(row.get("title") or "")).strip()
-            for url in row_url(row):
+            for url in row_urls(row):
                 url = url.replace("\\/", "/").strip()
                 if not url or url in seen_urls:
                     continue
@@ -412,7 +440,9 @@ def main() -> None:
                     manifest.append({**rec, "sha256": "", "error": str(e)})
                     print(f"  ERR {fn}: {e}", flush=True)
 
-        (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        (out_dir / "manifest.json").write_text(
+            json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+        )
         print(f"  Wrote {out_dir / 'manifest.json'}", flush=True)
 
 

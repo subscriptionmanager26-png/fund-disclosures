@@ -5148,9 +5148,9 @@
       "shortcode": "CMLIQ",
       "aliases": [
         "CMLF",
+        "CMLF_August 15, 2026",
         "CMLF_July 15, 2026",
         "CMLF_July 31, 2026",
-        "CMLF_August 15, 2026",
         "CMLF_June 15, 2026",
         "CMLF_June 15_ 2026",
         "CMLF_June 30, 2026",
@@ -5230,7 +5230,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "10YGF",
-      "aliases": [],
+      "aliases": [
+        "10 year Constant Maturity Gilt Fund",
+        "DSP 10 year Constant Maturity Gilt Fund",
+        "DSP 10 year Constant Maturity Gilt Fund (Ex: DSP 10Y G-Sec Fund )",
+        "DSP 10Y G-Sec Fund"
+      ],
       "canonical_amfi_code": "131301",
       "amfi_base_name": "DSP 10Y G - Sec Fund",
       "disclosure_label": "DSP 10Y G-Sec Fund",
@@ -5278,7 +5283,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "BOND",
-      "aliases": [],
+      "aliases": [
+        "DSP Bond Fund",
+        "DSP Medium Term Fund",
+        "DSP Medium Term Fund (Ex:DSP Bond Fund)",
+        "Medium Term Fund"
+      ],
       "canonical_amfi_code": "118924",
       "amfi_base_name": "DSP Bond Fund",
       "disclosure_label": "DSP Bond Fund",
@@ -5458,7 +5468,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "FLOATER",
-      "aliases": [],
+      "aliases": [
+        "DSP Floater Fund",
+        "DSP Floating Interest Rates Fund",
+        "DSP Floating Interest Rates Fund(Ex: DSP Floater Fund)",
+        "Floating Interest Rates Fund"
+      ],
       "canonical_amfi_code": "148771",
       "amfi_base_name": "DSP Floater Fund",
       "disclosure_label": "DSP Floater Fund",
@@ -5614,7 +5629,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "LDF",
-      "aliases": [],
+      "aliases": [
+        "DSP Low Duration Fund",
+        "DSP Ultra Short to Short Term Fund",
+        "DSP Ultra Short to Short Term Fund(Ex:DSP Low Duration Fund )",
+        "Ultra Short to Short Term Fund"
+      ],
       "canonical_amfi_code": "133925",
       "amfi_base_name": "DSP Low Duration Fund",
       "disclosure_label": "DSP Low Duration Fund",
@@ -5626,7 +5646,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "LIQUID",
-      "aliases": [],
+      "aliases": [
+        "DSP Liquid Fund",
+        "DSP Liquid Fund (Ex: DSP Liquidity Fund)",
+        "DSP Liquidity Fund",
+        "Liquid Fund"
+      ],
       "canonical_amfi_code": "119125",
       "amfi_base_name": "DSP Liquidity Fund",
       "disclosure_label": "DSP Liquidity Fund",
@@ -6094,6 +6119,23 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "REGULARSAVINGS",
+      "aliases": [
+        "DSP Conservative Hybrid Fund",
+        "Conservative Hybrid Fund",
+        "DSP Conservative Hybrid Fund(Ex:DSP Regular Savings Fund )",
+        "DSP Regular Savings Fund"
+      ],
+      "canonical_amfi_code": "102448",
+      "amfi_base_name": "DSP Conservative Hybrid Fund",
+      "disclosure_label": "DSP Conservative Hybrid Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "2026-06",
+      "last_verified_period": "2026-08"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "REGULARSAVINGS",
       "aliases": [],
       "canonical_amfi_code": "118994",
       "amfi_base_name": "DSP Regular Savings Fund",
@@ -6106,7 +6148,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "SAVINGS",
-      "aliases": [],
+      "aliases": [
+        "DSP Money Market Fund",
+        "DSP Money Market Fund(Ex:DSP Savings Fund )",
+        "DSP Savings Fund",
+        "Money Market Fund"
+      ],
       "canonical_amfi_code": "100087",
       "amfi_base_name": "DSP Savings Fund",
       "disclosure_label": "DSP Savings Fund",
@@ -6154,7 +6201,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "STR",
-      "aliases": [],
+      "aliases": [
+        "DSP Dynamic Term Fund",
+        "DSP Dynamic Term Fund(Ex:DSP Strategic Bond Fund )",
+        "DSP Strategic Bond Fund",
+        "Dynamic Term Fund"
+      ],
       "canonical_amfi_code": "119239",
       "amfi_base_name": "DSP Strategic Bond Fund",
       "disclosure_label": "DSP Strategic Bond Fund",
@@ -6226,7 +6278,12 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "ULTRA",
-      "aliases": [],
+      "aliases": [
+        "DSP Ultra Short Fund",
+        "DSP Ultra Short Term Fund",
+        "DSP Ultra Short Term Fund(Ex: DSP Ultra Short Fund)",
+        "Ultra Short Term Fund"
+      ],
       "canonical_amfi_code": "119205",
       "amfi_base_name": "DSP Ultra Short Fund",
       "disclosure_label": "DSP Ultra Short Fund",
@@ -6491,8 +6548,8 @@
       "amc_id": "edelweiss-mutual-fund",
       "shortcode": "EDLDUF",
       "aliases": [
-        "Edelweiss Ultra Short to Short Term Fund",
-        "EDELWEISS ULTRA SHORT TO SHORT TERM FUND"
+        "EDELWEISS ULTRA SHORT TO SHORT TERM FUND",
+        "Edelweiss Ultra Short to Short Term Fund"
       ],
       "canonical_amfi_code": "153416",
       "amfi_base_name": "Edelweiss Ultra Short to Short Term Fund",
@@ -10091,8 +10148,8 @@
       "amc_id": "hdfc-mutual-fund",
       "shortcode": "MY2005",
       "aliases": [
-        "HDFC Multi-Asset Allocation Fund",
         "HDFC Multi Asset Allocation Fund",
+        "HDFC Multi-Asset Allocation Fund",
         "HDFC Multi-Asset Fund",
         "Monthly HDFC Multi-Asset Allocation Fund"
       ],
@@ -11800,8 +11857,8 @@
       "amc_id": "icici-prudential-mutual-fund",
       "shortcode": "MONEY MARKET",
       "aliases": [
-        "MONEYMARKET",
-        "MMF"
+        "MMF",
+        "MONEYMARKET"
       ],
       "canonical_amfi_code": "120209",
       "amfi_base_name": "ICICI Prudential Money Market Fund",
@@ -12571,9 +12628,9 @@
       "amc_id": "invesco-mutual-fund",
       "shortcode": "IENEFOF",
       "aliases": [
-        "NASDAQ",
         "EQQQ",
-        "Invesco EQQQ NASDAQ-100 UCITS ETF"
+        "Invesco EQQQ NASDAQ-100 UCITS ETF",
+        "NASDAQ"
       ],
       "canonical_amfi_code": "149961",
       "amfi_base_name": "Invesco India - Invesco EQQQ Nasdaq - 100 ETF Fund of Fund",
@@ -24347,8 +24404,8 @@
       "amc_id": "union-mutual-fund",
       "shortcode": "LARGECAP",
       "aliases": [
-        "Largecap",
-        "Large Cap"
+        "Large Cap",
+        "Largecap"
       ],
       "canonical_amfi_code": "141248",
       "amfi_base_name": "Union Largecap Fund",
@@ -24402,8 +24459,8 @@
       "amc_id": "union-mutual-fund",
       "shortcode": "MIDCAP",
       "aliases": [
-        "Midcap",
-        "Mid Cap"
+        "Mid Cap",
+        "Midcap"
       ],
       "canonical_amfi_code": "148073",
       "amfi_base_name": "Union Midcap Fund",
@@ -24641,7 +24698,11 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "103",
-      "aliases": [],
+      "aliases": [
+        "Medium to Long Term Fund",
+        "UTI - Medium to Long Term Fund",
+        "UTI Medium to Long Term Fund"
+      ],
       "canonical_amfi_code": "120689",
       "amfi_base_name": "UTI Medium to Long Duration Fund",
       "disclosure_label": "UTI Medium to Long Duration Fund",
@@ -24718,7 +24779,11 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "154",
-      "aliases": [],
+      "aliases": [
+        "Short Term Fund",
+        "UTI - Short Term Fund",
+        "UTI Short Term Fund"
+      ],
       "canonical_amfi_code": "120718",
       "amfi_base_name": "UTI Short Duration Fund",
       "disclosure_label": "UTI Short Duration Fund",
@@ -24802,7 +24867,12 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "165",
-      "aliases": [],
+      "aliases": [
+        "UTI - Ultra Short to Short Term Fund",
+        "UTI Low Term Fund",
+        "UTI Ultra Short to Short Term Fund",
+        "Ultra Short to Short Term Fund"
+      ],
       "canonical_amfi_code": "120735",
       "amfi_base_name": "UTI Low Duration Fund",
       "disclosure_label": "UTI Low Duration Fund",
@@ -24826,7 +24896,11 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "176",
-      "aliases": [],
+      "aliases": [
+        "UTI - Ultra Short Term Fund",
+        "UTI Ultra Short Term Fund",
+        "Ultra Short Term Fund"
+      ],
       "canonical_amfi_code": "120746",
       "amfi_base_name": "UTI Ultra Short Duration Fund",
       "disclosure_label": "UTI Ultra Short Duration Fund",
@@ -24970,7 +25044,11 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "340",
-      "aliases": [],
+      "aliases": [
+        "Dynamic Term Fund",
+        "UTI - Dynamic Term Fund",
+        "UTI Dynamic Term Fund"
+      ],
       "canonical_amfi_code": "120762",
       "amfi_base_name": "UTI Dynamic Bond Fund",
       "disclosure_label": "Dynamic Bond Fund.",
@@ -24994,7 +25072,12 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "446",
-      "aliases": [],
+      "aliases": [
+        "Banking & PSU Debt Fund",
+        "UTI - Banking & PSU Debt Fund",
+        "UTI Banking & PSU Debt Fund",
+        "UTI Banking and PSU Debt Fund"
+      ],
       "canonical_amfi_code": "126940",
       "amfi_base_name": "UTI Banking & PSU Fund",
       "disclosure_label": "UTI Banking & PSU Fund",
@@ -25006,7 +25089,11 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "540",
-      "aliases": [],
+      "aliases": [
+        "Medium Term Fund",
+        "UTI - Medium Term Fund",
+        "UTI Medium Term Fund"
+      ],
       "canonical_amfi_code": "134503",
       "amfi_base_name": "UTI Medium Duration Fund",
       "disclosure_label": "UTI Medium Duration Fund",
@@ -25090,7 +25177,12 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "713",
-      "aliases": [],
+      "aliases": [
+        "Floating Interest Rates Fund",
+        "UTI - Floating Interest Rates Fund",
+        "UTI Floater Fund",
+        "UTI Floating Interest Rates Fund"
+      ],
       "canonical_amfi_code": "145295",
       "amfi_base_name": "UTI - Floater Fund",
       "disclosure_label": "Floater Fund",
@@ -25198,7 +25290,11 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "757",
-      "aliases": [],
+      "aliases": [
+        "10 year Constant Maturity Gilt Fund",
+        "UTI - 10 year Constant Maturity Gilt Fund",
+        "UTI 10 year Constant Maturity Gilt Fund"
+      ],
       "canonical_amfi_code": "150410",
       "amfi_base_name": "UTI Gilt Fund with 10 year Constant Duration",
       "disclosure_label": "UTI Gilt Fund with 10 year Constant Duration",
@@ -25306,7 +25402,11 @@
     {
       "amc_id": "uti-mutual-fund",
       "shortcode": "767",
-      "aliases": [],
+      "aliases": [
+        "Long Term Fund",
+        "UTI - Long Term Fund",
+        "UTI Long Term Fund"
+      ],
       "canonical_amfi_code": "151523",
       "amfi_base_name": "UTI Long Duration Fund",
       "disclosure_label": "UTI Long Duration Fund",
@@ -25633,9 +25733,9 @@
       "amc_id": "uti-mutual-fund",
       "shortcode": "UTI Nifty 1D Rate Liquid ETF - Growth",
       "aliases": [
-        "UTI Nifty 1D Rate Liquid ETF - Growth",
+        "Nifty 1D Rate Liquid ETF - Growth",
         "UTI Nifty 1D Rate Liquid ETF",
-        "Nifty 1D Rate Liquid ETF - Growth"
+        "UTI Nifty 1D Rate Liquid ETF - Growth"
       ],
       "canonical_amfi_code": "154466",
       "amfi_base_name": "UTI Nifty 1D Rate Liquid ETF - Growth",
