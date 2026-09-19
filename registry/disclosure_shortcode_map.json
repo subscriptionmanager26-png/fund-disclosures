@@ -7325,8 +7325,8 @@
       "shortcode": "FICBF",
       "aliases": [
         "FICDF",
-        "Franklin India Corporate Debt Fund",
-        "Franklin India Corporate Bond Fund (Formerly known as Franklin India Corporate Debt Fund)"
+        "Franklin India Corporate Bond Fund (Formerly known as Franklin India Corporate Debt Fund)",
+        "Franklin India Corporate Debt Fund"
       ],
       "canonical_amfi_code": "118569",
       "amfi_base_name": "Franklin India Corporate Debt Fund",
@@ -7438,8 +7438,8 @@
       "shortcode": "FIFIRF",
       "aliases": [
         "FIFRF",
-        "Franklin India Floating Rate Fund",
-        "Franklin India Floating Interest Rates Fund (Formerly known as Franklin India Floating Rate Fund)"
+        "Franklin India Floating Interest Rates Fund (Formerly known as Franklin India Floating Rate Fund)",
+        "Franklin India Floating Rate Fund"
       ],
       "canonical_amfi_code": "118508",
       "amfi_base_name": "Franklin India Floating Rate Fund",
@@ -7467,8 +7467,8 @@
       "shortcode": "FIGF",
       "aliases": [
         "FIGSF",
-        "Franklin India Government Securities Fund",
-        "Franklin India Gilt Fund (Formerly known as Franklin India Government Securities Fund)"
+        "Franklin India Gilt Fund (Formerly known as Franklin India Government Securities Fund)",
+        "Franklin India Government Securities Fund"
       ],
       "canonical_amfi_code": "118498",
       "amfi_base_name": "Franklin India Government Securities Fund",
@@ -13681,9 +13681,9 @@
       "amc_id": "jm-financial-mutual-fund",
       "shortcode": "JM Dynamic Term Fund",
       "aliases": [
-        "JM Dynamic Bond Fund",
         "Dynamic Bond Fund",
         "Dynamic Term Fund",
+        "JM Dynamic Bond Fund",
         "Portfolio- JM Dynamic Term Fund"
       ],
       "canonical_amfi_code": "120435",
@@ -13862,9 +13862,9 @@
       "shortcode": "JM Short Term Fund",
       "aliases": [
         "JM Short Duration Fund",
+        "Portfolio- JM Short Term Fund",
         "Short Duration Fund",
-        "Short Term Fund",
-        "Portfolio- JM Short Term Fund"
+        "Short Term Fund"
       ],
       "canonical_amfi_code": "150545",
       "amfi_base_name": "JM Short Duration Fund",
@@ -13893,8 +13893,8 @@
       "aliases": [
         "JM Low Duration Fund",
         "JM Ultra Short to Short Term Fund",
-        "Ultra Short to Short Term Fund",
-        "Portfolio- JM Ultra Short to Short Term Fund"
+        "Portfolio- JM Ultra Short to Short Term Fund",
+        "Ultra Short to Short Term Fund"
       ],
       "canonical_amfi_code": "143612",
       "amfi_base_name": "JM Low Duration Fund",

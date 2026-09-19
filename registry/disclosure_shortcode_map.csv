@@ -601,7 +601,7 @@ franklin-templeton-mutual-fund,FF,,118543,Franklin India Dynamic Asset Allocatio
 franklin-templeton-mutual-fund,FIAF,,153043,Franklin India Arbitrage Fund,Franklin India Arbitrage Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FIAHF,,118546,Franklin India Aggressive Hybrid Fund,Franklin India Aggressive Hybrid Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FIBAF,,150481,Franklin India Balanced Advantage Fund,Franklin India Balanced Advantage Fund,seeded,shortcode,2026-06,latest
-franklin-templeton-mutual-fund,FICBF,FICDF|Franklin India Corporate Debt Fund|Franklin India Corporate Bond Fund (Formerly known as Franklin India Corporate Debt Fund),118569,Franklin India Corporate Debt Fund,Franklin India Corporate Bond Fund,seeded,shortcode,2026-06,latest
+franklin-templeton-mutual-fund,FICBF,FICDF|Franklin India Corporate Bond Fund (Formerly known as Franklin India Corporate Debt Fund)|Franklin India Corporate Debt Fund,118569,Franklin India Corporate Debt Fund,Franklin India Corporate Bond Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FICDF,,118569,Franklin India Corporate Debt Fund,Franklin India Corporate Debt Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FICHF,,118574,Franklin India Conservative Hybrid Fund,Franklin India Conservative Hybrid Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FICRF,,148304,Franklin India Credit Risk Fund - Segregated Portfolio 3 (9.50% Yes bank Ltd CO 23Dec21,Franklin India Credit Risk Fund - Segregated Portfolio 3 - 9.50% Yes Bank Ltd CO 23 Dec 2021,seeded,shortcode,2026-06,latest
@@ -610,9 +610,9 @@ franklin-templeton-mutual-fund,FIDYF,,118527,Franklin India Dividend Yield Fund,
 franklin-templeton-mutual-fund,FIEF,,118535,Franklin India Flexi Cap Fund,Franklin India Flexi Cap Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FIESF,,144466,Franklin India Equity Savings Fund,Franklin India Equity Savings Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FIFEF,,118564,Franklin India Focused Equity Fund,Franklin India Focused Equity Fund,seeded,shortcode,2026-06,latest
-franklin-templeton-mutual-fund,FIFIRF,FIFRF|Franklin India Floating Rate Fund|Franklin India Floating Interest Rates Fund (Formerly known as Franklin India Floating Rate Fund),118508,Franklin India Floating Rate Fund,Franklin India Floating Interest Rates Fund,seeded,shortcode,2026-06,latest
+franklin-templeton-mutual-fund,FIFIRF,FIFRF|Franklin India Floating Interest Rates Fund (Formerly known as Franklin India Floating Rate Fund)|Franklin India Floating Rate Fund,118508,Franklin India Floating Rate Fund,Franklin India Floating Interest Rates Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FIFRF,,118508,Franklin India Floating Rate Fund,Franklin India Floating Rate Fund,seeded,shortcode,2026-06,latest
-franklin-templeton-mutual-fund,FIGF,FIGSF|Franklin India Government Securities Fund|Franklin India Gilt Fund (Formerly known as Franklin India Government Securities Fund),118498,Franklin India Government Securities Fund,Franklin India Gilt Fund,seeded,shortcode,2026-06,latest
+franklin-templeton-mutual-fund,FIGF,FIGSF|Franklin India Gilt Fund (Formerly known as Franklin India Government Securities Fund)|Franklin India Government Securities Fund,118498,Franklin India Government Securities Fund,Franklin India Gilt Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FIGSF,,118498,Franklin India Government Securities Fund,Franklin India Government Securities Fund,seeded,shortcode,2026-06,latest
 franklin-templeton-mutual-fund,FIIF-NSE,,118581,Franklin India INDEX FUND - NSE NIFTY 50 INDEX FUND,Franklin India NSE Nifty 50 Index Fund,seeded,shortcode,latest,latest
 franklin-templeton-mutual-fund,FILCF,,118531,Franklin India Large Cap Fund,Franklin India Large Cap Fund,seeded,shortcode,2026-06,latest
@@ -1115,7 +1115,7 @@ jio-blackrock-mutual-fund,JBSHORT,,154079,JioBlackRock Short Duration Fund,JioBl
 jm-financial-mutual-fund,JM Aggressive Hybrid Fund,,120484,JM Aggressive Hybrid Fund,JM Aggressive Hybrid Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Arbitrage Fund,,120482,JM Arbitrage Fund,JM Arbitrage Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Dynamic Bond Fund,,120435,JM Dynamic Bond Fund,JM Dynamic Bond Fund,seeded,shortcode,latest,latest
-jm-financial-mutual-fund,JM Dynamic Term Fund,JM Dynamic Bond Fund|Dynamic Bond Fund|Dynamic Term Fund|Portfolio- JM Dynamic Term Fund,120435,JM Dynamic Bond Fund,JM Dynamic Term Fund,seeded,shortcode,latest,latest
+jm-financial-mutual-fund,JM Dynamic Term Fund,Dynamic Bond Fund|Dynamic Term Fund|JM Dynamic Bond Fund|Portfolio- JM Dynamic Term Fund,120435,JM Dynamic Bond Fund,JM Dynamic Term Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM ELSS Tax Saver Fund,,120494,JM ELSS Tax Saver Fund,JM ELSS Tax Saver Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Flexicap Fund,,120492,JM Flexicap Fund,JM Flexicap Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Focused Fund,,120488,JM Focused Fund,JM Focused Fund,seeded,shortcode,latest,latest
@@ -1129,9 +1129,9 @@ jm-financial-mutual-fund,JM Midcap Fund,,150815,JM Midcap Fund,JM Midcap Fund,se
 jm-financial-mutual-fund,JM Multi Asset Allocation Fund,,154423,JM Multi Asset Allocation Fund,JM Multi Asset Allocation Fund (,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Overnight Fund,,147837,JM Overnight Fund,JM Overnight Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Short Duration Fund,,150545,JM Short Duration Fund,JM Short Duration Fund,seeded,shortcode,latest,latest
-jm-financial-mutual-fund,JM Short Term Fund,JM Short Duration Fund|Short Duration Fund|Short Term Fund|Portfolio- JM Short Term Fund,150545,JM Short Duration Fund,JM Short Term Fund,seeded,shortcode,latest,latest
+jm-financial-mutual-fund,JM Short Term Fund,JM Short Duration Fund|Portfolio- JM Short Term Fund|Short Duration Fund|Short Term Fund,150545,JM Short Duration Fund,JM Short Term Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Small Cap Fund,,152614,JM Small Cap Fund,JM Small Cap Fund,seeded,shortcode,latest,latest
-jm-financial-mutual-fund,JM Ultra Short to Short Term,JM Low Duration Fund|JM Ultra Short to Short Term Fund|Ultra Short to Short Term Fund|Portfolio- JM Ultra Short to Short Term Fund,143612,JM Low Duration Fund,JM Ultra Short to Short Term Fund,seeded,shortcode,latest,latest
+jm-financial-mutual-fund,JM Ultra Short to Short Term,JM Low Duration Fund|JM Ultra Short to Short Term Fund|Portfolio- JM Ultra Short to Short Term Fund|Ultra Short to Short Term Fund,143612,JM Low Duration Fund,JM Ultra Short to Short Term Fund,seeded,shortcode,latest,latest
 jm-financial-mutual-fund,JM Value Fund,,120486,JM Value Fund,JM Value Fund,seeded,shortcode,latest,latest
 kotak-mahindra-mutual-fund,A50,,153781,Kotak Nifty Alpha 50 Index Fund,Kotak Nifty Alpha 50 Index Fund,seeded,shortcode,2026-06,latest
 kotak-mahindra-mutual-fund,AL3,,154388,Kotak Nifty Alpha Low Volatility 30 Index Fund,KOTAK NIFTY ALPHA LOW VOLATILITY 30 INDEX FUND,seeded,shortcode,2026-06,latest
