@@ -219,6 +219,11 @@ def main() -> None:
             title = row["title"]
             url = row["url"]
             raw_name = unquote(urlparse(url).path.rsplit("/", 1)[-1])
+            # Overlap reports are not scheme portfolios — skip for monthly holdings.
+            blob = f"{title} {raw_name}".lower()
+            if "overlap" in blob:
+                print(f"  SKIP overlap report: {raw_name or title}", flush=True)
+                continue
             fn = safe_filename(raw_name or f"oldbridge-monthly-portfolio-{mk}.xlsx")
             rec = {
                 "month": mk,

@@ -1097,13 +1097,38 @@ def parse_as_of(text: str) -> str | None:
             return _iso_date(y, b, a)  # India DMY
         return None
 
-    m = re.search(rf"\b({_MONTH_RE})\s+(20\d{{2}})\b", s, re.I)
-    if m:
+    # Month + year only (no day). Target-maturity scheme names often embed an
+    # earlier month-year (e.g. "APR 2028 … Aug 2026.xlsx"); prefer the last hit
+    # so disclosure as-of wins over the maturity label.
+    month_year_hits = list(
+        re.finditer(rf"\b({_MONTH_RE})\s+(20\d{{2}})\b", s, re.I)
+    )
+    if month_year_hits:
+        m = month_year_hits[-1]
         mon = _MONTH_NUM.get(m.group(1).lower())
         if mon:
             y = int(m.group(2))
             return _iso_date(y, mon, calendar.monthrange(y, mon)[1])
     return None
+
+
+def _filename_has_explicit_day(filename: str | None) -> bool:
+    """True when the filename encodes a calendar day (15th, 31-Aug, …)."""
+    if not filename:
+        return False
+    s = filename.replace("_", " ")
+    s = re.sub(r"(?i)(\d)(?:st|nd|rd|th)\b", r"\1", s)
+    if re.search(
+        rf"\b(\d{{1,2}})[-/ .]({_MONTH_RE})[-/ . ]?(20\d{{2}}|\d{{2}})\b", s, re.I
+    ):
+        return True
+    if re.search(
+        rf"\b({_MONTH_RE})[-/ .]+(\d{{1,2}})[-/ .,]+(20\d{{2}}|\d{{2}})\b", s, re.I
+    ):
+        return True
+    if re.search(r"\b(\d{1,2})[./-](\d{1,2})[./-]((?:20)?\d{2})\b", s):
+        return True
+    return False
 
 
 def _row_as_of(row: list[str]) -> str | None:
@@ -1155,14 +1180,17 @@ def extract_as_of(
 ) -> str | None:
     """Sheet portfolio banner, then filename, then weaker sheet labels.
 
-    Disclosure filenames (…15th-July-2026…) are authoritative when the sheet
-    also has NAV-history "as on" dates that would otherwise win.
+    Disclosure filenames with an explicit day (…15th-July-2026…) are
+    authoritative when the sheet also has NAV-history "as on" dates that would
+    otherwise win. Month-year-only filename tokens (maturity APR 2028 + as-of
+    Aug 2026) defer to the sheet portfolio-statement date when present.
     """
     from_rows = extract_as_of_from_rows(rows)
     from_name = parse_as_of(filename) if filename else None
     if from_name and from_rows and from_name != from_rows:
-        # Prefer an explicit day-month-year in the filename over a conflicting sheet date.
-        return from_name
+        if _filename_has_explicit_day(filename):
+            return from_name
+        return from_rows
     return from_rows or from_name
 
 

@@ -113,6 +113,24 @@ class AsOfExtractionTests(unittest.TestCase):
             "2026-07-15",
         )
 
+    def test_parse_as_of_prefers_trailing_month_over_maturity(self):
+        self.assertEqual(
+            parse_as_of("PGIM INDIA CRISIL IBX GILT INDEX - APR 2028 Aug 2026.xlsx"),
+            "2026-08-31",
+        )
+        rows = [
+            ["PGIM INDIA CRISIL IBX GILT INDEX - APR 2028"],
+            ["Portfolio Statement as on August 31,2026"],
+        ]
+        self.assertEqual(
+            extract_as_of(
+                rows,
+                filename="PGIM INDIA CRISIL IBX GILT INDEX - APR 2028 Aug 2026.xlsx",
+            ),
+            "2026-08-31",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
+

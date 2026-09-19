@@ -84,6 +84,19 @@ export function sourceFileMatchesAsOfCadence(meta, asOf, cadence) {
   const day = Number(String(asOf).slice(8, 10));
   const lower = src.toLowerCase();
 
+  // Monthly sync: reject clear mid-month fortnightly packs so Sep-15 debt
+  // files never land under YYYY-MM-31 monthly as-of.
+  if (cadence === "monthly" && isMonthEndAsOf(asOf)) {
+    if (
+      /fortnightly|fortnight/.test(lower) &&
+      /(?:^|[^0-9])15(?:st|th)?(?:[^0-9]|$)|as[_ -]?on[_ -]?15|portfolio[_ -]?15[_ -]/.test(
+        lower,
+      )
+    ) {
+      return false;
+    }
+  }
+
   if (cadence === "fortnightly" && day === 15) {
     if (
       /(?:^|[^0-9])31[-_./ ]?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)|(?:january|february|march|april|may|june|july|august|september|october|november|december)[-_./ ]*31(?:st)?/i.test(

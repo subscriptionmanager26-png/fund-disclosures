@@ -1,0 +1,970 @@
+[
+  {
+    "month": "2026-08",
+    "title": "All Schemes Monthly Portfolio - as on 31st August 2026",
+    "scope": "consolidated",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/all-schemes-monthly-portfolio---as-on-31st-august-2026.xlsx?sfvrsn=a7fdc2ec_2",
+    "saved_as": "all-schemes-monthly-portfolio---as-on-31st-august-2026.xlsx",
+    "sha256": "e962a9d3c1478a8f857071cc20c7afcac742d23665bfc203996adb747588ba43"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Arbitrage Opportunities Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-arbitrage-opportunities-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=b1cd7d7d_2",
+    "saved_as": "sbi-arbitrage-opportunities-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "6adc0bcd906d7ce84f62fef0fbc5066684569ad6127729454388e570e601f479"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Automotive Opportunities Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-automotive-opportunities-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=b8a355b5_2",
+    "saved_as": "sbi-automotive-opportunities-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "aab1d131f46939e5c301c50ad5c7d4c0f1294b256622372110068b0b0f3a4ae1"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Balanced Advantage Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-balanced-advantage-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=8fe40da9_2",
+    "saved_as": "sbi-balanced-advantage-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "a08f94b0eb4712b281bfbe7735ec77b271e914b5b73da60079b409b2f7dbd532"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Balanced Hybrid Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-balanced-hybrid-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=5417847c_2",
+    "saved_as": "sbi-balanced-hybrid-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "61c79d8f97e04fd97353b2ff1de1666866da3912dc07e24f5e547828a8e7875d"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BANKING & PSU FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-banking-psu-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=cff90fb0_2",
+    "saved_as": "sbi-banking-psu-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "f771f77bfcee65ff8ee8e2508cffe30251daa33e51414fc8c4c6017416d6f111"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BANKING AND FINANCIAL SERVICES FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-banking-and-financial-services-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=c6f77bd0_2",
+    "saved_as": "sbi-banking-and-financial-services-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "1bb6b4be5ca5662f8f70493889c8f33e3c06f7a19a0be4f7575fb332767ee7d4"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BSE 100 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-bse-100-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=151480a5_2",
+    "saved_as": "sbi-bse-100-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "00ed7d87d293723f6be0864380a744d61ff97d05fbc60ddb4970d40092875601"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BSE PSU Bank ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-bse-psu-bank-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=e97000ee_2",
+    "saved_as": "sbi-bse-psu-bank-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "c96328bd3b653d5e000e32148912877f45bacf0a633569f68e160ec1877199b2"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BSE PSU Bank Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-bse-psu-bank-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=de3effda_2",
+    "saved_as": "sbi-bse-psu-bank-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "d6194202cd2080da4d4645b97339ae5c0ad50fe283e0744fd7755e0cbe4f0ef1"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BSE Sensex ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-bse-sensex-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=9d08e470_2",
+    "saved_as": "sbi-bse-sensex-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "17c2b769eb95e0708be8e6f1def7d81aef2aef97d1a9023960be5619b5dd030e"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BSE Sensex Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-bse-sensex-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=c3e45615_2",
+    "saved_as": "sbi-bse-sensex-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2ae047f1c7b47b7b822107ffef6dc230f730a19d53b87a8e7b9f62772d0204fc"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI BSE Sensex Next 50 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-bse-sensex-next-50-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=a1e0e77_2",
+    "saved_as": "sbi-bse-sensex-next-50-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "426ddfd4793013b2db638cb560f3094d1a5c326b7f02a126ac8bd8eb176b031c"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Children's Benefit Fund- Investment Plan MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-children&#39;s-benefit-fund--investment-plan-monthly-portfolio---august-2026.xlsx?sfvrsn=ccf5e1aa_2",
+    "saved_as": "SBI_Children_s_Benefit_Fund-_Investment_Plan_MONTHLY_PORTFOLIO_-_AUGUST_2026.xlsx",
+    "sha256": "101dd96850a8da483ac7715820ce9767f946c61399a1cd754928c33fc7437128"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Children's Fund-Savings Plan MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-children&#39;s-fund-savings-plan-monthly-portfolio---august-2026.xlsx?sfvrsn=928e8ab7_2",
+    "saved_as": "SBI_Children_s_Fund-Savings_Plan_MONTHLY_PORTFOLIO_-_AUGUST_2026.xlsx",
+    "sha256": "8eab9f2a92d8a489734aba1f14698f22b59549ee8f103d1d563f8d3b8eeae6d1"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Comma Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-comma-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=1ad8fe33_2",
+    "saved_as": "sbi-comma-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "00697b2a198937e6f549b3d11a90c5631a7de97a8c82f891380d732e3c3c64ae"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Conservative Hybrid Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-conservative-hybrid-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=f7ce9251_2",
+    "saved_as": "sbi-conservative-hybrid-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "7dafe1cafc6876967a66f076a824aa3c7c8b91ba5c3ae79323346cf5e0215e72"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Constant Maturity 10-Year Gilt Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-constant-maturity-10-year-gilt-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=c4344be9_2",
+    "saved_as": "sbi-constant-maturity-10-year-gilt-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "6ab86c657083af055e6cfced7121dcc41106ff562a58ca99715cfb6270986c77"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CONSUMPTION OPPORTUNITIES FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-consumption-opportunities-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=8acb9813_2",
+    "saved_as": "sbi-consumption-opportunities-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "d52699f4b295e252d74ef4098389c444806a74a6ea7fb821f70f504af073955d"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CONTRA FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-contra-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=3d25bf11_2",
+    "saved_as": "sbi-contra-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "7baa45120bef56af5677170c4969d594fce20881fe60a194587fa0b810e5f172"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CORPORATE BOND FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-corporate-bond-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=6c7c8348_2",
+    "saved_as": "sbi-corporate-bond-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "ea8cb4cf86132f1509af0ad86771a3882df6ae3ecfe829dc7c01e68d83bab998"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CPSE Bond Plus SDL Sep 2026 50 50 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-cpse-bond-plus-sdl-sep-2026-50-50-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=2165d9eb_2",
+    "saved_as": "sbi-cpse-bond-plus-sdl-sep-2026-50-50-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "11dbc3ddaff13f2d727e4f21d81925ef32801a3164a602ceff01996801dc2640"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CREDIT RISK FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-credit-risk-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=54abfeea_2",
+    "saved_as": "sbi-credit-risk-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "8e7591e628df293eacf1345a19452d89d41056ba97f2b112ade8c047a132b72e"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CRISIL IBX Gilt Index- August 2029 Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-crisil-ibx-gilt-index--august-2029-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=e7c9959f_2",
+    "saved_as": "sbi-crisil-ibx-gilt-index--august-2029-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2328e9867c46a5c5cb662f9395f4bc0b820b6c6d1cba45343ac67f7b266cb4c3"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CRISIL IBX Gilt Index- August 2036 Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-crisil-ibx-gilt-index--august-2036-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=2eb387dd_2",
+    "saved_as": "sbi-crisil-ibx-gilt-index--august-2036-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "6e71711f667b3023441de7bc200d1d10807ba467568c46d15a8ad68f0e87c6ad"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CRISIL IBX SDL Index- Sept 2027 Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-crisil-ibx-sdl-index--sept-2027-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=28cff78b_2",
+    "saved_as": "sbi-crisil-ibx-sdl-index--sept-2027-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "d2b9c598b7efefca32a14dc89cd5b4ef1a0bb2bf28e5b7cec8c30794d514a7f5"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CRISIL IBX SDL Index-June 2034 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-crisil-ibx-sdl-index-june-2034-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=25cb11a1_2",
+    "saved_as": "sbi-crisil-ibx-sdl-index-june-2034-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2b87d5eb168adab2e2d5e0545baebc8900865cf248c533f40a243c265ee74d41"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CRISIL-IBX 10 90 Gilt +SDL Index - Dec 2029 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-crisil-ibx-10-90-gilt-sdl-index---dec-2029-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=3e7a001a_2",
+    "saved_as": "sbi-crisil-ibx-10-90-gilt-sdl-index---dec-2029-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "4a0d24feaebd64126e0cc6f5a5a311109187d6e9877dab626cf216c7ef76c5a3"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CRISIL-IBX Financial Services 3-6 Months Debt Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-crisil-ibx-financial-services-3-6-months-debt-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=dcd88db6_2",
+    "saved_as": "sbi-crisil-ibx-financial-services-3-6-months-debt-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "192a0c3f3cf794632a1b75af38e5be8d35a9420cefbafb6f9d24f7d8f5ee2a89"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI CRISIL-IBX Financial Services 9-12 Months Debt Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-crisil-ibx-financial-services-9-12-months-debt-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=d937f034_2",
+    "saved_as": "sbi-crisil-ibx-financial-services-9-12-months-debt-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "35c30373f595be03f09c316dede0bf8e39ee4206d0b8dea4e3e48e159713f3b0"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Dividend Yield Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-dividend-yield-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=db26c50e_2",
+    "saved_as": "sbi-dividend-yield-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "bcedd53861af0de2d8637f16100693f77721ce37ea8b43c420fdf58d055fdbe7"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Dynamic Asset Allocation Active FoF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-dynamic-asset-allocation-active-fof-monthly-portfolio---august-2026.xlsx?sfvrsn=5d18f49b_2",
+    "saved_as": "sbi-dynamic-asset-allocation-active-fof-monthly-portfolio---august-2026.xlsx",
+    "sha256": "cd1b2ab55673c938f15a0aa86ccb4aa9ad7a9dda6ba06b0e240bfd125a8d820c"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI DYNAMIC BOND FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-dynamic-bond-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=fe3a49f4_2",
+    "saved_as": "sbi-dynamic-bond-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "fd33326be4efa01dc43290a248262e456bbac40db3424d904c0c30cc85124459"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI ELSS Tax Saver Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-elss-tax-saver-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=f5b20a02_2",
+    "saved_as": "sbi-elss-tax-saver-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "6fce111f848c2a402645cf1cdfb0d21fa17f2d2e3b01bbf5a7d684c94da998bc"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Energy Opportunities Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-energy-opportunities-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=137bd55d_2",
+    "saved_as": "sbi-energy-opportunities-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "80a2609a0ab81a7686fbb5c4440dd024d758deeb9888680d58942cb1de7a8242"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Equity Hybrid Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-equity-hybrid-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=e929ab71_2",
+    "saved_as": "sbi-equity-hybrid-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "e91372a0b9d8da6b444a9726d4688200520bdc619c9ed57b1c6ffbba55f74137"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI EQUITY MINIMUM VARIANCE FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-equity-minimum-variance-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=1631b2f2_2",
+    "saved_as": "sbi-equity-minimum-variance-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "1ec7a8e1e7a4c177c4a657405c25a51f6c545f3ceb0003915185194bde772ca5"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI EQUITY SAVINGS FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-equity-savings-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=2f005980_2",
+    "saved_as": "sbi-equity-savings-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "ee9de76e120eb316d0fe594beece718c46fe17970df499e2e1f6fcd3b7249fa5"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI ESG Exclusionary Strategy Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-esg-exclusionary-strategy-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=fd85bfcc_2",
+    "saved_as": "sbi-esg-exclusionary-strategy-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "7b63c8f9e1ca898a53f616ded85165a49452a399d4bc4f2b1fa8f18e385e0615"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI FIXED MATURITY PLAN (FMP)- SERIES 1 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-1-monthly-portfolio---august-2026.xlsx?sfvrsn=fc1de5b1_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-1-monthly-portfolio---august-2026.xlsx",
+    "sha256": "f2395a9781a00dfa192c406e0b28d69a8ef7dc73bb8e4f45d8829c1022005f4a"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 34 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-34-monthly-portfolio---august-2026.xlsx?sfvrsn=54699017_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-34-monthly-portfolio---august-2026.xlsx",
+    "sha256": "033817552b8c735707fe09b88e3a123edca877edc68d1901c1bf53b32e0d4d96"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 50 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-50-monthly-portfolio---august-2026.xlsx?sfvrsn=58724f78_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-50-monthly-portfolio---august-2026.xlsx",
+    "sha256": "6173ea0c017e7034765e902f2554489672ce659d774304ce3ca292f63bc0f5d5"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 51 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-51-monthly-portfolio---august-2026.xlsx?sfvrsn=1b11370f_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-51-monthly-portfolio---august-2026.xlsx",
+    "sha256": "448d5ec665b9e19dcbad616260bd24deb99bc7542d79e79f84d761dd68a42181"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 52 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-52-monthly-portfolio---august-2026.xlsx?sfvrsn=fa1e1516_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-52-monthly-portfolio---august-2026.xlsx",
+    "sha256": "961b2e977b27e04fe9459e5daaa744cf24483e3a18aae523646f80470a9d062e"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 53 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-53-monthly-portfolio---august-2026.xlsx?sfvrsn=f7d6768_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-53-monthly-portfolio---august-2026.xlsx",
+    "sha256": "7c0523db08910f48475f75aff739981b1b070757348939843f2cea44b00e160c"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 54 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-54-monthly-portfolio---august-2026.xlsx?sfvrsn=304548db_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-54-monthly-portfolio---august-2026.xlsx",
+    "sha256": "104d1e950b77b0c781d347cdddbe94ba9bd0c6ad4dc61e0f615215bb5cf5f072"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 55 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-55-monthly-portfolio---august-2026.xlsx?sfvrsn=78b499ad_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-55-monthly-portfolio---august-2026.xlsx",
+    "sha256": "a2190574c60f6cf532f0d0c7bfd96cb0a3d4d1d402a595494f2c93acceac972b"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 57 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-57-monthly-portfolio---august-2026.xlsx?sfvrsn=315272b_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-57-monthly-portfolio---august-2026.xlsx",
+    "sha256": "6acd829ff7cbfe3d8e4a4dfad77becbe479f48bbc93236d8b40652931ba0bc69"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 58 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-58-monthly-portfolio---august-2026.xlsx?sfvrsn=4e91581_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-58-monthly-portfolio---august-2026.xlsx",
+    "sha256": "c4baef5189599f1f4d63a2ab531d672d72ea3fbed4cf8d4afeaf1367c0c3be35"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 6 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-6-monthly-portfolio---august-2026.xlsx?sfvrsn=9cb92828_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-6-monthly-portfolio---august-2026.xlsx",
+    "sha256": "7ace889808d85ff7ac460894f8fa4b5b3f2c94416931530017744521ab0e1d42"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 60 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-60-monthly-portfolio---august-2026.xlsx?sfvrsn=8a1d8c3b_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-60-monthly-portfolio---august-2026.xlsx",
+    "sha256": "36d62e71302201164c7cd6c08737b89698911b4bdca9023cd6f3e9ca794a3aa4"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Fixed Maturity Plan (FMP)- Series 61 MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-fixed-maturity-plan-(fmp)--series-61-monthly-portfolio---august-2026.xlsx?sfvrsn=efb3e15b_2",
+    "saved_as": "sbi-fixed-maturity-plan-(fmp)--series-61-monthly-portfolio---august-2026.xlsx",
+    "sha256": "11b082958537fc1a5bcafec8a8efeb0979bdfc49de53f828e01e593cfc0688e4"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Flexicap Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-flexicap-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=fd20347e_2",
+    "saved_as": "sbi-flexicap-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "49369d88680baf8a2151421cfd5915e468438c902cb56d5d2c7ab351474beae5"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Floating Rate Debt Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-floating-rate-debt-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=b37a2c86_2",
+    "saved_as": "sbi-floating-rate-debt-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "91e8363c071b8eefdb4f7f5a3374608112fa162369f785ba5adf45c2377999b0"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI FOCUSED FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-focused-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=bd6d23d1_2",
+    "saved_as": "sbi-focused-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "6f58d61a398c770bda7bd12f97b0227802cdddc7e6769b4ad004a2687aa58a63"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Gilt Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-gilt-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=d0bb765_2",
+    "saved_as": "sbi-gilt-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "af59c2b3636633bf6b9732ccdf9cd37f4d23294f90faa7ba85b06f2132cde79b"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Gold ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-gold-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=861d35c8_2",
+    "saved_as": "sbi-gold-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "c742e9bf8fc2ac1c79d4e838b6a9bcd62cfd6c89761b9e7e7836b3ab9c27b875"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI GOLD FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-gold-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=7d9f8caf_2",
+    "saved_as": "sbi-gold-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "ca233ba625093b863dd8cfbf9af8f0383de39643c65a285cf20acd59e420cb91"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI HEALTHCARE OPPORTUNITIES FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-healthcare-opportunities-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=6763b44_2",
+    "saved_as": "sbi-healthcare-opportunities-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "9184cd3e5f667058756a4838fe58708d453482184f0e6a9aea358e3aefa5892e"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Income Plus Arbitrage Active FOF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-income-plus-arbitrage-active-fof-monthly-portfolio---august-2026.xlsx?sfvrsn=d935862f_2",
+    "saved_as": "sbi-income-plus-arbitrage-active-fof-monthly-portfolio---august-2026.xlsx",
+    "sha256": "4704a2b88817ee68b6c4d0136710b7a7a68532d3a4ea7ad24ed36bf82405e4fc"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI INFRASTRUCTURE FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-infrastructure-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=729955c1_2",
+    "saved_as": "sbi-infrastructure-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "7135f825505ff1a420aa1bb7263b07bc332ea62cd540ea082453f6790b1aec48"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Innovative Opportunities Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-innovative-opportunities-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=5e22ce23_2",
+    "saved_as": "sbi-innovative-opportunities-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "0bc3985337f3c4c2aacfa54c9e03f4db6b8cbf9aceab97f1d7d50962f415d10d"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI International Access- US Equity FoF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-international-access--us-equity-fof-monthly-portfolio---august-2026.xlsx?sfvrsn=1e486fd_2",
+    "saved_as": "sbi-international-access--us-equity-fof-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2c9dbb4dccc5ec4afc3c8002558cb721fc49f6e9bdc649ede7e3b5d077a78961"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI LARGE & MIDCAP FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-large-midcap-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=c937b192_2",
+    "saved_as": "sbi-large-midcap-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "c700f6ed22f39e9a91420aa10a1d3fa58bb80d6487edfb17b7c1d916a2c573eb"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Large Cap Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-large-cap-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=508e40_2",
+    "saved_as": "sbi-large-cap-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "140dc42ab80b6330343ebadf223e20262a09cfc8ad562e21cc8cc959dcbec910"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI LIQUID FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-liquid-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=509de68d_2",
+    "saved_as": "sbi-liquid-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "16ba309ce51b3cb6c3cce63d39e1885298b3014ffb23526c6da98551699b33a3"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Long Duration Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-long-duration-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=ac9268e3_2",
+    "saved_as": "sbi-long-duration-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "c1dd304beb957648b4a6d1ff6e4abafd18105acdd4a9d5506a0ac22270d4a8bb"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI LONG TERM ADVANTAGE FUND - SERIES IV MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-long-term-advantage-fund---series-iv-monthly-portfolio---august-2026.xlsx?sfvrsn=d8baa5a0_2",
+    "saved_as": "sbi-long-term-advantage-fund---series-iv-monthly-portfolio---august-2026.xlsx",
+    "sha256": "a8dbeb6bf0ca3de0f81cb04bdaf78fe6f3b3959ca4109abaca4cbb3ef4db0686"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI LONG TERM ADVANTAGE FUND - SERIES V MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-long-term-advantage-fund---series-v-monthly-portfolio---august-2026.xlsx?sfvrsn=8c6dec99_2",
+    "saved_as": "sbi-long-term-advantage-fund---series-v-monthly-portfolio---august-2026.xlsx",
+    "sha256": "3151465c902dcf2fb34487793fb77ba2ae53f4af6b59ac4943c76bfd5c0daaa9"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI LONG TERM ADVANTAGE FUND - SERIES VI MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-long-term-advantage-fund---series-vi-monthly-portfolio---august-2026.xlsx?sfvrsn=f06a4aee_2",
+    "saved_as": "sbi-long-term-advantage-fund---series-vi-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2231337bcc61552a6df9a0519fad8111d0062891721013c694995c4e9daa719c"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Low Duration Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-low-duration-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=1735990c_2",
+    "saved_as": "sbi-low-duration-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "556d985116b84e3f269de763617049dff543172fd5739c60f20ffbc0339ad794"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Medium Duration Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-medium-duration-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=3f9cca58_2",
+    "saved_as": "sbi-medium-duration-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "a9a0bbbb4a7181e73a27b8751f173ab0b05dc543b32e55415f5e9d9d83f02717"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Medium to Long Duration Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-medium-to-long-duration-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=710a25bf_2",
+    "saved_as": "sbi-medium-to-long-duration-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "e94aab28867a27210a7564b9742875c7400e69312a38d5ae28f77a2ff6071940"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI MIDCAP FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-midcap-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=b24400f5_2",
+    "saved_as": "sbi-midcap-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "aeb18f5ac6dc36050f65c0d2fa1aee534c0d756f0a2f30004b322d34dfea9d19"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI MNC Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-mnc-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=a9ab1de0_2",
+    "saved_as": "sbi-mnc-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "960aef429254fad9966df3a285ad5b4e473b058d7083110ee6aa1ecfe6511d93"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI MULTI ASSET ALLOCATION FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-multi-asset-allocation-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=a982900a_2",
+    "saved_as": "sbi-multi-asset-allocation-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "c6cd3fd914f752d4d83117e3f9617aece369a854caad390d591fc5fd15cb31ce"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI MultiCap Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-multicap-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=90c0f455_2",
+    "saved_as": "sbi-multicap-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "7a04883b38cf2dfe893fb64b9a5fe2ae2c890eb6919e8da410164c37083289a1"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY 10 yr Benchmark G-Sec ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-10-yr-benchmark-g-sec-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=cd476a06_2",
+    "saved_as": "sbi-nifty-10-yr-benchmark-g-sec-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "205ef5515e98f3c79a78661e2977ddb8d6a3a1ccb4f92f36c578adc7606d1ee2"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY 1D Rate ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-1d-rate-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=d950ab1e_2",
+    "saved_as": "sbi-nifty-1d-rate-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "a2db98af20b9f748ac290dbcf1fe5d36a03e5f3bb5ea7fd6664782b89a897eb8"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty 1D Rate Liquid ETF - IDCW MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-1d-rate-liquid-etf---idcw-monthly-portfolio---august-2026.xlsx?sfvrsn=9ee37c95_2",
+    "saved_as": "sbi-nifty-1d-rate-liquid-etf---idcw-monthly-portfolio---august-2026.xlsx",
+    "sha256": "8f6d541c00a8a4d9fe7ffaa4437d92709ab60673b3f03ddc146ac609bc0cbd57"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY 200 Quality 30 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-200-quality-30-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=a734af33_2",
+    "saved_as": "sbi-nifty-200-quality-30-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2e7a05a15617814e372f20928eefd19cdb78c6e9b7397d0c71e925cb203bfb1d"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty 200 Value 30 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-200-value-30-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=2b9429e9_2",
+    "saved_as": "sbi-nifty-200-value-30-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "e1f7eb5c0452f8b6ae7270b262a24eb0e7ebb477b4fae3624410715010ad15e8"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY 50 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-50-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=90c2636_2",
+    "saved_as": "sbi-nifty-50-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "928870e8dc8b2d4ffe7a9c142b6b03478242067f7640169d4104fb224067c0da"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty 500 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-500-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=dc4f26be_2",
+    "saved_as": "sbi-nifty-500-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "66de1d62a0de9145c5fe031e9164c8d3f45ec6ab4ee719075f7b6e19cc0b0f04"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY Bank ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-bank-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=47284fc2_2",
+    "saved_as": "sbi-nifty-bank-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "ac9dfeeb6735a55359c62c1d3e6c2014658624ee4c1f3f07cb7d8af2fd707514"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty Bank Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-bank-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=984f9199_2",
+    "saved_as": "sbi-nifty-bank-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "4a7cc7baf04ac1405799e676398c05bee0975d317e6c28578ff43112b6cf0c61"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY Consumption ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-consumption-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=e7a65f96_2",
+    "saved_as": "sbi-nifty-consumption-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "ea08882528fbb80afca70c6125a8d7db535471aba44d27fc93a8e46fb1859dfc"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty G-Sec Jul 2031 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-g-sec-jul-2031-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=3c0bb764_2",
+    "saved_as": "sbi-nifty-g-sec-jul-2031-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "ee4cb93ba59d55355c09a919fc5ab58823e45c41a433c4612952fee4d37c4707"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY INDEX FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=40409eb1_2",
+    "saved_as": "sbi-nifty-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "8cb7da048d375ecc448fa0de7b9fd12bb2a131e790979f852e9c871a7478cbbb"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty India Consumption Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-india-consumption-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=74207057_2",
+    "saved_as": "sbi-nifty-india-consumption-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "23fd924c8fec59e243173f5f5d5008de0db34a39d7cfea106123294dc9846d5d"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY IT ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-it-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=dd5d100a_2",
+    "saved_as": "sbi-nifty-it-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "918f2b61cf80adbac3372fe23f941a5b8662e21eb190ab67e5079fb0106f3524"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty IT Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-it-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=7469a01e_2",
+    "saved_as": "sbi-nifty-it-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "65790a845c83d429195db211ba531d1feb2e0d384f484bcae53fff5510bb3492"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY Midcap 150 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-midcap-150-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=a07b35c2_2",
+    "saved_as": "sbi-nifty-midcap-150-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2612b723bd3b4acc3c71d0d8f072e6787278487ed7cf07436b376f11e678c1e1"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty Midcap 150 Momentum 50 ETF FOF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-midcap-150-momentum-50-etf-fof-monthly-portfolio---august-2026.xlsx?sfvrsn=f1861c44_2",
+    "saved_as": "sbi-nifty-midcap-150-momentum-50-etf-fof-monthly-portfolio---august-2026.xlsx",
+    "sha256": "87c453fd494bb3ad1ac7e609c4463ccd7803e0a6adb3c36d2b211cfdbc00a142"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty Midcap 150 Momentum 50 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-midcap-150-momentum-50-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=e0d2fefd_2",
+    "saved_as": "sbi-nifty-midcap-150-momentum-50-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "f166ad89db9f42d1eed17d0eb33cb8e29fd429551b3b04450cc94f749f991a8e"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty Midcap150 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-midcap150-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=a527014c_2",
+    "saved_as": "sbi-nifty-midcap150-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "8d7e87a9fe1f6ab37ef058cbcd062abf97e6427657a116055586d4a3c0e73011"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY Next 50 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-next-50-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=82b7fa79_2",
+    "saved_as": "sbi-nifty-next-50-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "bd5b338433180863ad6830969cacf4ebd28935145e8493e3ac85eb49d5a60209"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY Next 50 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-next-50-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=ea1283f9_2",
+    "saved_as": "sbi-nifty-next-50-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "b6f63546e9359d99a6dfe5a2e91cd02d83baa43924155c72ee8544c2f825b630"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY Private Bank ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-private-bank-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=d96f8d2c_2",
+    "saved_as": "sbi-nifty-private-bank-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "fcf43dcb10b593fefc6cc062ee898769d8acd5df8fb0cf9ea587b80db6026f5a"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty Small Cap 250 ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-small-cap-250-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=5e9ea1df_2",
+    "saved_as": "sbi-nifty-small-cap-250-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "5ce3724b0bb3683505085a5dd2dd35b794458929f1dff8c523f055c0c04586ae"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY Smallcap 250 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty-smallcap-250-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=63295da5_2",
+    "saved_as": "sbi-nifty-smallcap-250-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "acb35270f0bee9827983a15026ba721ea3a2e736420dfa499aa492003439212d"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty100 Low Volatility 30 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty100-low-volatility-30-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=7fe3bbbc_2",
+    "saved_as": "sbi-nifty100-low-volatility-30-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "99b085dcb59f478062969056d1e41880deb22f9d50a855a6da1b8ef8f9c44aa8"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty200 Momentum 30 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty200-momentum-30-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=9a71a9d5_2",
+    "saved_as": "sbi-nifty200-momentum-30-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "a7c95310213d8f715a84e383328646d22cfcf4e5e53ae47bc6362c19d670cbb8"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty200 Quality 30 Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty200-quality-30-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=53b7d583_2",
+    "saved_as": "sbi-nifty200-quality-30-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "2604ee7f254882ee1e9fe02ad782f7fb7aef96829e1069d223d393d5e37a80b9"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Nifty50 Equal Weight ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty50-equal-weight-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=8a646b5d_2",
+    "saved_as": "sbi-nifty50-equal-weight-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "593ffc8ee1132c399d51c6c679e6e10bbd1332771be6f752cb0d3d509a018d48"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI NIFTY50 Equal Weight Index Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-nifty50-equal-weight-index-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=223f1f7b_2",
+    "saved_as": "sbi-nifty50-equal-weight-index-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "0a79767090fb3ae4868f42834a16d949fb027f8ba2c7728ae9e42918212739a6"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Overnight Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-overnight-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=9e984164_2",
+    "saved_as": "sbi-overnight-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "fa1fdeae6cb990092abdcf3ad9468c79834d2c4af65be153a5359053965f1114"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI PSU FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-psu-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=1c23e868_2",
+    "saved_as": "sbi-psu-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "4385b66c11cc0073ec21258b8e6d7f4196a621d4bc9ca26245d3a53e0be0b130"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Quality Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-quality-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=e6cabe33_2",
+    "saved_as": "sbi-quality-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "bd231b928d55fcb69d205469ccf6a56d838367a3866cdb97aa85ae693124c285"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Quant Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-quant-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=5847cc59_2",
+    "saved_as": "sbi-quant-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "da7cd787a9d5f583af6b0d7c1e192dd67cba3e77f08f3ed42f976ac77fe773c0"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI RETIREMENT BENEFIT FUND - AGGRESSIVE HYBRID PLAN MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-retirement-benefit-fund---aggressive-hybrid-plan-monthly-portfolio---august-2026.xlsx?sfvrsn=c1510358_2",
+    "saved_as": "sbi-retirement-benefit-fund---aggressive-hybrid-plan-monthly-portfolio---august-2026.xlsx",
+    "sha256": "480fe5203e450065eff5c44ee7d7ff4de2ae2a25679b1497bccd90372140d170"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI RETIREMENT BENEFIT FUND - AGGRESSIVE PLAN MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-retirement-benefit-fund---aggressive-plan-monthly-portfolio---august-2026.xlsx?sfvrsn=cd885895_2",
+    "saved_as": "sbi-retirement-benefit-fund---aggressive-plan-monthly-portfolio---august-2026.xlsx",
+    "sha256": "1954116ef3e7582a4a464c5bc0adb8d6df8eb2610119875ee7e7ee829ad5b9f7"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI RETIREMENT BENEFIT FUND - CONSERVATIVE HYBRID PLAN MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-retirement-benefit-fund---conservative-hybrid-plan-monthly-portfolio---august-2026.xlsx?sfvrsn=c5e35e5a_2",
+    "saved_as": "sbi-retirement-benefit-fund---conservative-hybrid-plan-monthly-portfolio---august-2026.xlsx",
+    "sha256": "b2a9607b0802b5a00dd78b8bb3c918eea4c5d53ccb9bc19413f3f9c16e2fcfe9"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI RETIREMENT BENEFIT FUND - CONSERVATIVE PLAN MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-retirement-benefit-fund---conservative-plan-monthly-portfolio---august-2026.xlsx?sfvrsn=22550035_2",
+    "saved_as": "sbi-retirement-benefit-fund---conservative-plan-monthly-portfolio---august-2026.xlsx",
+    "sha256": "49280b26368421a2b78a4af2fc61584b539dfdd2bab488fc419dbbc155895ac2"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI SAVINGS FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-savings-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=d3c9f5f2_2",
+    "saved_as": "sbi-savings-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "fafe6c57fcaddef2d566482125388fc0bbf7b3b09ba74eaff2bab74156585122"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI SHORT TERM DEBT FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-short-term-debt-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=ef8d082_2",
+    "saved_as": "sbi-short-term-debt-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "0f33732cf7680074470a93ab28af9466229da0b249c3456ce84894f6540c380f"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Silver ETF Fund of Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-silver-etf-fund-of-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=1420a85_2",
+    "saved_as": "sbi-silver-etf-fund-of-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "27e68a81a29f0487dbfaa63a624c854901abd825135ecdd94cb5ea92a3e4e45e"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Silver ETF MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-silver-etf-monthly-portfolio---august-2026.xlsx?sfvrsn=2ff4f8fb_2",
+    "saved_as": "sbi-silver-etf-monthly-portfolio---august-2026.xlsx",
+    "sha256": "ece836a2a0c061fc3e24d6a70e108334e573fa54e046a728e45083fb5055ffcd"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI SMALL CAP FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-small-cap-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=9c20b052_2",
+    "saved_as": "sbi-small-cap-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "71b589984c9b3db4bbb1baf7365072e0e6f604cf18ccfc215a1dc9c1d3183b48"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI TECHNOLOGY OPPORTUNITIES FUND MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-technology-opportunities-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=9c69ae27_2",
+    "saved_as": "sbi-technology-opportunities-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "c88e8c8578f1767e398d71e1d3cae7900001c4b83fa698ed5ce3696497f0dfdb"
+  },
+  {
+    "month": "2026-08",
+    "title": "SBI Ultra Short Duration Fund MONTHLY PORTFOLIO - AUGUST 2026",
+    "scope": "per_scheme",
+    "download_url": "https://www.sbimf.com/docs/default-source/scheme-portfolios/sbi-ultra-short-duration-fund-monthly-portfolio---august-2026.xlsx?sfvrsn=5dee9e94_2",
+    "saved_as": "sbi-ultra-short-duration-fund-monthly-portfolio---august-2026.xlsx",
+    "sha256": "fa3a430c03be5b54f75fca0ff9697e7e3c56611c2390c8cb281a2e81fe2ac98c"
+  }
+]
