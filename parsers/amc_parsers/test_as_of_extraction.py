@@ -113,11 +113,6 @@ class AsOfExtractionTests(unittest.TestCase):
             "2026-07-15",
         )
 
-
-if __name__ == "__main__":
-    unittest.main()
-
-
     def test_parse_as_of_prefers_trailing_month_over_maturity(self):
         self.assertEqual(
             parse_as_of("PGIM INDIA CRISIL IBX GILT INDEX - APR 2028 Aug 2026.xlsx"),
@@ -134,4 +129,8 @@ if __name__ == "__main__":
             ),
             "2026-08-31",
         )
+
+
+if __name__ == "__main__":
+    unittest.main()
 
