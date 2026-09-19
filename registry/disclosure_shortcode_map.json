@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Durable disclosure key → AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
+  "note": "Durable disclosure key \u2192 AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
   "entries": [
     {
       "amc_id": "360-one-mutual-fund",
@@ -362,6 +362,18 @@
       "source": "shortcode",
       "first_seen_period": "2026-06",
       "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "aditya-birla-sun-life-mutual-fund",
+      "shortcode": "ABSLUS10",
+      "aliases": [],
+      "canonical_amfi_code": "152150",
+      "amfi_base_name": "Aditya Birla Sun Life US Treasury 3 - 10 Year Bond ETFs Fund Of Funds",
+      "disclosure_label": "ADITYA BIRLA SUN LIFE US TREASURY 3-10 YEAR BONDS ETFS PASSIVE FOF",
+      "confidence": "manual",
+      "source": "gap_fix",
+      "first_seen_period": "2026-07",
+      "last_verified_period": "2026-07"
     },
     {
       "amc_id": "aditya-birla-sun-life-mutual-fund",
@@ -1757,7 +1769,7 @@
       "aliases": [],
       "canonical_amfi_code": "135764",
       "amfi_base_name": "Axis Children's Fund - No Lock in",
-      "disclosure_label": "Axis Children’s Fund",
+      "disclosure_label": "Axis Children\u2019s Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -5229,18 +5241,6 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Aggressive Hybrid",
-      "aliases": [],
-      "canonical_amfi_code": "119019",
-      "amfi_base_name": "DSP Aggressive Hybrid Fund",
-      "disclosure_label": "DSP Aggressive Hybrid Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
       "shortcode": "ARBITRAGE",
       "aliases": [],
       "canonical_amfi_code": "142283",
@@ -5253,11 +5253,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "BANKING & PSU",
+      "shortcode": "Aggressive Hybrid",
       "aliases": [],
-      "canonical_amfi_code": "124175",
-      "amfi_base_name": "DSP Banking & PSU Debt Fund",
-      "disclosure_label": "DSP Banking and PSU Debt Fund",
+      "canonical_amfi_code": "119019",
+      "amfi_base_name": "DSP Aggressive Hybrid Fund",
+      "disclosure_label": "DSP Aggressive Hybrid Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5265,11 +5265,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Banking and Financial Services",
+      "shortcode": "BANKING & PSU",
       "aliases": [],
-      "canonical_amfi_code": "152206",
-      "amfi_base_name": "DSP Banking & Financial Services Fund",
-      "disclosure_label": "DSP Banking & Financial Services Fund",
+      "canonical_amfi_code": "124175",
+      "amfi_base_name": "DSP Banking & PSU Debt Fund",
+      "disclosure_label": "DSP Banking and PSU Debt Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5325,11 +5325,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Business Cycle Fund",
+      "shortcode": "Banking and Financial Services",
       "aliases": [],
-      "canonical_amfi_code": "153121",
-      "amfi_base_name": "DSP Business Cycle Fund",
-      "disclosure_label": "DSP Business Cycle Fund",
+      "canonical_amfi_code": "152206",
+      "amfi_base_name": "DSP Banking & Financial Services Fund",
+      "disclosure_label": "DSP Banking & Financial Services Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5337,11 +5337,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Corporate Bond",
+      "shortcode": "Business Cycle Fund",
       "aliases": [],
-      "canonical_amfi_code": "144646",
-      "amfi_base_name": "DSP Corporate Bond Fund",
-      "disclosure_label": "DSP Corporate Bond Fund",
+      "canonical_amfi_code": "153121",
+      "amfi_base_name": "DSP Business Cycle Fund",
+      "disclosure_label": "DSP Business Cycle Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5366,6 +5366,18 @@
       "canonical_amfi_code": "151329",
       "amfi_base_name": "DSP CRISIL - IBX 50:50 Gilt Plus SDL - April 2033 Index Fund",
       "disclosure_label": "DSP CRISIL-IBX 50:50 Gilt Plus SDL - April 2033 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Corporate Bond",
+      "aliases": [],
+      "canonical_amfi_code": "144646",
+      "amfi_base_name": "DSP Corporate Bond Fund",
+      "disclosure_label": "DSP Corporate Bond Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5445,18 +5457,6 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Flexi Cap",
-      "aliases": [],
-      "canonical_amfi_code": "119076",
-      "amfi_base_name": "DSP Flexi Cap Fund",
-      "disclosure_label": "DSP Flexi Cap Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
       "shortcode": "FLOATER",
       "aliases": [],
       "canonical_amfi_code": "148771",
@@ -5505,6 +5505,18 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
+      "shortcode": "Flexi Cap",
+      "aliases": [],
+      "canonical_amfi_code": "119076",
+      "amfi_base_name": "DSP Flexi Cap Fund",
+      "disclosure_label": "DSP Flexi Cap Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
       "shortcode": "GILT",
       "aliases": [],
       "canonical_amfi_code": "119099",
@@ -5513,30 +5525,6 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "Global Clean Energy FOF",
-      "aliases": [],
-      "canonical_amfi_code": "119275",
-      "amfi_base_name": "DSP Global Clean Energy Overseas Equity Omni FoF",
-      "disclosure_label": "DSP Global Clean Energy Overseas Equity Omni FoF",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "Global Innovation",
-      "aliases": [],
-      "canonical_amfi_code": "149816",
-      "amfi_base_name": "DSP Global Innovation Overseas Equity Omni FoF",
-      "disclosure_label": "DSP Global Innovation Overseas Equity Omni FoF",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
     {
@@ -5558,6 +5546,30 @@
       "canonical_amfi_code": "152183",
       "amfi_base_name": "DSP Gold ETF Fund of Fund",
       "disclosure_label": "DSP Gold ETF Fund of Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Global Clean Energy FOF",
+      "aliases": [],
+      "canonical_amfi_code": "119275",
+      "amfi_base_name": "DSP Global Clean Energy Overseas Equity Omni FoF",
+      "disclosure_label": "DSP Global Clean Energy Overseas Equity Omni FoF",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Global Innovation",
+      "aliases": [],
+      "canonical_amfi_code": "149816",
+      "amfi_base_name": "DSP Global Innovation Overseas Equity Omni FoF",
+      "disclosure_label": "DSP Global Innovation Overseas Equity Omni FoF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5601,30 +5613,6 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Large & Mid Cap",
-      "aliases": [],
-      "canonical_amfi_code": "119218",
-      "amfi_base_name": "DSP Large & Mid Cap Fund",
-      "disclosure_label": "DSP Large & Mid Cap Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "Large Cap",
-      "aliases": [],
-      "canonical_amfi_code": "119250",
-      "amfi_base_name": "DSP Large Cap Fund",
-      "disclosure_label": "DSP Large Cap Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
       "shortcode": "LDF",
       "aliases": [],
       "canonical_amfi_code": "133925",
@@ -5661,6 +5649,30 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
+      "shortcode": "Large & Mid Cap",
+      "aliases": [],
+      "canonical_amfi_code": "119218",
+      "amfi_base_name": "DSP Large & Mid Cap Fund",
+      "disclosure_label": "DSP Large & Mid Cap Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Large Cap",
+      "aliases": [],
+      "canonical_amfi_code": "119250",
+      "amfi_base_name": "DSP Large Cap Fund",
+      "disclosure_label": "DSP Large Cap Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
       "shortcode": "MIDCAP",
       "aliases": [],
       "canonical_amfi_code": "119071",
@@ -5673,11 +5685,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Midcap 150 Quality 50 ETF",
+      "shortcode": "MSCI India ETF",
       "aliases": [],
-      "canonical_amfi_code": "149403",
-      "amfi_base_name": "DSP Nifty Midcap 150 Quality 50 ETF",
-      "disclosure_label": "DSP NIFTY MIDCAP 150 QUALITY 50 ETF",
+      "canonical_amfi_code": "153975",
+      "amfi_base_name": "DSP MSCI INDIA ETF",
+      "disclosure_label": "DSP MSCI India ETF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5685,11 +5697,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "MSCI India ETF",
+      "shortcode": "Midcap 150 Quality 50 ETF",
       "aliases": [],
-      "canonical_amfi_code": "153975",
-      "amfi_base_name": "DSP MSCI INDIA ETF",
-      "disclosure_label": "DSP MSCI India ETF",
+      "canonical_amfi_code": "149403",
+      "amfi_base_name": "DSP Nifty Midcap 150 Quality 50 ETF",
+      "disclosure_label": "DSP NIFTY MIDCAP 150 QUALITY 50 ETF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5733,14 +5745,74 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Nifty 50 Equal ETF",
+      "shortcode": "NIFTY FMCG ETF",
       "aliases": [],
-      "canonical_amfi_code": "149286",
-      "amfi_base_name": "DSP Nifty 50 Equal Weight ETF",
-      "disclosure_label": "DSP Nifty 50 Equal Weight ETF",
+      "canonical_amfi_code": "154357",
+      "amfi_base_name": "DSP Nifty FMCG ETF",
+      "disclosure_label": "DSP NIFTY FMCG ETF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "NIFTY MIDCAP 150 Q50",
+      "aliases": [],
+      "canonical_amfi_code": "150428",
+      "amfi_base_name": "DSP Nifty Midcap 150 Quality 50 Index Fund",
+      "disclosure_label": "DSP Nifty Midcap 150 Quality 50 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "NIFTY SDL Gsec 2027",
+      "aliases": [],
+      "canonical_amfi_code": "151373",
+      "amfi_base_name": "DSP Nifty SDL Plus G - Sec Sep 2027 50:50 Index Fund",
+      "disclosure_label": "DSP Nifty SDL Plus G-Sec Sep 2027 50:50 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "NIFTY50INDEX",
+      "aliases": [],
+      "canonical_amfi_code": "146376",
+      "amfi_base_name": "DSP Nifty 50 Index Fund",
+      "disclosure_label": "DSP Nifty 50 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "NIFTYNEXT50INDEX",
+      "aliases": [],
+      "canonical_amfi_code": "146381",
+      "amfi_base_name": "DSP Nifty Next 50 Index Fund",
+      "disclosure_label": "DSP Nifty Next 50 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "NRNEF",
+      "aliases": [],
+      "canonical_amfi_code": "119028",
+      "amfi_base_name": "DSP Natural Resources and New Energy Fund",
+      "disclosure_label": "DSP Natural Resources & New Energy Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "2026-06",
       "last_verified_period": "latest"
     },
     {
@@ -5750,6 +5822,18 @@
       "canonical_amfi_code": "149392",
       "amfi_base_name": "DSP Nifty 50 ETF",
       "disclosure_label": "DSP NIFTY 50 ETF",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Nifty 50 Equal ETF",
+      "aliases": [],
+      "canonical_amfi_code": "149286",
+      "amfi_base_name": "DSP Nifty 50 Equal Weight ETF",
+      "disclosure_label": "DSP Nifty 50 Equal Weight ETF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5786,18 +5870,6 @@
       "canonical_amfi_code": "152654",
       "amfi_base_name": "DSP Nifty Bank Index Fund",
       "disclosure_label": "DSP Nifty Bank Index Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "NIFTY FMCG ETF",
-      "aliases": [],
-      "canonical_amfi_code": "154357",
-      "amfi_base_name": "DSP Nifty FMCG ETF",
-      "disclosure_label": "DSP NIFTY FMCG ETF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5865,35 +5937,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "NIFTY MIDCAP 150 Q50",
-      "aliases": [],
-      "canonical_amfi_code": "150428",
-      "amfi_base_name": "DSP Nifty Midcap 150 Quality 50 Index Fund",
-      "disclosure_label": "DSP Nifty Midcap 150 Quality 50 Index Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
       "shortcode": "Nifty Next 50 ETF",
       "aliases": [],
       "canonical_amfi_code": "154087",
       "amfi_base_name": "DSP Nifty Next 50 ETF",
       "disclosure_label": "DSP Nifty Next 50 ETF",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "Nifty Private Bank ETF",
-      "aliases": [],
-      "canonical_amfi_code": "151887",
-      "amfi_base_name": "DSP Nifty Private Bank ETF",
-      "disclosure_label": "DSP Nifty Private Bank ETF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5913,11 +5961,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Nifty Pvt Bank Index",
+      "shortcode": "Nifty Private Bank ETF",
       "aliases": [],
-      "canonical_amfi_code": "153348",
-      "amfi_base_name": "DSP Nifty Private Bank Index Fund",
-      "disclosure_label": "DSP Nifty Private Bank Index Fund",
+      "canonical_amfi_code": "151887",
+      "amfi_base_name": "DSP Nifty Private Bank ETF",
+      "disclosure_label": "DSP Nifty Private Bank ETF",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -5925,11 +5973,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "NIFTY SDL Gsec 2027",
+      "shortcode": "Nifty Pvt Bank Index",
       "aliases": [],
-      "canonical_amfi_code": "151373",
-      "amfi_base_name": "DSP Nifty SDL Plus G - Sec Sep 2027 50:50 Index Fund",
-      "disclosure_label": "DSP Nifty SDL Plus G-Sec Sep 2027 50:50 Index Fund",
+      "canonical_amfi_code": "153348",
+      "amfi_base_name": "DSP Nifty Private Bank Index Fund",
+      "disclosure_label": "DSP Nifty Private Bank Index Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -6033,42 +6081,6 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "NIFTY50INDEX",
-      "aliases": [],
-      "canonical_amfi_code": "146376",
-      "amfi_base_name": "DSP Nifty 50 Index Fund",
-      "disclosure_label": "DSP Nifty 50 Index Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "NIFTYNEXT50INDEX",
-      "aliases": [],
-      "canonical_amfi_code": "146381",
-      "amfi_base_name": "DSP Nifty Next 50 Index Fund",
-      "disclosure_label": "DSP Nifty Next 50 Index Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "NRNEF",
-      "aliases": [],
-      "canonical_amfi_code": "119028",
-      "amfi_base_name": "DSP Natural Resources and New Energy Fund",
-      "disclosure_label": "DSP Natural Resources & New Energy Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "2026-06",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
       "shortcode": "OVERNIGHT",
       "aliases": [],
       "canonical_amfi_code": "146062",
@@ -6105,47 +6117,11 @@
     },
     {
       "amc_id": "dsp-mutual-fund",
-      "shortcode": "Sensex Next 30 ETF",
-      "aliases": [],
-      "canonical_amfi_code": "153228",
-      "amfi_base_name": "DSP BSE SENSEX Next 30 ETF",
-      "disclosure_label": "DSP BSE Sensex Next 30 ETF",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "Sensex Next 30 Index",
-      "aliases": [],
-      "canonical_amfi_code": "153219",
-      "amfi_base_name": "DSP BSE SENSEX Next 30 Index Fund",
-      "disclosure_label": "DSP BSE Sensex Next 30 Index Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
       "shortcode": "SILVER ETF",
       "aliases": [],
       "canonical_amfi_code": "150523",
       "amfi_base_name": "DSP Silver ETF",
       "disclosure_label": "DSP SILVER ETF",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "dsp-mutual-fund",
-      "shortcode": "Silver ETF FOF",
-      "aliases": [],
-      "canonical_amfi_code": "153487",
-      "amfi_base_name": "DSP Silver ETF Fund of Fund",
-      "disclosure_label": "DSP Silver ETF Fund of Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -6185,6 +6161,42 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Sensex Next 30 ETF",
+      "aliases": [],
+      "canonical_amfi_code": "153228",
+      "amfi_base_name": "DSP BSE SENSEX Next 30 ETF",
+      "disclosure_label": "DSP BSE Sensex Next 30 ETF",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Sensex Next 30 Index",
+      "aliases": [],
+      "canonical_amfi_code": "153219",
+      "amfi_base_name": "DSP BSE SENSEX Next 30 Index Fund",
+      "disclosure_label": "DSP BSE Sensex Next 30 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "Silver ETF FOF",
+      "aliases": [],
+      "canonical_amfi_code": "153487",
+      "amfi_base_name": "DSP Silver ETF Fund of Fund",
+      "disclosure_label": "DSP Silver ETF Fund of Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
     {
@@ -6361,7 +6373,7 @@
       "aliases": [],
       "canonical_amfi_code": "153115",
       "amfi_base_name": "Edelweiss CRISIL IBX AAA Financial Services - Jan 2028 Index Fund",
-      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond – Jan 2028 Index Fund",
+      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond \u2013 Jan 2028 Index Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -8529,6 +8541,18 @@
     },
     {
       "amc_id": "hdfc-mutual-fund",
+      "shortcode": "DERIVATIVEMY2005",
+      "aliases": [],
+      "canonical_amfi_code": "119131",
+      "amfi_base_name": "HDFC Multi - Asset Fund",
+      "disclosure_label": "HDFC Multi Asset Fund",
+      "confidence": "seeded",
+      "source": "name_match",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "hdfc-mutual-fund",
       "shortcode": "DerivativeHDFC Balanced Advanta",
       "aliases": [],
       "canonical_amfi_code": "118968",
@@ -8752,18 +8776,6 @@
       "disclosure_label": "HDFC Retirement Savings Fund Hybrid Debt Plan",
       "confidence": "seeded",
       "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "hdfc-mutual-fund",
-      "shortcode": "DERIVATIVEMY2005",
-      "aliases": [],
-      "canonical_amfi_code": "119131",
-      "amfi_base_name": "HDFC Multi - Asset Fund",
-      "disclosure_label": "HDFC Multi Asset Fund",
-      "confidence": "seeded",
-      "source": "name_match",
       "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
@@ -10076,6 +10088,23 @@
       "last_verified_period": "latest"
     },
     {
+      "amc_id": "hdfc-mutual-fund",
+      "shortcode": "MY2005",
+      "aliases": [
+        "HDFC Multi-Asset Allocation Fund",
+        "HDFC Multi Asset Allocation Fund",
+        "HDFC Multi-Asset Fund",
+        "Monthly HDFC Multi-Asset Allocation Fund"
+      ],
+      "canonical_amfi_code": "103130",
+      "amfi_base_name": "HDFC Multi-Asset Fund",
+      "disclosure_label": "HDFC Multi-Asset Allocation Fund",
+      "confidence": "manual",
+      "source": "manual_fix",
+      "first_seen_period": "2026-07-31",
+      "last_verified_period": "2026-07-31"
+    },
+    {
       "amc_id": "helios-mutual-fund",
       "shortcode": "H01",
       "aliases": [],
@@ -11373,11 +11402,11 @@
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
-      "shortcode": "ICICI Prudential Children’s Fund",
+      "shortcode": "ICICI Prudential Children\u2019s Fund",
       "aliases": [],
       "canonical_amfi_code": "120579",
       "amfi_base_name": "ICICI Prudential Children's Fund",
-      "disclosure_label": "ICICI Prudential Children’s Fund",
+      "disclosure_label": "ICICI Prudential Children\u2019s Fund",
       "confidence": "seeded",
       "source": "name_match",
       "first_seen_period": "latest",
@@ -11430,6 +11459,18 @@
       "source": "shortcode",
       "first_seen_period": "2026-06",
       "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "icici-prudential-mutual-fund",
+      "shortcode": "INDEX",
+      "aliases": [],
+      "canonical_amfi_code": "120620",
+      "amfi_base_name": "ICICI Prudential Nifty 50 Index Fund",
+      "disclosure_label": "ICICI Prudential Nifty 50 Index Fund",
+      "confidence": "manual",
+      "source": "gap_fix",
+      "first_seen_period": "2026-07",
+      "last_verified_period": "2026-07"
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
@@ -11754,6 +11795,21 @@
       "source": "shortcode",
       "first_seen_period": "2026-06",
       "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "icici-prudential-mutual-fund",
+      "shortcode": "MONEY MARKET",
+      "aliases": [
+        "MONEYMARKET",
+        "MMF"
+      ],
+      "canonical_amfi_code": "120209",
+      "amfi_base_name": "ICICI Prudential Money Market Fund",
+      "disclosure_label": "ICICI Prudential Money Market Fund",
+      "confidence": "manual",
+      "source": "gap_fix",
+      "first_seen_period": "2026-07",
+      "last_verified_period": "2026-07"
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
@@ -13491,11 +13547,11 @@
     },
     {
       "amc_id": "jm-financial-mutual-fund",
-      "shortcode": "JM Large and Midcap Fund",
+      "shortcode": "JM Large Cap Fund",
       "aliases": [],
-      "canonical_amfi_code": "153629",
-      "amfi_base_name": "JM Large & Mid Cap Fund",
-      "disclosure_label": "JM Large and Midcap Fund",
+      "canonical_amfi_code": "120490",
+      "amfi_base_name": "JM Large Cap Fund",
+      "disclosure_label": "JM Large Cap Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -13503,11 +13559,11 @@
     },
     {
       "amc_id": "jm-financial-mutual-fund",
-      "shortcode": "JM Large Cap Fund",
+      "shortcode": "JM Large and Midcap Fund",
       "aliases": [],
-      "canonical_amfi_code": "120490",
-      "amfi_base_name": "JM Large Cap Fund",
-      "disclosure_label": "JM Large Cap Fund",
+      "canonical_amfi_code": "153629",
+      "amfi_base_name": "JM Large & Mid Cap Fund",
+      "disclosure_label": "JM Large and Midcap Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -13923,18 +13979,6 @@
     },
     {
       "amc_id": "kotak-mahindra-mutual-fund",
-      "shortcode": "Common Notes",
-      "aliases": [],
-      "canonical_amfi_code": "151286",
-      "amfi_base_name": "Kotak FMP Series 304",
-      "disclosure_label": "Kotak FMP Series 183",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "kotak-mahindra-mutual-fund",
       "shortcode": "CON",
       "aliases": [],
       "canonical_amfi_code": "119769",
@@ -13979,6 +14023,18 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "kotak-mahindra-mutual-fund",
+      "shortcode": "Common Notes",
+      "aliases": [],
+      "canonical_amfi_code": "151286",
+      "amfi_base_name": "Kotak FMP Series 304",
+      "disclosure_label": "Kotak FMP Series 183",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
     {
@@ -15235,7 +15291,7 @@
       "aliases": [],
       "canonical_amfi_code": "120285",
       "amfi_base_name": "LIC MF Children's Fund",
-      "disclosure_label": "LIC MF CHILDREN’S FUND",
+      "disclosure_label": "LIC MF CHILDREN\u2019S FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -18235,18 +18291,6 @@
     },
     {
       "amc_id": "navi-mutual-fund",
-      "shortcode": "Navi Nifty India Manufacturing Index Fund",
-      "aliases": [],
-      "canonical_amfi_code": "150515",
-      "amfi_base_name": "Navi Nifty India Manufacturing Index Fund",
-      "disclosure_label": "Navi Nifty India Manufacturing Index Fund",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "navi-mutual-fund",
       "shortcode": "Navi Nifty IT Index Fund",
       "aliases": [],
       "canonical_amfi_code": "152535",
@@ -18259,11 +18303,11 @@
     },
     {
       "amc_id": "navi-mutual-fund",
-      "shortcode": "Navi Nifty Midcap 150 Index fund",
+      "shortcode": "Navi Nifty India Manufacturing Index Fund",
       "aliases": [],
-      "canonical_amfi_code": "149892",
-      "amfi_base_name": "Navi Nifty Midcap 150 Index Fund",
-      "disclosure_label": "Navi Nifty Midcap 150 Index fund",
+      "canonical_amfi_code": "150515",
+      "amfi_base_name": "Navi Nifty India Manufacturing Index Fund",
+      "disclosure_label": "Navi Nifty India Manufacturing Index Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -18276,6 +18320,18 @@
       "canonical_amfi_code": "154027",
       "amfi_base_name": "Navi Nifty Midsmall 400 Index Fund",
       "disclosure_label": "Navi Nifty MidSmallcap 400 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "navi-mutual-fund",
+      "shortcode": "Navi Nifty Midcap 150 Index fund",
+      "aliases": [],
+      "canonical_amfi_code": "149892",
+      "amfi_base_name": "Navi Nifty Midcap 150 Index Fund",
+      "disclosure_label": "Navi Nifty Midcap 150 Index fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -19839,20 +19895,6 @@
     },
     {
       "amc_id": "pgim-india-mutual-fund",
-      "shortcode": "Money Market",
-      "aliases": [
-        "PGIM INDIA MONEY MARKET FUND"
-      ],
-      "canonical_amfi_code": "148161",
-      "amfi_base_name": "PGIM India Money Market Fund",
-      "disclosure_label": "PGIM INDIA MONEY MARKET FUND",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "2026-07",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "pgim-india-mutual-fund",
       "shortcode": "Hybrid Equity",
       "aliases": [],
       "canonical_amfi_code": "138386",
@@ -19870,6 +19912,18 @@
       "canonical_amfi_code": "151407",
       "amfi_base_name": "PGIM India CRISIL IBX Gilt Index - Apr 2028 Fund",
       "disclosure_label": "PGIM INDIA CRISIL IBX GILT INDEX - APR 2028",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "pgim-india-mutual-fund",
+      "shortcode": "LIQUID",
+      "aliases": [],
+      "canonical_amfi_code": "138299",
+      "amfi_base_name": "PGIM India Liquid Fund",
+      "disclosure_label": "PGIM INDIA LIQUID FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
@@ -19901,14 +19955,14 @@
     },
     {
       "amc_id": "pgim-india-mutual-fund",
-      "shortcode": "LIQUID",
+      "shortcode": "MULTICAP",
       "aliases": [],
-      "canonical_amfi_code": "138299",
-      "amfi_base_name": "PGIM India Liquid Fund",
-      "disclosure_label": "PGIM INDIA LIQUID FUND",
+      "canonical_amfi_code": "152815",
+      "amfi_base_name": "PGIM India Multi Cap Fund",
+      "disclosure_label": "PGIM INDIA MULTI CAP FUND",
       "confidence": "seeded",
       "source": "shortcode",
-      "first_seen_period": "latest",
+      "first_seen_period": "2026-06",
       "last_verified_period": "latest"
     },
     {
@@ -19925,14 +19979,16 @@
     },
     {
       "amc_id": "pgim-india-mutual-fund",
-      "shortcode": "MULTICAP",
-      "aliases": [],
-      "canonical_amfi_code": "152815",
-      "amfi_base_name": "PGIM India Multi Cap Fund",
-      "disclosure_label": "PGIM INDIA MULTI CAP FUND",
+      "shortcode": "Money Market",
+      "aliases": [
+        "PGIM INDIA MONEY MARKET FUND"
+      ],
+      "canonical_amfi_code": "148161",
+      "amfi_base_name": "PGIM India Money Market Fund",
+      "disclosure_label": "PGIM INDIA MONEY MARKET FUND",
       "confidence": "seeded",
       "source": "shortcode",
-      "first_seen_period": "2026-06",
+      "first_seen_period": "2026-07",
       "last_verified_period": "latest"
     },
     {
@@ -19949,18 +20005,6 @@
     },
     {
       "amc_id": "pgim-india-mutual-fund",
-      "shortcode": "Real Estate",
-      "aliases": [],
-      "canonical_amfi_code": "149298",
-      "amfi_base_name": "PGIM India Global Select Real Estate Securities Fund of Fund",
-      "disclosure_label": "PGIM INDIA GLOBAL SELECT REAL ESTATE SEC. FOF",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "pgim-india-mutual-fund",
       "shortcode": "RETIREMENT",
       "aliases": [],
       "canonical_amfi_code": "152537",
@@ -19969,6 +20013,18 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "pgim-india-mutual-fund",
+      "shortcode": "Real Estate",
+      "aliases": [],
+      "canonical_amfi_code": "149298",
+      "amfi_base_name": "PGIM India Global Select Real Estate Securities Fund of Fund",
+      "disclosure_label": "PGIM INDIA GLOBAL SELECT REAL ESTATE SEC. FOF",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
     {
@@ -20417,18 +20473,6 @@
     },
     {
       "amc_id": "quant-mutual-fund",
-      "shortcode": "quant Large & Mid Cap Fund",
-      "aliases": [],
-      "canonical_amfi_code": "120826",
-      "amfi_base_name": "quant Large & Mid Cap Fund",
-      "disclosure_label": "quant Large & Mid Cap Fund",
-      "confidence": "seeded",
-      "source": "name_match",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "quant-mutual-fund",
       "shortcode": "QVF",
       "aliases": [],
       "canonical_amfi_code": "149335",
@@ -20437,6 +20481,18 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "quant-mutual-fund",
+      "shortcode": "quant Large & Mid Cap Fund",
+      "aliases": [],
+      "canonical_amfi_code": "120826",
+      "amfi_base_name": "quant Large & Mid Cap Fund",
+      "disclosure_label": "quant Large & Mid Cap Fund",
+      "confidence": "seeded",
+      "source": "name_match",
+      "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
     {
@@ -24178,7 +24234,11 @@
     {
       "amc_id": "union-mutual-fund",
       "shortcode": "Dynamic Bond Fund",
-      "aliases": [],
+      "aliases": [
+        "Dynamic Term Fund",
+        "UNION DYNAMIC TERM FUND",
+        "UNION DYNAMIC TERM FUND (FORMERLY UNION DYNAMIC BOND FUND)"
+      ],
       "canonical_amfi_code": "119311",
       "amfi_base_name": "Union Dynamic Bond Fund",
       "disclosure_label": "UNION DYNAMIC BOND FUND",
@@ -24213,6 +24273,18 @@
     },
     {
       "amc_id": "union-mutual-fund",
+      "shortcode": "FOD",
+      "aliases": [],
+      "canonical_amfi_code": "153575",
+      "amfi_base_name": "Union Income Plus Arbitrage Active FOF",
+      "disclosure_label": "UNION INCOME PLUS ARBITRAGE ACTIVE FOF",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "union-mutual-fund",
       "shortcode": "Flexi Cap Fund",
       "aliases": [],
       "canonical_amfi_code": "119292",
@@ -24233,18 +24305,6 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "union-mutual-fund",
-      "shortcode": "FOD",
-      "aliases": [],
-      "canonical_amfi_code": "153575",
-      "amfi_base_name": "Union Income Plus Arbitrage Active FOF",
-      "disclosure_label": "UNION INCOME PLUS ARBITRAGE ACTIVE FOF",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "2026-06",
       "last_verified_period": "latest"
     },
     {
@@ -24285,18 +24345,6 @@
     },
     {
       "amc_id": "union-mutual-fund",
-      "shortcode": "Large & Midcap",
-      "aliases": [],
-      "canonical_amfi_code": "147750",
-      "amfi_base_name": "Union Large & Midcap Fund",
-      "disclosure_label": "UNION LARGE & MIDCAP FUND",
-      "confidence": "seeded",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "union-mutual-fund",
       "shortcode": "LARGECAP",
       "aliases": [
         "Largecap",
@@ -24308,6 +24356,18 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "union-mutual-fund",
+      "shortcode": "Large & Midcap",
+      "aliases": [],
+      "canonical_amfi_code": "147750",
+      "amfi_base_name": "Union Large & Midcap Fund",
+      "disclosure_label": "UNION LARGE & MIDCAP FUND",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
     {
@@ -24325,7 +24385,11 @@
     {
       "amc_id": "union-mutual-fund",
       "shortcode": "Low Duration",
-      "aliases": [],
+      "aliases": [
+        "UNION ULTRA SHORT TO SHORT TERM FUND",
+        "UNION ULTRA SHORT TO SHORT TERM FUND (FORMERLY UNION LOW DURATION FUND)",
+        "Ultra Short to Short Term"
+      ],
       "canonical_amfi_code": "153654",
       "amfi_base_name": "Union Low Duration Fund",
       "disclosure_label": "UNION LOW DURATION FUND",
@@ -24400,7 +24464,11 @@
     {
       "amc_id": "union-mutual-fund",
       "shortcode": "Short Duration",
-      "aliases": [],
+      "aliases": [
+        "Short Term",
+        "UNION SHORT TERM FUND",
+        "UNION SHORT TERM FUND (FORMERLY UNION SHORT DURATION FUND)"
+      ],
       "canonical_amfi_code": "153242",
       "amfi_base_name": "Union Short Duration Fund",
       "disclosure_label": "UNION SHORT DURATION FUND",
@@ -25501,23 +25569,6 @@
     },
     {
       "amc_id": "uti-mutual-fund",
-      "shortcode": "exposure",
-      "aliases": [
-        "SCHEME: UTI - Unit Linked Insurance Plan",
-        "UTI - Unit Linked Insurance",
-        "UTI - Unit Linked Insurance Plan",
-        "Unit Linked Insurance Plan"
-      ],
-      "canonical_amfi_code": "100646",
-      "amfi_base_name": "UTI - Unit Linked Insurance",
-      "disclosure_label": "SCHEME: UTI - Unit Linked Insurance Plan",
-      "confidence": "manual",
-      "source": "shortcode",
-      "first_seen_period": "latest",
-      "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "uti-mutual-fund",
       "shortcode": "SHEET0",
       "aliases": [],
       "canonical_amfi_code": "120656",
@@ -25538,6 +25589,77 @@
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
+      "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "UTI - Credit Risk Fund.",
+      "aliases": [
+        "UTI - Credit Risk Fund"
+      ],
+      "canonical_amfi_code": "117981",
+      "amfi_base_name": "UTI - Credit Risk Fund.",
+      "disclosure_label": "UTI - Credit Risk Fund.",
+      "confidence": "manual",
+      "source": "fortnightly_label",
+      "first_seen_period": "2026-07-15",
+      "last_verified_period": "2026-07-15"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "UTI - Medium Term Fund ( Segregated - 06032020)",
+      "aliases": [],
+      "canonical_amfi_code": "148246",
+      "amfi_base_name": "UTI - Medium Term Fund ( Segregated - 06032020",
+      "disclosure_label": "UTI - Medium Term Fund ( Segregated - 06032020)",
+      "confidence": "manual",
+      "source": "fortnightly_label",
+      "first_seen_period": "2026-07-15",
+      "last_verified_period": "2026-07-15"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "UTI - Money Market Fund",
+      "aliases": [],
+      "canonical_amfi_code": "100723",
+      "amfi_base_name": "UTI - Money Market Fund",
+      "disclosure_label": "UTI - Money Market Fund",
+      "confidence": "manual",
+      "source": "fortnightly_label",
+      "first_seen_period": "2026-07-15",
+      "last_verified_period": "2026-07-15"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "UTI Nifty 1D Rate Liquid ETF - Growth",
+      "aliases": [
+        "UTI Nifty 1D Rate Liquid ETF - Growth",
+        "UTI Nifty 1D Rate Liquid ETF",
+        "Nifty 1D Rate Liquid ETF - Growth"
+      ],
+      "canonical_amfi_code": "154466",
+      "amfi_base_name": "UTI Nifty 1D Rate Liquid ETF - Growth",
+      "disclosure_label": "UTI Nifty 1D Rate Liquid ETF - Growth",
+      "confidence": "manual",
+      "source": "manual_fix",
+      "first_seen_period": "2026-07-31",
+      "last_verified_period": "2026-07-31"
+    },
+    {
+      "amc_id": "uti-mutual-fund",
+      "shortcode": "exposure",
+      "aliases": [
+        "SCHEME: UTI - Unit Linked Insurance Plan",
+        "UTI - Unit Linked Insurance",
+        "UTI - Unit Linked Insurance Plan",
+        "Unit Linked Insurance Plan"
+      ],
+      "canonical_amfi_code": "100646",
+      "amfi_base_name": "UTI - Unit Linked Insurance",
+      "disclosure_label": "SCHEME: UTI - Unit Linked Insurance Plan",
+      "confidence": "manual",
+      "source": "shortcode",
+      "first_seen_period": "latest",
       "last_verified_period": "latest"
     },
     {
@@ -26059,116 +26181,6 @@
       "source": "shortcode",
       "first_seen_period": "2026-06",
       "last_verified_period": "latest"
-    },
-    {
-      "amc_id": "icici-prudential-mutual-fund",
-      "shortcode": "INDEX",
-      "aliases": [],
-      "canonical_amfi_code": "120620",
-      "amfi_base_name": "ICICI Prudential Nifty 50 Index Fund",
-      "disclosure_label": "ICICI Prudential Nifty 50 Index Fund",
-      "confidence": "manual",
-      "source": "gap_fix",
-      "first_seen_period": "2026-07",
-      "last_verified_period": "2026-07"
-    },
-    {
-      "amc_id": "icici-prudential-mutual-fund",
-      "shortcode": "MONEY MARKET",
-      "aliases": [
-        "MONEYMARKET",
-        "MMF"
-      ],
-      "canonical_amfi_code": "120209",
-      "amfi_base_name": "ICICI Prudential Money Market Fund",
-      "disclosure_label": "ICICI Prudential Money Market Fund",
-      "confidence": "manual",
-      "source": "gap_fix",
-      "first_seen_period": "2026-07",
-      "last_verified_period": "2026-07"
-    },
-    {
-      "amc_id": "aditya-birla-sun-life-mutual-fund",
-      "shortcode": "ABSLUS10",
-      "aliases": [],
-      "canonical_amfi_code": "152150",
-      "amfi_base_name": "Aditya Birla Sun Life US Treasury 3 - 10 Year Bond ETFs Fund Of Funds",
-      "disclosure_label": "ADITYA BIRLA SUN LIFE US TREASURY 3-10 YEAR BONDS ETFS PASSIVE FOF",
-      "confidence": "manual",
-      "source": "gap_fix",
-      "first_seen_period": "2026-07",
-      "last_verified_period": "2026-07"
-    },
-    {
-      "amc_id": "uti-mutual-fund",
-      "shortcode": "UTI - Credit Risk Fund.",
-      "aliases": [
-        "UTI - Credit Risk Fund"
-      ],
-      "canonical_amfi_code": "117981",
-      "amfi_base_name": "UTI - Credit Risk Fund.",
-      "disclosure_label": "UTI - Credit Risk Fund.",
-      "confidence": "manual",
-      "source": "fortnightly_label",
-      "first_seen_period": "2026-07-15",
-      "last_verified_period": "2026-07-15"
-    },
-    {
-      "amc_id": "uti-mutual-fund",
-      "shortcode": "UTI - Medium Term Fund ( Segregated - 06032020)",
-      "aliases": [],
-      "canonical_amfi_code": "148246",
-      "amfi_base_name": "UTI - Medium Term Fund ( Segregated - 06032020",
-      "disclosure_label": "UTI - Medium Term Fund ( Segregated - 06032020)",
-      "confidence": "manual",
-      "source": "fortnightly_label",
-      "first_seen_period": "2026-07-15",
-      "last_verified_period": "2026-07-15"
-    },
-    {
-      "amc_id": "uti-mutual-fund",
-      "shortcode": "UTI - Money Market Fund",
-      "aliases": [],
-      "canonical_amfi_code": "100723",
-      "amfi_base_name": "UTI - Money Market Fund",
-      "disclosure_label": "UTI - Money Market Fund",
-      "confidence": "manual",
-      "source": "fortnightly_label",
-      "first_seen_period": "2026-07-15",
-      "last_verified_period": "2026-07-15"
-    },
-    {
-      "amc_id": "uti-mutual-fund",
-      "shortcode": "UTI Nifty 1D Rate Liquid ETF - Growth",
-      "aliases": [
-        "UTI Nifty 1D Rate Liquid ETF - Growth",
-        "UTI Nifty 1D Rate Liquid ETF",
-        "Nifty 1D Rate Liquid ETF - Growth"
-      ],
-      "canonical_amfi_code": "154466",
-      "amfi_base_name": "UTI Nifty 1D Rate Liquid ETF - Growth",
-      "disclosure_label": "UTI Nifty 1D Rate Liquid ETF - Growth",
-      "confidence": "manual",
-      "source": "manual_fix",
-      "first_seen_period": "2026-07-31",
-      "last_verified_period": "2026-07-31"
-    },
-    {
-      "amc_id": "hdfc-mutual-fund",
-      "shortcode": "MY2005",
-      "aliases": [
-        "HDFC Multi-Asset Allocation Fund",
-        "HDFC Multi Asset Allocation Fund",
-        "HDFC Multi-Asset Fund",
-        "Monthly HDFC Multi-Asset Allocation Fund"
-      ],
-      "canonical_amfi_code": "103130",
-      "amfi_base_name": "HDFC Multi-Asset Fund",
-      "disclosure_label": "HDFC Multi-Asset Allocation Fund",
-      "confidence": "manual",
-      "source": "manual_fix",
-      "first_seen_period": "2026-07-31",
-      "last_verified_period": "2026-07-31"
     }
   ]
 }

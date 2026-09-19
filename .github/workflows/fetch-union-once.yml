@@ -1,0 +1,37 @@
+# One-shot Union MF fetch from GitHub-hosted runners (different egress than Cloud Agent VMs).
+# Union's edge often TLS-resets datacenter IPs; Actions IPs sometimes still work.
+name: fetch-union-once
+
+on:
+  workflow_dispatch:
+    inputs:
+      months:
+        description: "YYYY-MM months to fetch"
+        required: true
+        default: "2026-08"
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install -q curl_cffi requests
+      - name: Fetch Union monthly
+        run: |
+          set -euo pipefail
+          python scrapers/python/fetch_union.py --months ${{ inputs.months }} --root scrapers
+          echo "=== staging tree ==="
+          find scrapers/amcs/union-mutual-fund -type f | head -100
+          find scrapers/amcs/union-mutual-fund -type f | wc -l
+      - name: Upload files
+        uses: actions/upload-artifact@v4
+        with:
+          name: union-monthly-${{ inputs.months }}
+          path: scrapers/amcs/union-mutual-fund/
+          if-no-files-found: warn
+          retention-days: 3
