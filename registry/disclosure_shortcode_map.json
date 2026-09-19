@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Durable disclosure key \u2192 AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
+  "note": "Durable disclosure key → AMFI fund map. Key is a pack ticker (e.g. 1DGROWTH) or sheet title as-is (e.g. '360 ONE Balanced Hybrid Fund'). Matcher resolves these before name fuzzy-match.",
   "entries": [
     {
       "amc_id": "360-one-mutual-fund",
@@ -1757,7 +1757,7 @@
       "aliases": [],
       "canonical_amfi_code": "135764",
       "amfi_base_name": "Axis Children's Fund - No Lock in",
-      "disclosure_label": "Axis Children\u2019s Fund",
+      "disclosure_label": "Axis Children’s Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -6361,7 +6361,7 @@
       "aliases": [],
       "canonical_amfi_code": "153115",
       "amfi_base_name": "Edelweiss CRISIL IBX AAA Financial Services - Jan 2028 Index Fund",
-      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond \u2013 Jan 2028 Index Fund",
+      "disclosure_label": "Edelweiss CRISIL IBX AAA Financial Services Bond – Jan 2028 Index Fund",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -11373,11 +11373,11 @@
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
-      "shortcode": "ICICI Prudential Children\u2019s Fund",
+      "shortcode": "ICICI Prudential Children’s Fund",
       "aliases": [],
       "canonical_amfi_code": "120579",
       "amfi_base_name": "ICICI Prudential Children's Fund",
-      "disclosure_label": "ICICI Prudential Children\u2019s Fund",
+      "disclosure_label": "ICICI Prudential Children’s Fund",
       "confidence": "seeded",
       "source": "name_match",
       "first_seen_period": "latest",
@@ -11386,14 +11386,19 @@
     {
       "amc_id": "icici-prudential-mutual-fund",
       "shortcode": "ICICI Prudential Equity & Debt Fund",
-      "aliases": [],
-      "canonical_amfi_code": "120251",
+      "aliases": [
+        "ICICI Prudential Aggressive Hybrid Fund",
+        "Aggressive Hybrid Fund",
+        "ICICI Prudential Equity & Debt Fund"
+      ],
+      "canonical_amfi_code": "100355",
       "amfi_base_name": "ICICI Prudential Equity & Debt Fund",
-      "disclosure_label": "ICICI Prudential Equity & Debt Fund",
+      "disclosure_label": "ICICI Prudential Aggressive Hybrid Fund",
       "confidence": "seeded",
       "source": "name_match",
       "first_seen_period": "latest",
-      "last_verified_period": "latest"
+      "last_verified_period": "latest",
+      "notes": " Aug 2026 disclosure renamed Equity & Debt → Aggressive Hybrid Fund."
     },
     {
       "amc_id": "icici-prudential-mutual-fund",
@@ -15211,7 +15216,7 @@
       "aliases": [],
       "canonical_amfi_code": "120285",
       "amfi_base_name": "LIC MF Children's Fund",
-      "disclosure_label": "LIC MF CHILDREN\u2019S FUND",
+      "disclosure_label": "LIC MF CHILDREN’S FUND",
       "confidence": "seeded",
       "source": "shortcode",
       "first_seen_period": "2026-06",
@@ -16396,8 +16401,14 @@
     {
       "amc_id": "mirae-asset-mutual-fund",
       "shortcode": "MAGEF",
-      "aliases": [],
-      "canonical_amfi_code": "150595",
+      "aliases": [
+        "magef",
+        "MAGEF",
+        "Mirae Asset Global Electric & Autonomous Vehicles Equity Passive FOF",
+        "Global Electric & Autonomous Vehicles Equity Passive FOF",
+        "Mirae Asset Global Electric & Autonomous Vehicles ETFs Fund of Fund"
+      ],
+      "canonical_amfi_code": "150594",
       "amfi_base_name": "Mirae Asset Global Electric & Autonomous Vehicles Equity Passive FOF",
       "disclosure_label": "Mirae Asset Global Electric & Autonomous Vehicles Equity Passive FOF",
       "confidence": "seeded",
@@ -19842,7 +19853,12 @@
     {
       "amc_id": "pgim-india-mutual-fund",
       "shortcode": "IBX GILT",
-      "aliases": [],
+      "aliases": [
+        "IBX GILT",
+        "PGIM INDIA CRISIL IBX GILT INDEX - APR 2028",
+        "PGIM India CRISIL IBX Gilt Index - Apr 2028 Fund",
+        "CRISIL IBX GILT INDEX - APR 2028"
+      ],
       "canonical_amfi_code": "151407",
       "amfi_base_name": "PGIM India CRISIL IBX Gilt Index - Apr 2028 Fund",
       "disclosure_label": "PGIM INDIA CRISIL IBX GILT INDEX - APR 2028",

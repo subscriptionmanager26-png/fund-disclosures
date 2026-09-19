@@ -30,7 +30,8 @@ DISC_ROOT = ROOT / "data" / "disclosures"
 PARSED_ROOT = ROOT / "data" / "parsed"
 
 JUNK_FOLDER = re.compile(
-    r"(?i)^(common notes|contents|cover|notes|disclaimer|risk.?o.?meter)$"
+    r"(?i)^(common notes|contents|cover|notes|disclaimer|risk.?o.?meter|"
+    r"portfolio overlap.*)$"
 )
 
 

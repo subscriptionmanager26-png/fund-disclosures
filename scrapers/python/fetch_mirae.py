@@ -171,24 +171,51 @@ def encrypt_request_payload(payload: dict) -> str:
     return out
 
 
-def call_get_downloads(pgno: int, pgsize: int, *, ctx: ssl.SSLContext) -> dict:
-    payload = {"modulename": "portfolio_tab1", "pgno": pgno, "pgsize": pgsize}
-    encrypted = encrypt_request_payload(payload)
-    body = json.dumps({"request": encrypted}).encode("utf-8")
-    req = urllib.request.Request(API_URL, data=body, headers=HEADERS_JSON, method="POST")
+def call_get_downloads(
+    pgno: int,
+    pgsize: int,
+    *,
+    ctx: ssl.SSLContext,
+    modulename: str = "portfolio_tab1",
+) -> dict:
+    """POST GetDownloadsData.
+
+    As of 2026-09 the site accepts the plain request object (RSA EncryptFunction
+    responses come back as ``Request is null or empty``). Keep
+    ``encrypt_request_payload`` for debugging older builds only.
+
+    ``modulename`` tabs on /downloads/portfolio:
+      portfolio_tab1 = Monthly Portfolio (default)
+      portfolio_tab3 = Fortnightly Portfolio  ← do not use for monthly syncs
+    """
+    payload = {"modulename": modulename, "pgno": pgno, "pgsize": pgsize}
+    body = json.dumps({"request": payload}, separators=(",", ":")).encode("utf-8")
+    headers = {
+        **HEADERS_JSON,
+        "Content-Type": "application/json;charset=utf-8",
+    }
+    req = urllib.request.Request(API_URL, data=body, headers=headers, method="POST")
     with urllib.request.urlopen(req, timeout=120, context=ctx) as resp:
         return json.loads(resp.read().decode("utf-8", errors="ignore"))
 
 
-def fetch_all_rows(*, page_size: int, ctx: ssl.SSLContext) -> list[dict]:
+def fetch_all_rows(
+    *,
+    page_size: int,
+    ctx: ssl.SSLContext,
+    modulename: str = "portfolio_tab1",
+) -> list[dict]:
     out: list[dict] = []
     page = 1
     total = None
     while True:
-        data = call_get_downloads(page, page_size, ctx=ctx)
+        data = call_get_downloads(page, page_size, ctx=ctx, modulename=modulename)
         rc = str(data.get("ReturnCode", ""))
         if rc != "0":
-            raise RuntimeError(f"GetDownloadsData ReturnCode={data.get('ReturnCode')} msg={data.get('ReturnMsg')}")
+            raise RuntimeError(
+                f"GetDownloadsData ReturnCode={data.get('ReturnCode')} "
+                f"msg={data.get('ReturnMsg')}"
+            )
         rows = data.get("Data") or []
         if not isinstance(rows, list) or not rows:
             break
@@ -223,6 +250,11 @@ def main() -> None:
     parser.add_argument("--months", nargs="+", default=["2026-01", "2026-02"], help="YYYY-MM")
     parser.add_argument("--page-size", type=int, default=500, help="API page size (default: 500)")
     parser.add_argument(
+        "--modulename",
+        default="portfolio_tab1",
+        help="Downloads tab id: portfolio_tab1=monthly (default), portfolio_tab3=fortnightly",
+    )
+    parser.add_argument(
         "--root",
         type=Path,
         default=Path(__file__).resolve().parent.parent,
@@ -237,10 +269,17 @@ def main() -> None:
     ctx = _ssl_context(args.insecure_ssl)
     targets = {month_key_to_ym(mk): mk for mk in args.months}
     amc_dir = args.root / "amcs" / "mirae-asset-mutual-fund"
+    modulename = (args.modulename or "portfolio_tab1").strip()
+    if modulename == "portfolio_tab3":
+        print(
+            "NOTE: portfolio_tab3 is Fortnightly Portfolio — "
+            "do not mix with monthly as-of syncs.",
+            flush=True,
+        )
 
-    print(f"POST {API_URL} …", flush=True)
+    print(f"POST {API_URL} (modulename={modulename}) …", flush=True)
     try:
-        rows = fetch_all_rows(page_size=args.page_size, ctx=ctx)
+        rows = fetch_all_rows(page_size=args.page_size, ctx=ctx, modulename=modulename)
     except urllib.error.URLError as e:
         if not args.insecure_ssl and "CERTIFICATE_VERIFY_FAILED" in str(e).upper():
             raise SystemExit(
