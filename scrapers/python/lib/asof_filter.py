@@ -198,17 +198,31 @@ def canonical_as_of_for_folder(
     folder_period: str,
     disclosure_type: str,
 ) -> str | None:
-    """When a file lives in a date-keyed folder, clamp as_of to that slice if same month."""
+    """Clamp portfolio as_of to the disclosure folder date when appropriate.
+
+    Monthly folders (``…/monthly/YYYY-MM-DD/``) are authoritative: target-maturity
+    labels in scheme names (e.g. APR 2028) must not become the portfolio as_of.
+
+    Fortnightly folders clamp within the same calendar month to the mid-month
+    (15) or month-end slice so 14 Aug → 15 and stray day values stay consistent.
+    """
     if not AS_OF_RE.match(folder_period):
         return extracted
+    fy, fm, fd = (int(x) for x in folder_period.split("-"))
+
+    if disclosure_type == "monthly":
+        # Always prefer the month-end storage key for monthly disclosures.
+        return folder_period
+
     if disclosure_type != "fortnightly":
         return extracted
-    fy, fm, fd = (int(x) for x in folder_period.split("-"))
+
     if not extracted or not AS_OF_RE.match(extracted):
         return folder_period
     ey, em, ed = (int(x) for x in extracted.split("-"))
     if (ey, em) != (fy, fm):
-        return extracted
+        # Off-month maturity / noise → keep folder fortnightly slice.
+        return folder_period
     folder_mid = fd <= 15
     extract_mid = ed <= 15
     if folder_mid != extract_mid:
