@@ -69,6 +69,14 @@ export function classifyDisclosureFile(file, opts = {}) {
     return { keep: false, reason: "excluded_non_portfolio" };
   }
 
+  // Filename cadence must match job type even when trust_adapter_period is set.
+  if (type === "monthly" && /fortnight(?:ly)?/i.test(blob)) {
+    return { keep: false, reason: "wrong_cadence", detail: "fortnightly_in_monthly" };
+  }
+  if (type === "fortnightly" && /monthly/i.test(blob) && !/fortnight/i.test(blob)) {
+    return { keep: false, reason: "wrong_cadence", detail: "monthly_in_fortnightly" };
+  }
+
   const base = baseName(url) || filename;
   if (/weekly/i.test(base) && !/monthly|fortnight/i.test(base)) {
     return { keep: false, reason: "weekly_not_portfolio" };

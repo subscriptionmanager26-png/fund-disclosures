@@ -91,6 +91,21 @@ test("keeps Kotak consolidated SEBI monthly (SEBI in path is not regulatory junk
   assert.match(v.reason, /as_of_slice|month_in_name/);
 });
 
+test("rejects fortnightly filename on monthly job even with trust_adapter_period", () => {
+  const file = {
+    filename: "LIC_MF_Fortnightly_Portfolio_Sep-26.xlsx",
+    url: "https://www.licmf.com/assets/LIC_MF_Fortnightly_Portfolio_Sep-26.xlsx",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "monthly",
+    period: sepPeriod,
+    storageKey: "2026-09-30",
+    trustAdapterPeriod: true,
+  });
+  assert.equal(v.keep, false);
+  assert.equal(v.reason, "wrong_cadence");
+});
+
 test("LIC monthly path month beats upload timestamp in filename", () => {
   const file = {
     filename: "LEFE3009-09-2026-09_58_30.xlsx",

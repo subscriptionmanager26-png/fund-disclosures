@@ -39,8 +39,8 @@ function runPython(script, args) {
   };
 }
 
-function readManifest(slug, period) {
-  const man = join(stagingRoot, "amcs", slug, period, "manifest.json");
+function readManifest(slug, period, type = "monthly") {
+  const man = join(stagingRoot, type, "amcs", slug, period, "manifest.json");
   if (!existsSync(man)) return [];
   try {
     const data = JSON.parse(readFileSync(man, "utf8"));
@@ -118,7 +118,9 @@ export function createPythonRefAdapter(cfg) {
         }
       }
 
-      const baseArgs = ["--months", ctx.period, "--root", stagingRoot, ...extra];
+      // Scope staging by cadence so a prior fortnightly run cannot leak files into monthly.
+      const cadenceRoot = join(stagingRoot, ctx.type);
+      const baseArgs = ["--months", ctx.period, "--root", cadenceRoot, ...extra];
 
       // Hosts where Node fetch fails (TLS) or Akamai blocks plain HTTP (Edelweiss CDN).
       const forceRealFetch = [
@@ -138,8 +140,8 @@ export function createPythonRefAdapter(cfg) {
         };
       }
 
-      const rows = readManifest(cfg.slug, ctx.period);
-      const stageDir = join(stagingRoot, "amcs", cfg.slug, ctx.period);
+      const rows = readManifest(cfg.slug, ctx.period, ctx.type);
+      const stageDir = join(cadenceRoot, "amcs", cfg.slug, ctx.period);
       const files = [];
       const seen = new Set();
       for (const row of rows) {
