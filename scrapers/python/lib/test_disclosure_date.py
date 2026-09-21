@@ -170,6 +170,16 @@ class DisclosureDateTests(unittest.TestCase):
             self.assertTrue(blob_matches_year_month(name, year=2026, month=8))
             self.assertTrue(file_matches_asof_strict(name, name, "2026-08-31"))
 
+    def test_old_bridge_month_underscore_year(self):
+        for name in (
+            "OBMF_Flexi_Cap_Portfolio_Aug_26_361398e946.xlsx",
+            "OBMF_Focused_Portfolio_Aug_26_f450e08d0d.xlsx",
+            "OBMF_Arbitrage_Portfolio_Aug_26_25fe420782.xlsx",
+        ):
+            self.assertEqual(extract_all_year_months(name), [(2026, 8)])
+            self.assertTrue(blob_matches_year_month(name, year=2026, month=8))
+            self.assertTrue(dates_match_as_of(name, as_of="2026-08-31"))
+
     def test_lic_monthly_path_over_upload_timestamp(self):
         url = (
             "https://www.licmf.com/assets/downloads/portfolio/monthly/2026/8/"

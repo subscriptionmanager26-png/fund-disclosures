@@ -97,12 +97,27 @@ export function extractDisclosureDates(...parts) {
   }
 
   const mdyName = new RegExp(
-    `(?<![A-Za-z])(${MONTH_TOKEN})[-_\\s./]+(\\d{1,2})(?:st|nd|rd|th)?(?:[-_\\s./]+|,\\s*-?\\s*)(\\d{2}|\\d{4})(?!\\d)`,
+    `(?<![A-Za-z])(${MONTH_TOKEN})[-_\\s./]+(\\d{1,2})(?:st|nd|rd|th)?(?:[-_\\s./]+|,\\s*-?\\s*)(\\d{4}|\\d{2}(?![a-fA-F\\d]))`,
     "gi",
   );
   for (const m of blob.matchAll(mdyName)) {
     const mon = MONTH_NUM[m[1].toLowerCase()];
     if (mon) add(validDate(expandYear(m[3]), mon, Number(m[2])));
+  }
+
+  // Old Bridge: OBMF_Flexi_Cap_Portfolio_Aug_26_<hash>.xlsx — Aug_26 = August 2026
+  const monthUnderscoreYear = new RegExp(
+    `(?<![A-Za-z])(${MONTH_TOKEN})[-_](\\d{2})(?:_|\\.xls)`,
+    "gi",
+  );
+  for (const m of blob.matchAll(monthUnderscoreYear)) {
+    const mon = MONTH_NUM[m[1].toLowerCase()];
+    const yy = Number(m[2]);
+    // 20–29 = 2-digit year (Aug_26). 30–31 are usually month-end days (Jul_31_<hash>).
+    if (mon && yy >= 20 && yy <= 29) {
+      const year = 2000 + yy;
+      add(validDate(year, mon, lastDayOfMonth(year, mon)));
+    }
   }
 
   // Kotak: FortnightlyPortfolioAugust312026.xlsx / July152026
@@ -176,13 +191,24 @@ export function extractAllYearMonths(...parts) {
   }
 
   const monthYear = new RegExp(
-    `(?<![A-Za-z])(${MONTH_TOKEN})([-_\\s./]+)(20\\d{2}|\\d{2})(?!\\d)`,
+    `(?<![A-Za-z])(${MONTH_TOKEN})([-_\\s./]+)(20\\d{2}|\\d{2}(?![a-fA-F\\d]))`,
     "gi",
   );
   for (const m of blob.matchAll(monthYear)) {
     const month = MONTH_NUM[m[1].toLowerCase()];
     if (!month || !monthYearTokenOk(m[2], m[3], blob, m.index + m[0].length)) continue;
     add(expandYear(m[3]), month);
+  }
+
+  // Old Bridge: Aug_26 in filename = August 2026 (not day 26)
+  const monthUnderscoreYear = new RegExp(
+    `(?<![A-Za-z])(${MONTH_TOKEN})[-_](\\d{2})(?:_|\\.xls)`,
+    "gi",
+  );
+  for (const m of blob.matchAll(monthUnderscoreYear)) {
+    const month = MONTH_NUM[m[1].toLowerCase()];
+    const yy = Number(m[2]);
+    if (month && yy >= 20 && yy <= 29) add(2000 + yy, month);
   }
 
   // Mirae: sml250_aug2026.xlsx / largecap_aug2026.xlsx
