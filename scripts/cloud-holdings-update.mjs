@@ -148,6 +148,19 @@ function buildFetchParseJobs(yms) {
   return jobs;
 }
 
+function todayUtcIso() {
+  const d = new Date();
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** Monthly month-end disclosures are not published before calendar month-end. */
+function isFutureMonthEnd(periodIso) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(periodIso) && periodIso > todayUtcIso();
+}
+
 const toYm = monthYm();
 // Daily job: previous + current month only. Older months are already on GitHub.
 const fromYm = shiftYm(toYm, -1);
@@ -190,6 +203,18 @@ console.log(
 );
 
 for (const { type, period } of fetchJobs) {
+  if (type === "monthly" && isFutureMonthEnd(period)) {
+    console.log(`\n→ skip fetch ${type} ${period} (month-end not reached)`);
+    report.fetch.push({
+      type,
+      period,
+      skipped: true,
+      reason: "future_month_end",
+      ...summarizeFetch(null),
+    });
+    continue;
+  }
+
   run(
     "npm",
     [
