@@ -232,6 +232,11 @@ export function portfolioAsofKey(asOf, portfolioId) {
   return `portfolios/asof/${asOf}/${portfolioId}.json`;
 }
 
+function portfolioAsOfFileExists(outDir, asOf, portfolioId) {
+  if (!outDir || !AS_OF_RE.test(String(asOf || "")) || !portfolioId) return true;
+  return existsSync(join(outDir, portfolioAsofKey(asOf, portfolioId)));
+}
+
 export function attachAvailableAsOf(
   catalog,
   asOfDatesByPortfolio,
@@ -243,18 +248,21 @@ export function attachAvailableAsOf(
     const pid = String(
       row.portfolio_id || row.parent_amfi || row.amfi_code || "",
     ).trim();
-    const merged = new Set(pid ? asOfDatesByPortfolio.get(pid) || [] : []);
+    const merged = new Set();
+
+    // Only keep as-of dates that still have a portfolio file on disk when
+    // outDir is provided (guards against partial-sync phantom stamps).
+    for (const d of pid ? asOfDatesByPortfolio.get(pid) || [] : []) {
+      const day = String(d).trim();
+      if (!AS_OF_RE.test(day)) continue;
+      if (portfolioAsOfFileExists(outDir, day, pid)) merged.add(day);
+    }
 
     // Keep published as-of links when the portfolio file still exists on disk.
     for (const d of row.available_as_of || []) {
       const day = String(d).trim();
       if (!AS_OF_RE.test(day) || !pid) continue;
-      if (outDir) {
-        const path = join(outDir, portfolioAsofKey(day, pid));
-        if (existsSync(path)) merged.add(day);
-      } else {
-        merged.add(day);
-      }
+      if (portfolioAsOfFileExists(outDir, day, pid)) merged.add(day);
     }
 
     if (merged.size) {
@@ -466,4 +474,33 @@ export function assertCatalogPortfolioCoverage(outDir, catalog) {
     }
   }
   return { ok: missing.length === 0, missing };
+}
+
+/**
+ * Every catalog available_as_of entry must have a matching portfolio file.
+ * Catches phantom dates (e.g. partial sync stamping all schemes with a slice).
+ */
+export function assertNoPhantomAsOfLinks(outDir, catalog) {
+  const phantom = [];
+  const seen = new Set();
+  for (const [code, row] of Object.entries(catalog || {})) {
+    if (!row?.has_holdings || !row?.portfolio_id) continue;
+    const pid = String(row.portfolio_id);
+    if (!/^\d{4,8}$/.test(pid)) continue;
+    for (const d of row.available_as_of || []) {
+      const day = String(d).trim();
+      if (!AS_OF_RE.test(day)) continue;
+      const key = `${pid}@${day}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (!portfolioAsOfFileExists(outDir, day, pid)) {
+        phantom.push({
+          portfolio_id: pid,
+          as_of: day,
+          sample_amfi: code,
+        });
+      }
+    }
+  }
+  return { ok: phantom.length === 0, phantom };
 }

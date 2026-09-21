@@ -188,6 +188,12 @@ if (doPush) {
     meta.commit = commit;
     meta.raw_base = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${commit}`;
     meta.cdn_filings = `${meta.raw_base}/catalog/filings.json`;
+    // Keep CDN catalog / portfolio pins aligned with the filings pin so CI
+    // verify-catalog does not keep validating a stale phantom catalog.
+    meta.cdn_catalog = `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}@${commit}/catalog/amfi-lookup.json`;
+    meta.cdn_portfolio_template = `https://cdn.jsdelivr.net/gh/${OWNER}/${REPO}@${commit}/portfolios/asof/{as_of}/{portfolio_id}.json`;
+    meta.cdn_asof_template = meta.cdn_portfolio_template;
+    meta.catalog_pinned_at = new Date().toISOString();
     writeJson(metaPath, meta);
     run("git", ["-C", outDir, "add", "meta.json"]);
     run("git", [
