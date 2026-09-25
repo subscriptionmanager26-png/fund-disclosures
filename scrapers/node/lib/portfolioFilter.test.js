@@ -76,6 +76,21 @@ test("trust_adapter_period keeps API-filtered undated per-scheme files", () => {
   assert.equal(v.reason, "adapter_period");
 });
 
+test("trust_adapter_period keeps undated fortnightly zip when adapter scoped", () => {
+  const file = {
+    filename: "absl_fortnightly_portfolio_report_150926.zip",
+    url: "https://example.com/absl_fortnightly_portfolio_report_150926.zip",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "fortnightly",
+    period: { year: 2026, month: 9 },
+    storageKey: "2026-09-15",
+    trustAdapterPeriod: true,
+  });
+  assert.equal(v.keep, true);
+  assert.equal(v.reason, "adapter_period");
+});
+
 test("keeps Kotak consolidated SEBI monthly (SEBI in path is not regulatory junk)", () => {
   const file = {
     filename: "ConsolidatedSEBIPortfolioJuly2026.xlsx",
