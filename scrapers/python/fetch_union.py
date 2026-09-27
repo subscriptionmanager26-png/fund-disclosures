@@ -161,8 +161,26 @@ def load_page_docs(page_url: str, url_re: re.Pattern[str]) -> list[dict]:
     return docs
 
 
+def is_fortnightly_api_doc(doc: dict) -> bool:
+    url = str(doc.get("Url") or "")
+    title = str(doc.get("Title") or "")
+    blob = f"{url} {title}".lower()
+    if "fortnight" not in blob:
+        return False
+    if re.search(r"\.(xlsx|xls|xlsb)(\?|$)", url, re.I):
+        return True
+    return "fortnightly-portfolio" in blob
+
+
 def load_fortnightly_docs(as_of: str | None) -> list[dict]:
     docs = load_page_docs(FORTNIGHTLY_PAGE_URL, FORTNIGHTLY_URL_RE)
+    if not as_of:
+        return docs
+    return [d for d in docs if asof_filter.filename_matches_asof(str(d.get("Url") or ""), as_of)]
+
+
+def load_fortnightly_docs_from_api(as_of: str | None) -> list[dict]:
+    docs = [{**d, "_source": "api"} for d in load_api_docs() if is_fortnightly_api_doc(d)]
     if not as_of:
         return docs
     return [d for d in docs if asof_filter.filename_matches_asof(str(d.get("Url") or ""), as_of)]
@@ -283,7 +301,16 @@ def main() -> None:
         except Exception as e:
             print(f"  HTML scrape failed: {e}", flush=True)
             page_docs = []
-        api_docs: list[dict] = []
+        if not page_docs:
+            try:
+                page_docs = load_fortnightly_docs_from_api(as_of)
+                print(
+                    f"  API indexed {len(page_docs)} fortnightly link(s)"
+                    + (f" for as_of={as_of}" if as_of else ""),
+                    flush=True,
+                )
+            except Exception as e:
+                print(f"  API fallback failed: {e}", flush=True)
 
         for month_key in args.months:
             selected = list(page_docs)
@@ -308,7 +335,7 @@ def main() -> None:
                     "download_url": file_url,
                     "saved_as": fname,
                     "Title": doc.get("Title"),
-                    "source": "html_fortnightly",
+                    "source": doc.get("_source") or "html_fortnightly",
                 }
                 if args.dry_run:
                     print(f"  [{i}] {fname}", flush=True)

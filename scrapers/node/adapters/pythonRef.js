@@ -128,6 +128,7 @@ export function createPythonRefAdapter(cfg) {
         "fetch_edelweiss.py",
         "fetch_navi.py",
         "fetch_union.py",
+        "fetch_hsbc.py",
       ].includes(cfg.script);
 
       // Prefer dry-run if the script supports it (unless we must stage files)

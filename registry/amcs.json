@@ -825,7 +825,8 @@
           "script": "fetch_hsbc.py",
           "python_slug": "hsbc-mutual-fund",
           "extra_args": [],
-          "notes": "python_ref fortnightly (fallback after empty HTML)"
+          "trust_adapter_period": true,
+          "notes": "Per-scheme slugs under document-DDMMYYYY; curl_cffi for TLS"
         }
       }
     },
@@ -1814,7 +1815,8 @@
           "script": "fetch_sundaram.py",
           "python_slug": "sundaram-mutual-fund",
           "extra_args": [],
-          "notes": "python_ref fortnightly (fallback after empty HTML)"
+          "trust_adapter_period": true,
+          "notes": "AJAX Catid=Fortnightly filters by title month; hashed filenames"
         }
       }
     },
@@ -2007,7 +2009,8 @@
           "script": "fetch_union.py",
           "python_slug": "union-mutual-fund",
           "extra_args": [],
-          "notes": "python_ref fortnightly (fallback after empty HTML)"
+          "trust_adapter_period": true,
+          "notes": "HTML/API scoped to fortnightly folder; curl_cffi for TLS"
         }
       }
     },
