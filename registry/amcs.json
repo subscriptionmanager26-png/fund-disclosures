@@ -85,7 +85,8 @@
           "script": "fetch_abakkus.py",
           "python_slug": "abakkus-mutual-fund",
           "extra_args": [],
-          "notes": "python_ref fortnightly (fallback after empty HTML)"
+          "trust_adapter_period": true,
+          "notes": "verticals-data JSON on disclosures page; curl_cffi for TLS"
         }
       }
     },
@@ -1368,7 +1369,8 @@
           "script": "fetch_navi.py",
           "python_slug": "navi-mutual-fund",
           "extra_args": [],
-          "notes": "python_ref fortnightly (fallback after empty HTML)"
+          "trust_adapter_period": true,
+          "notes": "WP REST API filters by fortnight; curl_cffi for Akamai"
         }
       }
     },
