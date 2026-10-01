@@ -5,61 +5,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#0f172a" />
-  <title>Capture holdings</title>
+  <title>Capture all holdings</title>
   <style>
-    :root { --bg:#0f172a; --card:#1e293b; --text:#f1f5f9; --muted:#94a3b8; --accent:#38bdf8; --ok:#4ade80; --border:#334155; }
+    :root { --bg:#0f172a; --card:#1e293b; --text:#f1f5f9; --muted:#94a3b8; --ok:#4ade80; --accent:#38bdf8; --border:#334155; }
     * { box-sizing:border-box; }
-    body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:1rem 1rem 4rem; }
-    h1 { font-size:1.5rem; margin:0 0 .35rem; }
-    p { color:var(--muted); margin:0 0 1rem; }
+    body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:1.25rem; max-width:32rem; margin-inline:auto; }
+    h1 { font-size:1.45rem; margin:0 0 .4rem; }
+    h2 { font-size:1rem; margin:0 0 .5rem; }
+    p { color:var(--muted); margin:0 0 1rem; line-height:1.45; }
     .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.1rem; margin-bottom:1rem; }
-    button { width:100%; font:inherit; font-weight:700; font-size:1.1rem; border:none; border-radius:12px; padding:1rem; margin-top:.6rem; cursor:pointer; }
-    .primary { background:var(--ok); color:#052e16; }
-    .secondary { background:#334155; color:var(--text); font-size:.95rem; padding:.75rem; }
-    input { width:100%; font:inherit; padding:.7rem; border-radius:8px; border:1px solid var(--border); background:#0b1220; color:var(--text); margin-top:.35rem; }
-    label { font-size:.85rem; color:var(--muted); }
-    .status { min-height:1.2rem; font-size:.9rem; margin-top:.5rem; }
+    button { width:100%; font:inherit; font-weight:700; font-size:1.05rem; border:none; border-radius:12px; padding:1rem; cursor:pointer; margin-top:.5rem; }
+    .go { background:var(--ok); color:#052e16; font-size:1.2rem; }
+    .sec { background:#334155; color:var(--text); font-size:.95rem; padding:.8rem; }
+    .linkish { background:#1e3a5f; color:var(--accent); }
+    input { width:100%; font:inherit; padding:.7rem; border-radius:8px; border:1px solid var(--border); background:#0b1220; color:var(--text); margin-top:.3rem; }
+    label { font-size:.85rem; color:var(--muted); display:block; margin-top:.6rem; }
+    .hidden { display:none; }
+    .status { margin-top:.75rem; font-size:.95rem; min-height:1.2em; }
     .ok { color:var(--ok); }
     .err { color:#f87171; }
-    .hidden { display:none; }
-    a { color:var(--accent); }
+    .pill { display:inline-block; background:#334155; color:var(--muted); font-size:.75rem; padding:.15rem .5rem; border-radius:6px; margin:.15rem .2rem 0 0; }
+    ol { padding-left:1.2rem; color:var(--muted); margin:.5rem 0 0; }
+    li { margin:.35rem 0; }
+    .why { font-size:.9rem; border-left:3px solid var(--accent); padding-left:.75rem; margin:0; }
   </style>
 </head>
 <body>
-  <h1>Capture holdings</h1>
-  <p>One tap on Navi → cloud agent gets the files.</p>
+  <h1>Capture blocked AMCs</h1>
+  <p class="why">
+    <strong>Yes — the APIs run on your phone.</strong> Navi and Union block cloud servers.
+    This page starts a chain that calls each AMC’s API <em>inside your mobile browser</em>
+    (same as when you browse their site), then uploads download links for the cloud agent.
+  </p>
 
   <div id="setup" class="card hidden">
-    <label>Upload server URL</label>
+    <h2>One-time setup</h2>
+    <label>Upload server (Cloudflare Worker URL)</label>
     <input id="uploadUrl" placeholder="https://fund-holdings-residential-capture….workers.dev" />
-    <label style="margin-top:.75rem;display:block">PIN (4 digits)</label>
-    <input id="pin" inputmode="numeric" maxlength="8" placeholder="e.g. 4829" />
-    <button type="button" class="primary" id="saveSetup">Save & continue</button>
+    <label>PIN</label>
+    <input id="pin" inputmode="numeric" maxlength="12" placeholder="4+ digits" autocomplete="off" />
+    <button type="button" class="go" id="saveSetup">Save</button>
   </div>
 
   <div id="main" class="hidden">
-    <div class="card" id="onNavi">
-      <button type="button" class="primary" id="captureNow">Capture &amp; publish Navi</button>
+    <div class="card">
+      <p style="margin:0 0 .75rem">AMCs in this run:</p>
+      <span class="pill">Navi</span><span class="pill">Union</span><span class="pill">Abakkus</span>
+      <button type="button" class="go" id="captureAll">Capture all AMCs</button>
       <div class="status" id="status"></div>
     </div>
 
-    <div class="card" id="offNavi">
-      <p style="margin:0">1. Open <a href="https://navi.com/mutual-fund/downloads/portfolio">Navi portfolio</a><br>
-      2. Tap your <strong>Navi capture</strong> bookmark once</p>
-      <button type="button" class="secondary" id="installBookmark">Install bookmark (one-time)</button>
+    <div class="card">
+      <h2>One tap forever (recommended)</h2>
+      <p style="margin:0 0 .5rem">Install Tampermonkey + our auto-helper once. After that, only tap <strong>Capture all AMCs</strong> each fortnight — no re-tapping on each site.</p>
+      <button type="button" class="linkish" id="installHelper">Install auto-helper (Tampermonkey)</button>
     </div>
 
-    <button type="button" class="secondary" id="changePin">Change PIN / server</button>
+    <div class="card">
+      <h2>Without Tampermonkey</h2>
+      <p style="margin:0 0 .5rem">Copy this bookmark. Tap it once per AMC page as they open (~3 taps).</p>
+      <button type="button" class="sec" id="installBookmark">Copy “Capture all” bookmark</button>
+    </div>
+
+    <div class="card">
+      <h2>Each fortnight</h2>
+      <ol>
+        <li>Tap <strong>Capture all AMCs</strong></li>
+        <li>Wait ~20s while Navi → Union → Abakkus run on your phone</li>
+        <li>Done screen — cloud agent picks up files automatically</li>
+      </ol>
+    </div>
+    <button type="button" class="sec" id="changeSetup">Change PIN / server</button>
   </div>
 
   <script>
-    const DEFAULT_UPLOAD = "";
-
     const $ = (id) => document.getElementById(id);
-    const cfg = () => ({
-      uploadUrl: localStorage.getItem("rh_upload") || DEFAULT_UPLOAD,
-      pin: localStorage.getItem("rh_pin") || "",
-    });
+    const HELPER_PATH = "capture-auto.user.js";
+    const PAGES_HELPER =
+      "https://subscriptionmanager26-png.github.io/fund-disclosures/residential-capture/capture-auto.user.js";
+
+    function cfg() {
+      return {
+        uploadUrl: (localStorage.getItem("rh_upload") || "").replace(/\/$/, ""),
+        pin: localStorage.getItem("rh_pin") || "",
+      };
+    }
+
+    function helperUrl() {
+      const { uploadUrl } = cfg();
+      return uploadUrl ? `${uploadUrl}/${HELPER_PATH}` : PAGES_HELPER;
+    }
 
     function setStatus(msg, ok) {
       const el = $("status");
@@ -67,153 +102,84 @@
       el.className = "status " + (ok ? "ok" : "err");
     }
 
-    function monthPeriod() {
-      const d = new Date();
-      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
-    }
-
-    function fortnightValue() {
-      const d = new Date();
-      const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      const m = names[d.getMonth()];
-      const end = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
-      return d.getDate() <= 18 ? m + " 1-15" : m + " 16-" + end;
-    }
-
-    function fy(y, mo) { return mo >= 4 ? y + "-" + (y + 1) : (y - 1) + "-" + y; }
-
-    function nonce() {
-      const h = document.documentElement.innerHTML;
-      return h.match(/"nonce"\s*:\s*"([a-f0-9]+)"/i)?.[1] || h.match(/wp-nonce["']?\s*[:=]\s*["']([a-f0-9]+)/i)?.[1] || "";
-    }
-
-    async function captureNavi() {
-      const n = nonce();
-      if (!n) throw new Error("Not on Navi portfolio page");
-      const period = monthPeriod();
-      const [y, mo] = period.split("-").map(Number);
-      const val = fortnightValue();
-      const r = await fetch("https://navi.com/wp-json/nv/v1/documents", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-          "wp-nonce": n,
-          "x-requested-with": "XMLHttpRequest",
-        },
-        body: new URLSearchParams({
-          financial_year: fy(y, mo),
-          value: val,
-          category: "885",
-          type: "Fortnightly",
-          order: "DESC",
-        }),
-      });
-      const j = await r.json();
-      if (!j.success) throw new Error("Navi API: " + JSON.stringify(j).slice(0, 120));
-      const files = [];
-      for (const row of j.data || []) {
-        const urls = Array.isArray(row.url) ? row.url : row.url ? [row.url] : [];
-        for (const u of urls) {
-          if (!u) continue;
-          files.push({
-            title: row.title || "",
-            download_url: String(u).replace(/\\\//g, "/"),
-            saved_as: decodeURIComponent(String(u).split("/").pop()),
-          });
-        }
-      }
-      if (!files.length) throw new Error("No files in API response");
-      return {
-        amc_id: "navi-mutual-fund",
-        period,
-        cadence: "fortnightly",
-        captured_at: new Date().toISOString(),
-        captured_from: "one-tap",
-        files,
-      };
-    }
-
-    async function publish(manifest) {
+    function startChain() {
       const { uploadUrl, pin } = cfg();
-      if (!pin) throw new Error("Set PIN first (Change PIN button)");
-      const r = await fetch(uploadUrl.replace(/\/$/, "") + "/publish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin, manifest }),
-      });
-      const data = await r.json().catch(() => ({}));
-      if (!r.ok || !data.ok) throw new Error(data.error || "Upload failed");
-      return data;
+      const s = document.createElement("script");
+      s.type = "module";
+      s.textContent =
+        `import { runChain, AMC_CHAIN } from '${uploadUrl}/chain.mjs?w=${encodeURIComponent(uploadUrl)}&p=${encodeURIComponent(pin)}';` +
+        `runChain().then(r=>{if(r.done)setStatus('All '+AMC_CHAIN.length+' AMCs captured',true)}).catch(e=>{setStatus(e.message,false);alert(e.message);});`;
+      document.head.appendChild(s);
     }
 
-    async function runCapture(btn) {
-      btn.disabled = true;
-      setStatus("Capturing…", true);
-      try {
-        const manifest = await captureNavi();
-        setStatus("Uploading " + manifest.files.length + " files…", true);
-        const res = await publish(manifest);
-        setStatus("Done — " + manifest.files.length + " files published", true);
-        return res;
-      } catch (e) {
-        setStatus(e.message || String(e), false);
-        throw e;
-      } finally {
-        btn.disabled = false;
-      }
+    function bookmarkletHref() {
+      const { uploadUrl, pin } = cfg();
+      const u = encodeURIComponent(uploadUrl);
+      const p = encodeURIComponent(pin);
+      const code =
+        `(async()=>{const s=document.createElement('script');s.type='module';` +
+        `s.textContent=\`import {runChain} from '${uploadUrl}/chain.mjs?w=${u}&p=${p}';` +
+        `runChain().catch(e=>alert(e.message));\`;document.head.appendChild(s);})()`;
+      return "javascript:" + code;
     }
 
-    function bookmarkletCode(uploadUrl, pin) {
-      const u = uploadUrl.replace(/\/$/, "");
-      const p = pin.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-      return `javascript:(async()=>{try{const h=document.documentElement.innerHTML;const n=h.match(/"nonce"\\s*:\\s*"([a-f0-9]+)"/i)?.[1];if(!n){alert('Open Navi portfolio page first');return}const d=new Date();const per=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const names=['January','February','March','April','May','June','July','August','September','October','November','December'];const m=names[d.getMonth()];const end=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();const val=d.getDate()<=18?m+' 1-15':m+' 16-'+end;const y=d.getFullYear(),mo=d.getMonth()+1;const fy=mo>=4?y+'-'+(y+1):(y-1)+'-'+y;const r=await fetch('https://navi.com/wp-json/nv/v1/documents',{method:'POST',credentials:'include',headers:{'content-type':'application/x-www-form-urlencoded; charset=UTF-8','wp-nonce':n,'x-requested-with':'XMLHttpRequest'},body:new URLSearchParams({financial_year:fy,value:val,category:'885',type:'Fortnightly',order:'DESC'})});const j=await r.json();if(!j.success){alert('API failed');return}const files=[];for(const row of j.data||[]){const urls=Array.isArray(row.url)?row.url:(row.url?[row.url]:[]);for(const u of urls){if(!u)continue;files.push({title:row.title||'',download_url:u,saved_as:decodeURIComponent(u.split('/').pop())})}}const manifest={amc_id:'navi-mutual-fund',period:per,cadence:'fortnightly',captured_at:new Date().toISOString(),files};const up=await fetch('${u}/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:'${p}',manifest})});const out=await up.json();alert(out.ok?'Published '+files.length+' files':'Failed: '+(out.error||up.status))}catch(e){alert(e)}})();`;
-    }
-
-    function showScreen() {
-      const { pin } = cfg();
-      if (!pin) {
+    function show() {
+      const { pin, uploadUrl } = cfg();
+      if (!pin || !uploadUrl) {
         $("setup").classList.remove("hidden");
         $("main").classList.add("hidden");
-        $("uploadUrl").value = cfg().uploadUrl;
+        $("uploadUrl").value = uploadUrl;
         return;
       }
       $("setup").classList.add("hidden");
       $("main").classList.remove("hidden");
-      const onNavi = /navi\.com$/i.test(location.hostname);
-      $("onNavi").classList.toggle("hidden", !onNavi);
-      $("offNavi").classList.toggle("hidden", onNavi);
     }
 
     $("saveSetup").onclick = () => {
-      const url = $("uploadUrl").value.trim() || DEFAULT_UPLOAD;
+      const uploadUrl = $("uploadUrl").value.trim().replace(/\/$/, "");
       const pin = $("pin").value.trim();
-      if (pin.length < 4) { alert("PIN at least 4 digits"); return; }
-      localStorage.setItem("rh_upload", url);
+      if (!uploadUrl.startsWith("http")) { alert("Enter worker URL"); return; }
+      if (pin.length < 4) { alert("PIN at least 4 chars"); return; }
+      localStorage.setItem("rh_upload", uploadUrl);
       localStorage.setItem("rh_pin", pin);
-      showScreen();
+      show();
     };
 
-    $("captureNow").onclick = () => runCapture($("captureNow"));
+    $("captureAll").onclick = () => {
+      setStatus("Starting chain on your phone…", true);
+      try { startChain(); } catch (e) { setStatus(e.message, false); }
+    };
+
+    $("installHelper").onclick = () => {
+      const url = helperUrl();
+      const tm =
+        "https://www.tampermonkey.net/script_installation.php#url=" +
+        encodeURIComponent(url);
+      window.open(tm, "_blank");
+      alert(
+        "1. Install Tampermonkey from your app store if needed.\n" +
+        "2. Confirm installing the auto-helper script.\n" +
+        "3. Then tap Capture all AMCs — no more per-site taps."
+      );
+    };
 
     $("installBookmark").onclick = async () => {
-      const { uploadUrl, pin } = cfg();
-      const code = bookmarkletCode(uploadUrl, pin);
+      const href = bookmarkletHref();
       try {
-        await navigator.clipboard.writeText(code);
-        alert("Copied! Add a bookmark, paste this as the URL, name it Navi capture.");
+        await navigator.clipboard.writeText(href);
+        alert('Copied. Create a bookmark named "Capture all" and paste this as the URL.');
       } catch {
-        prompt("Copy bookmark URL:", code);
+        prompt("Bookmark URL:", href);
       }
     };
 
-    $("changePin").onclick = () => {
+    $("changeSetup").onclick = () => {
       $("setup").classList.remove("hidden");
       $("uploadUrl").value = cfg().uploadUrl;
       $("pin").value = cfg().pin;
     };
 
-    showScreen();
+    show();
   </script>
 </body>
 </html>
