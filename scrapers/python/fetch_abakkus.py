@@ -36,6 +36,10 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 VERTICALS_RE = re.compile(r"(?:const|var|let)\s+verticals\s*=\s*(\[.*?\]);", re.S)
+VERTICALS_DATA_RE = re.compile(
+    r'<script[^>]+id=["\']verticals-data["\'][^>]*>(\[.*?\])</script>',
+    re.S | re.I,
+)
 TITLE_YM_RE = re.compile(
     r"\b"
     r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
@@ -109,7 +113,30 @@ def safe_filename(name: str) -> str:
     return s[:220] or "abakkus_monthly_portfolio.xlsx"
 
 
+def _curl_session():
+    try:
+        from curl_cffi import requests as creq  # type: ignore
+
+        return creq
+    except ImportError:
+        return None
+
+
 def fetch_html(*, ctx: ssl.SSLContext) -> str:
+    creq = _curl_session()
+    if creq is not None:
+        try:
+            r = creq.get(
+                PAGE_URL,
+                headers=HEADERS,
+                impersonate="chrome131",
+                timeout=180,
+                verify=ctx.verify_mode != ssl.CERT_NONE,
+            )
+            r.raise_for_status()
+            return r.text
+        except Exception:
+            pass
     req = urllib.request.Request(PAGE_URL, headers=HEADERS, method="GET")
     with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
         return resp.read().decode("utf-8", errors="ignore")
@@ -150,11 +177,20 @@ def parse_ym_from_title(title: str) -> tuple[int, int] | None:
     return None
 
 
-def extract_rows_from_verticals(page_html: str, *, fortnightly: bool = False) -> list[dict]:
+def _load_verticals_json(page_html: str) -> list | None:
+    m = VERTICALS_DATA_RE.search(page_html)
+    if m:
+        return json.loads(m.group(1))
     m = VERTICALS_RE.search(page_html)
-    if not m:
+    if m:
+        return json.loads(m.group(1))
+    return None
+
+
+def extract_rows_from_verticals(page_html: str, *, fortnightly: bool = False) -> list[dict]:
+    data = _load_verticals_json(page_html)
+    if not data:
         return []
-    data = json.loads(m.group(1))
     want = "fortnightly portfolio" if fortnightly else "monthly portfolio disclosures"
     target = None
     for vertical in data:
@@ -200,11 +236,22 @@ def extract_rows_from_verticals(page_html: str, *, fortnightly: bool = False) ->
 
 
 def download(url: str, *, ctx: ssl.SSLContext) -> bytes:
-    req = urllib.request.Request(
-        url,
-        headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
-        method="GET",
-    )
+    headers = {**HEADERS, "Accept": "*/*", "Referer": PAGE_URL}
+    creq = _curl_session()
+    if creq is not None:
+        try:
+            r = creq.get(
+                url,
+                headers=headers,
+                impersonate="chrome131",
+                timeout=180,
+                verify=ctx.verify_mode != ssl.CERT_NONE,
+            )
+            r.raise_for_status()
+            return r.content
+        except Exception:
+            pass
+    req = urllib.request.Request(url, headers=headers, method="GET")
     with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
         return resp.read()
 

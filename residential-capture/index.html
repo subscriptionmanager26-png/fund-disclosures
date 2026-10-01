@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Capture all holdings</title>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --text:#f1f5f9; --muted:#94a3b8; --ok:#4ade80; --accent:#38bdf8; --border:#334155; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:1.25rem; max-width:32rem; margin-inline:auto; }
+    h1 { font-size:1.45rem; margin:0 0 .4rem; }
+    h2 { font-size:1rem; margin:0 0 .5rem; }
+    p { color:var(--muted); margin:0 0 1rem; line-height:1.45; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.1rem; margin-bottom:1rem; }
+    button { width:100%; font:inherit; font-weight:700; font-size:1.05rem; border:none; border-radius:12px; padding:1rem; cursor:pointer; margin-top:.5rem; }
+    .go { background:var(--ok); color:#052e16; font-size:1.2rem; }
+    .sec { background:#334155; color:var(--text); font-size:.95rem; padding:.8rem; }
+    .linkish { background:#1e3a5f; color:var(--accent); }
+    input { width:100%; font:inherit; padding:.7rem; border-radius:8px; border:1px solid var(--border); background:#0b1220; color:var(--text); margin-top:.3rem; }
+    label { font-size:.85rem; color:var(--muted); display:block; margin-top:.6rem; }
+    .hidden { display:none; }
+    .status { margin-top:.75rem; font-size:.95rem; min-height:1.2em; }
+    .ok { color:var(--ok); }
+    .err { color:#f87171; }
+    .pill { display:inline-block; background:#334155; color:var(--muted); font-size:.75rem; padding:.15rem .5rem; border-radius:6px; margin:.15rem .2rem 0 0; }
+    ol { padding-left:1.2rem; color:var(--muted); margin:.5rem 0 0; }
+    li { margin:.35rem 0; }
+    .why { font-size:.9rem; border-left:3px solid var(--accent); padding-left:.75rem; margin:0; }
+  </style>
+</head>
+<body>
+  <h1>Capture blocked AMCs</h1>
+  <p class="why">
+    <strong>Yes — the APIs run on your phone.</strong> Navi and Union block cloud servers.
+    This page starts a chain that calls each AMC’s API <em>inside your mobile browser</em>
+    (same as when you browse their site), then uploads download links for the cloud agent.
+  </p>
+
+  <div id="setup" class="card hidden">
+    <h2>One-time setup</h2>
+    <label>Upload server (Cloudflare Worker URL)</label>
+    <input id="uploadUrl" placeholder="https://fund-holdings-residential-capture….workers.dev" />
+    <label>PIN</label>
+    <input id="pin" inputmode="numeric" maxlength="12" placeholder="4+ digits" autocomplete="off" />
+    <button type="button" class="go" id="saveSetup">Save</button>
+  </div>
+
+  <div id="main" class="hidden">
+    <div class="card">
+      <p style="margin:0 0 .75rem">AMCs in this run:</p>
+      <span class="pill">Navi</span><span class="pill">Union</span><span class="pill">Abakkus</span>
+      <button type="button" class="go" id="captureAll">Capture all AMCs</button>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>One tap forever (recommended)</h2>
+      <p style="margin:0 0 .5rem">Install Tampermonkey + our auto-helper once. After that, only tap <strong>Capture all AMCs</strong> each fortnight — no re-tapping on each site.</p>
+      <button type="button" class="linkish" id="installHelper">Install auto-helper (Tampermonkey)</button>
+    </div>
+
+    <div class="card">
+      <h2>Without Tampermonkey</h2>
+      <p style="margin:0 0 .5rem">Copy this bookmark. Tap it once per AMC page as they open (~3 taps).</p>
+      <button type="button" class="sec" id="installBookmark">Copy “Capture all” bookmark</button>
+    </div>
+
+    <div class="card">
+      <h2>Each fortnight</h2>
+      <ol>
+        <li>Tap <strong>Capture all AMCs</strong></li>
+        <li>Wait ~20s while Navi → Union → Abakkus run on your phone</li>
+        <li>Done screen — cloud agent picks up files automatically</li>
+      </ol>
+    </div>
+    <button type="button" class="sec" id="changeSetup">Change PIN / server</button>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const HELPER_PATH = "capture-auto.user.js";
+    const PAGES_HELPER =
+      "https://subscriptionmanager26-png.github.io/fund-disclosures/residential-capture/capture-auto.user.js";
+
+    function cfg() {
+      return {
+        uploadUrl: (localStorage.getItem("rh_upload") || "").replace(/\/$/, ""),
+        pin: localStorage.getItem("rh_pin") || "",
+      };
+    }
+
+    function helperUrl() {
+      const { uploadUrl } = cfg();
+      return uploadUrl ? `${uploadUrl}/${HELPER_PATH}` : PAGES_HELPER;
+    }
+
+    function setStatus(msg, ok) {
+      const el = $("status");
+      el.textContent = msg;
+      el.className = "status " + (ok ? "ok" : "err");
+    }
+
+    function startChain() {
+      const { uploadUrl, pin } = cfg();
+      const s = document.createElement("script");
+      s.type = "module";
+      s.textContent =
+        `import { runChain, AMC_CHAIN } from '${uploadUrl}/chain.mjs?w=${encodeURIComponent(uploadUrl)}&p=${encodeURIComponent(pin)}';` +
+        `runChain().then(r=>{if(r.done)setStatus('All '+AMC_CHAIN.length+' AMCs captured',true)}).catch(e=>{setStatus(e.message,false);alert(e.message);});`;
+      document.head.appendChild(s);
+    }
+
+    function bookmarkletHref() {
+      const { uploadUrl, pin } = cfg();
+      const u = encodeURIComponent(uploadUrl);
+      const p = encodeURIComponent(pin);
+      const code =
+        `(async()=>{const s=document.createElement('script');s.type='module';` +
+        `s.textContent=\`import {runChain} from '${uploadUrl}/chain.mjs?w=${u}&p=${p}';` +
+        `runChain().catch(e=>alert(e.message));\`;document.head.appendChild(s);})()`;
+      return "javascript:" + code;
+    }
+
+    function show() {
+      const { pin, uploadUrl } = cfg();
+      if (!pin || !uploadUrl) {
+        $("setup").classList.remove("hidden");
+        $("main").classList.add("hidden");
+        $("uploadUrl").value = uploadUrl;
+        return;
+      }
+      $("setup").classList.add("hidden");
+      $("main").classList.remove("hidden");
+    }
+
+    $("saveSetup").onclick = () => {
+      const uploadUrl = $("uploadUrl").value.trim().replace(/\/$/, "");
+      const pin = $("pin").value.trim();
+      if (!uploadUrl.startsWith("http")) { alert("Enter worker URL"); return; }
+      if (pin.length < 4) { alert("PIN at least 4 chars"); return; }
+      localStorage.setItem("rh_upload", uploadUrl);
+      localStorage.setItem("rh_pin", pin);
+      show();
+    };
+
+    $("captureAll").onclick = () => {
+      setStatus("Starting chain on your phone…", true);
+      try { startChain(); } catch (e) { setStatus(e.message, false); }
+    };
+
+    $("installHelper").onclick = () => {
+      const url = helperUrl();
+      const tm =
+        "https://www.tampermonkey.net/script_installation.php#url=" +
+        encodeURIComponent(url);
+      window.open(tm, "_blank");
+      alert(
+        "1. Install Tampermonkey from your app store if needed.\n" +
+        "2. Confirm installing the auto-helper script.\n" +
+        "3. Then tap Capture all AMCs — no more per-site taps."
+      );
+    };
+
+    $("installBookmark").onclick = async () => {
+      const href = bookmarkletHref();
+      try {
+        await navigator.clipboard.writeText(href);
+        alert('Copied. Create a bookmark named "Capture all" and paste this as the URL.');
+      } catch {
+        prompt("Bookmark URL:", href);
+      }
+    };
+
+    $("changeSetup").onclick = () => {
+      $("setup").classList.remove("hidden");
+      $("uploadUrl").value = cfg().uploadUrl;
+      $("pin").value = cfg().pin;
+    };
+
+    show();
+  </script>
+</body>
+</html>

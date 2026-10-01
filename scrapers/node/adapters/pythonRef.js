@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, mkdirSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadResidentialManifest } from "../lib/residentialManifest.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const scriptsDir = join(root, "scrapers/python");
@@ -128,19 +129,29 @@ export function createPythonRefAdapter(cfg) {
         "fetch_edelweiss.py",
         "fetch_navi.py",
         "fetch_union.py",
+        "fetch_hsbc.py",
+        "fetch_abakkus.py",
       ].includes(cfg.script);
 
-      // Prefer dry-run if the script supports it (unless we must stage files)
-      let result = runWithArgFallback(cfg.script, baseArgs, forceRealFetch);
-
-      if (!result.ok) {
-        return {
-          files: [],
-          notes: `python_exit_${result.status ?? "x"}: ${(result.stderr || result.stdout || result.error || "").slice(0, 240)}`,
-        };
+      if (process.env.RESIDENTIAL_MANIFEST_FIRST === "1") {
+        const residential = await loadResidentialManifest({
+          root,
+          slug: cfg.slug,
+          period: ctx.period,
+          cadence: ctx.type,
+        });
+        if (residential?.files?.length) {
+          return { files: residential.files, notes: residential.notes };
+        }
       }
 
-      const rows = readManifest(cfg.slug, ctx.period, ctx.type);
+      // Prefer dry-run if the script supports it (unless we must stage files)
+      const result = runWithArgFallback(cfg.script, baseArgs, forceRealFetch);
+      const pythonNotes = result.ok
+        ? ""
+        : `python_exit_${result.status ?? "x"}: ${(result.stderr || result.stdout || result.error || "").slice(0, 240)}`;
+
+      const rows = result.ok ? readManifest(cfg.slug, ctx.period, ctx.type) : [];
       const stageDir = join(cadenceRoot, "amcs", cfg.slug, ctx.period);
       const files = [];
       const seen = new Set();
@@ -172,6 +183,22 @@ export function createPythonRefAdapter(cfg) {
             });
           }
         }
+      }
+
+      if (!files.length) {
+        const residential = await loadResidentialManifest({
+          root,
+          slug: cfg.slug,
+          period: ctx.period,
+          cadence: ctx.type,
+        });
+        if (residential?.files?.length) {
+          return { files: residential.files, notes: residential.notes };
+        }
+      }
+
+      if (!files.length && pythonNotes) {
+        return { files: [], notes: pythonNotes };
       }
 
       return {
