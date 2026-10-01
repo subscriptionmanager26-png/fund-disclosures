@@ -3,324 +3,217 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#0f172a" />
-  <title>Holdings link capture</title>
+  <title>Capture holdings</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --ok: #4ade80;
-      --border: #334155;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.45;
-      padding: 1rem;
-      padding-bottom: 5rem;
-    }
-    h1 { font-size: 1.35rem; margin: 0 0 0.25rem; }
-    .sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0 0.25rem; }
-    input, select, textarea, button {
-      width: 100%;
-      font: inherit;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #0b1220;
-      color: var(--text);
-      padding: 0.65rem 0.75rem;
-    }
-    textarea { min-height: 8rem; font-family: ui-monospace, monospace; font-size: 0.8rem; }
-    button {
-      background: var(--accent);
-      color: #0f172a;
-      font-weight: 600;
-      border: none;
-      margin-top: 0.75rem;
-      cursor: pointer;
-    }
-    button.secondary { background: #334155; color: var(--text); }
-    button.ok { background: var(--ok); }
-    .tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
-    .tabs button { width: auto; flex: 1; min-width: 7rem; margin: 0; }
-    .tabs button.active { outline: 2px solid var(--accent); }
-    .hidden { display: none; }
-    pre {
-      white-space: pre-wrap;
-      word-break: break-all;
-      font-size: 0.75rem;
-      background: #0b1220;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.75rem;
-      max-height: 14rem;
-      overflow: auto;
-    }
-    .path { font-family: ui-monospace, monospace; font-size: 0.78rem; color: var(--accent); word-break: break-all; }
-    .toast {
-      position: fixed;
-      left: 1rem; right: 1rem; bottom: 1rem;
-      background: var(--ok);
-      color: #052e16;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      font-weight: 600;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .toast.show { opacity: 1; }
-    a { color: var(--accent); }
-    ol { padding-left: 1.2rem; }
-    li { margin: 0.35rem 0; }
+    :root { --bg:#0f172a; --card:#1e293b; --text:#f1f5f9; --muted:#94a3b8; --accent:#38bdf8; --ok:#4ade80; --border:#334155; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:system-ui,sans-serif; background:var(--bg); color:var(--text); padding:1rem 1rem 4rem; }
+    h1 { font-size:1.5rem; margin:0 0 .35rem; }
+    p { color:var(--muted); margin:0 0 1rem; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.1rem; margin-bottom:1rem; }
+    button { width:100%; font:inherit; font-weight:700; font-size:1.1rem; border:none; border-radius:12px; padding:1rem; margin-top:.6rem; cursor:pointer; }
+    .primary { background:var(--ok); color:#052e16; }
+    .secondary { background:#334155; color:var(--text); font-size:.95rem; padding:.75rem; }
+    input { width:100%; font:inherit; padding:.7rem; border-radius:8px; border:1px solid var(--border); background:#0b1220; color:var(--text); margin-top:.35rem; }
+    label { font-size:.85rem; color:var(--muted); }
+    .status { min-height:1.2rem; font-size:.9rem; margin-top:.5rem; }
+    .ok { color:var(--ok); }
+    .err { color:#f87171; }
+    .hidden { display:none; }
+    a { color:var(--accent); }
   </style>
 </head>
 <body>
-  <h1>Holdings link capture</h1>
-  <p class="sub">For AMCs that block cloud servers (Navi, Union). Capture on your phone, publish to GitHub — the daily agent downloads from CDN links.</p>
+  <h1>Capture holdings</h1>
+  <p>One tap on Navi → cloud agent gets the files.</p>
 
-  <div class="card">
-    <label for="amc">AMC</label>
-    <select id="amc">
-      <option value="navi-mutual-fund">Navi Mutual Fund</option>
-      <option value="union-mutual-fund">Union Mutual Fund</option>
-      <option value="other">Other (type slug below)</option>
-    </select>
-    <label for="amcCustom" class="hidden">AMC slug</label>
-    <input id="amcCustom" class="hidden" placeholder="e.g. dsp-mutual-fund" />
-
-    <label for="period">Period (YYYY-MM)</label>
-    <input id="period" value="2026-09" inputmode="numeric" />
-
-    <label for="cadence">Cadence</label>
-    <select id="cadence">
-      <option value="monthly">Monthly</option>
-      <option value="fortnightly">Fortnightly</option>
-    </select>
+  <div id="setup" class="card hidden">
+    <label>Upload server URL</label>
+    <input id="uploadUrl" placeholder="https://fund-holdings-residential-capture….workers.dev" />
+    <label style="margin-top:.75rem;display:block">PIN (4 digits)</label>
+    <input id="pin" inputmode="numeric" maxlength="8" placeholder="e.g. 4829" />
+    <button type="button" class="primary" id="saveSetup">Save & continue</button>
   </div>
 
-  <div class="card">
-    <div class="tabs">
-      <button type="button" class="tab active" data-tab="api">API JSON</button>
-      <button type="button" class="tab" data-tab="urls">URLs</button>
-      <button type="button" class="tab" data-tab="navi">Navi helper</button>
+  <div id="main" class="hidden">
+    <div class="card" id="onNavi">
+      <button type="button" class="primary" id="captureNow">Capture &amp; publish Navi</button>
+      <div class="status" id="status"></div>
     </div>
 
-    <div id="panel-api">
-      <label for="apiJson">Paste API response (e.g. Navi <code>documents</code> POST body)</label>
-      <textarea id="apiJson" placeholder='{"success":true,"data":[{"title":"...","url":"https://..."}]}'></textarea>
+    <div class="card" id="offNavi">
+      <p style="margin:0">1. Open <a href="https://navi.com/mutual-fund/downloads/portfolio">Navi portfolio</a><br>
+      2. Tap your <strong>Navi capture</strong> bookmark once</p>
+      <button type="button" class="secondary" id="installBookmark">Install bookmark (one-time)</button>
     </div>
 
-    <div id="panel-urls" class="hidden">
-      <label for="urlList">One download URL per line</label>
-      <textarea id="urlList" placeholder="https://public-assets.prod.navi-tech.in/.../file.xlsx"></textarea>
-    </div>
-
-    <div id="panel-navi" class="hidden">
-      <p><strong>On your phone (Safari / Chrome):</strong></p>
-      <ol>
-        <li>Open <a href="https://navi.com/mutual-fund/downloads/portfolio" target="_blank" rel="noopener">navi.com portfolio page</a></li>
-        <li>Bookmark this capture page, then add the <strong>Navi fetch</strong> bookmarklet below</li>
-        <li>On the Navi page, tap the bookmarklet — it copies a manifest JSON</li>
-        <li>Return here, paste into <strong>API JSON</strong> tab or paste full manifest below</li>
-      </ol>
-      <label>Navi bookmarklet (copy link, add as bookmark URL)</label>
-      <textarea id="bookmarklet" readonly rows="3"></textarea>
-      <button type="button" class="secondary" id="copyBookmarklet">Copy bookmarklet</button>
-      <label for="naviManifest">Or paste full manifest JSON from bookmarklet</label>
-      <textarea id="naviManifest" placeholder='{"amc_id":"navi-mutual-fund","files":[...]}'></textarea>
-    </div>
-
-    <button type="button" id="build">Build manifest</button>
+    <button type="button" class="secondary" id="changePin">Change PIN / server</button>
   </div>
-
-  <div class="card hidden" id="outCard">
-    <p><strong>Manifest ready</strong> — save this file in the repo so the cloud agent can read it:</p>
-    <p class="path" id="githubPath"></p>
-    <pre id="outJson"></pre>
-    <button type="button" id="copyJson">Copy JSON</button>
-    <button type="button" class="secondary" id="downloadJson">Download .json</button>
-    <button type="button" class="ok" id="openGithub">Open GitHub to save</button>
-    <p class="sub" style="margin-top:0.75rem">On GitHub mobile: paste JSON → Commit. The agent fetches from <span class="path" id="rawUrl"></span></p>
-  </div>
-
-  <div class="toast" id="toast">Copied</div>
 
   <script>
-    const REPO = "subscriptionmanager26-png/fund-disclosures";
-    const BRANCH = "main";
+    const DEFAULT_UPLOAD = "";
 
     const $ = (id) => document.getElementById(id);
-    const toast = (msg) => {
-      const t = $("toast");
-      t.textContent = msg;
-      t.classList.add("show");
-      setTimeout(() => t.classList.remove("show"), 2000);
-    };
+    const cfg = () => ({
+      uploadUrl: localStorage.getItem("rh_upload") || DEFAULT_UPLOAD,
+      pin: localStorage.getItem("rh_pin") || "",
+    });
 
-    function slug() {
-      const v = $("amc").value;
-      return v === "other" ? $("amcCustom").value.trim() : v;
+    function setStatus(msg, ok) {
+      const el = $("status");
+      el.textContent = msg;
+      el.className = "status " + (ok ? "ok" : "err");
     }
 
-    function manifestPath() {
-      const s = slug();
-      const p = $("period").value.trim();
-      const c = $("cadence").value;
-      return `data/residential-capture/manifests/${s}/${p}.${c}.json`;
+    function monthPeriod() {
+      const d = new Date();
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
     }
 
-    function filenameFromUrl(url) {
-      try {
-        return decodeURIComponent(new URL(url).pathname.split("/").pop() || "download.xlsx");
-      } catch {
-        return url.split("/").pop() || "download.xlsx";
-      }
+    function fortnightValue() {
+      const d = new Date();
+      const names = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const m = names[d.getMonth()];
+      const end = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      return d.getDate() <= 18 ? m + " 1-15" : m + " 16-" + end;
     }
 
-    function rowsFromApiJson(text) {
-      const obj = JSON.parse(text);
-      if (obj.files && Array.isArray(obj.files)) return obj.files;
-      const data = obj.data || obj.result || [];
-      const rows = Array.isArray(data) ? data : [];
+    function fy(y, mo) { return mo >= 4 ? y + "-" + (y + 1) : (y - 1) + "-" + y; }
+
+    function nonce() {
+      const h = document.documentElement.innerHTML;
+      return h.match(/"nonce"\s*:\s*"([a-f0-9]+)"/i)?.[1] || h.match(/wp-nonce["']?\s*[:=]\s*["']([a-f0-9]+)/i)?.[1] || "";
+    }
+
+    async function captureNavi() {
+      const n = nonce();
+      if (!n) throw new Error("Not on Navi portfolio page");
+      const period = monthPeriod();
+      const [y, mo] = period.split("-").map(Number);
+      const val = fortnightValue();
+      const r = await fetch("https://navi.com/wp-json/nv/v1/documents", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "wp-nonce": n,
+          "x-requested-with": "XMLHttpRequest",
+        },
+        body: new URLSearchParams({
+          financial_year: fy(y, mo),
+          value: val,
+          category: "885",
+          type: "Fortnightly",
+          order: "DESC",
+        }),
+      });
+      const j = await r.json();
+      if (!j.success) throw new Error("Navi API: " + JSON.stringify(j).slice(0, 120));
       const files = [];
-      for (const row of rows) {
-        const title = row.title || row.name || "";
+      for (const row of j.data || []) {
         const urls = Array.isArray(row.url) ? row.url : row.url ? [row.url] : [];
         for (const u of urls) {
           if (!u) continue;
           files.push({
-            title,
+            title: row.title || "",
             download_url: String(u).replace(/\\\//g, "/"),
-            saved_as: filenameFromUrl(u),
+            saved_as: decodeURIComponent(String(u).split("/").pop()),
           });
         }
       }
-      return files;
-    }
-
-    function rowsFromUrls(text) {
-      return text
-        .split(/\n+/)
-        .map((l) => l.trim())
-        .filter((l) => /^https?:\/\//i.test(l))
-        .map((url) => ({
-          title: "",
-          download_url: url,
-          saved_as: filenameFromUrl(url),
-        }));
-    }
-
-    function buildManifest(files) {
+      if (!files.length) throw new Error("No files in API response");
       return {
-        amc_id: slug(),
-        period: $("period").value.trim(),
-        cadence: $("cadence").value,
+        amc_id: "navi-mutual-fund",
+        period,
+        cadence: "fortnightly",
         captured_at: new Date().toISOString(),
-        captured_from: "residential-capture web",
+        captured_from: "one-tap",
         files,
       };
     }
 
-    $("amc").addEventListener("change", () => {
-      $("amcCustom").classList.toggle("hidden", $("amc").value !== "other");
-    });
-
-    document.querySelectorAll(".tab").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        ["api", "urls", "navi"].forEach((t) => {
-          $("panel-" + t).classList.toggle("hidden", btn.dataset.tab !== t);
-        });
+    async function publish(manifest) {
+      const { uploadUrl, pin } = cfg();
+      if (!pin) throw new Error("Set PIN first (Change PIN button)");
+      const r = await fetch(uploadUrl.replace(/\/$/, "") + "/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin, manifest }),
       });
-    });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok || !data.ok) throw new Error(data.error || "Upload failed");
+      return data;
+    }
 
-    const naviBookmarklet = `javascript:(async()=>{try{const html=document.documentElement.innerHTML;const nonce=html.match(/"nonce":"([a-f0-9]+)"/i)?.[1]||html.match(/wp-nonce["']?\\s*[:=]\\s*["']([a-f0-9]+)/i)?.[1];if(!nonce){alert('wp-nonce not found');return}const cat=prompt('Category: 884=Monthly, 885=Fortnightly','885');const typ=cat==='884'?'Monthly':'Fortnightly';const fy=prompt('Financial year','2026-2027');const val=prompt('Value (e.g. September 1-15 or September)','September 1-15');const r=await fetch('https://navi.com/wp-json/nv/v1/documents',{method:'POST',credentials:'include',headers:{'content-type':'application/x-www-form-urlencoded; charset=UTF-8','wp-nonce':nonce,'x-requested-with':'XMLHttpRequest'},body:new URLSearchParams({financial_year:fy,value:val,category:cat,type:typ,order:'DESC'})});const j=await r.json();if(!j.success){alert('API failed: '+JSON.stringify(j).slice(0,200));return}const files=[];for(const row of j.data||[]){const urls=Array.isArray(row.url)?row.url:(row.url?[row.url]:[]);for(const u of urls){if(!u)continue;files.push({title:row.title||'',download_url:u,saved_as:decodeURIComponent(u.split('/').pop())})}}const per=prompt('Period YYYY-MM',new Date().toISOString().slice(0,7));const out={amc_id:'navi-mutual-fund',period:per,cadence:typ.toLowerCase(),captured_at:new Date().toISOString(),captured_from:'navi bookmarklet',files};await navigator.clipboard.writeText(JSON.stringify(out,null,2));alert('Copied '+files.length+' file link(s) to clipboard')}catch(e){alert(e)}})();`;
-
-    $("bookmarklet").value = naviBookmarklet;
-
-    $("copyBookmarklet").addEventListener("click", async () => {
-      await navigator.clipboard.writeText(naviBookmarklet);
-      toast("Bookmarklet copied");
-    });
-
-    let lastManifest = null;
-
-    $("build").addEventListener("click", () => {
+    async function runCapture(btn) {
+      btn.disabled = true;
+      setStatus("Capturing…", true);
       try {
-        let files = [];
-        const naviPaste = $("naviManifest").value.trim();
-        if (naviPaste) {
-          const m = JSON.parse(naviPaste);
-          files = m.files || rowsFromApiJson(naviPaste);
-        } else if (!$("panel-api").classList.contains("hidden")) {
-          files = rowsFromApiJson($("apiJson").value.trim());
-        } else if (!$("panel-urls").classList.contains("hidden")) {
-          files = rowsFromUrls($("urlList").value);
-        } else {
-          files = rowsFromApiJson($("apiJson").value.trim());
-        }
-        if (!files.length) {
-          alert("No file links found. Paste API JSON or URLs.");
-          return;
-        }
-        lastManifest = buildManifest(files);
-        const json = JSON.stringify(lastManifest, null, 2);
-        $("outJson").textContent = json;
-        const path = manifestPath();
-        $("githubPath").textContent = path;
-        $("rawUrl").textContent =
-          `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${path}`;
-        $("outCard").classList.remove("hidden");
-        $("outCard").scrollIntoView({ behavior: "smooth" });
+        const manifest = await captureNavi();
+        setStatus("Uploading " + manifest.files.length + " files…", true);
+        const res = await publish(manifest);
+        setStatus("Done — " + manifest.files.length + " files published", true);
+        return res;
       } catch (e) {
-        alert("Parse error: " + e.message);
+        setStatus(e.message || String(e), false);
+        throw e;
+      } finally {
+        btn.disabled = false;
       }
-    });
+    }
 
-    $("copyJson").addEventListener("click", async () => {
-      if (!lastManifest) return;
-      await navigator.clipboard.writeText(JSON.stringify(lastManifest, null, 2));
-      toast("JSON copied");
-    });
+    function bookmarkletCode(uploadUrl, pin) {
+      const u = uploadUrl.replace(/\/$/, "");
+      const p = pin.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+      return `javascript:(async()=>{try{const h=document.documentElement.innerHTML;const n=h.match(/"nonce"\\s*:\\s*"([a-f0-9]+)"/i)?.[1];if(!n){alert('Open Navi portfolio page first');return}const d=new Date();const per=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const names=['January','February','March','April','May','June','July','August','September','October','November','December'];const m=names[d.getMonth()];const end=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();const val=d.getDate()<=18?m+' 1-15':m+' 16-'+end;const y=d.getFullYear(),mo=d.getMonth()+1;const fy=mo>=4?y+'-'+(y+1):(y-1)+'-'+y;const r=await fetch('https://navi.com/wp-json/nv/v1/documents',{method:'POST',credentials:'include',headers:{'content-type':'application/x-www-form-urlencoded; charset=UTF-8','wp-nonce':n,'x-requested-with':'XMLHttpRequest'},body:new URLSearchParams({financial_year:fy,value:val,category:'885',type:'Fortnightly',order:'DESC'})});const j=await r.json();if(!j.success){alert('API failed');return}const files=[];for(const row of j.data||[]){const urls=Array.isArray(row.url)?row.url:(row.url?[row.url]:[]);for(const u of urls){if(!u)continue;files.push({title:row.title||'',download_url:u,saved_as:decodeURIComponent(u.split('/').pop())})}}const manifest={amc_id:'navi-mutual-fund',period:per,cadence:'fortnightly',captured_at:new Date().toISOString(),files};const up=await fetch('${u}/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:'${p}',manifest})});const out=await up.json();alert(out.ok?'Published '+files.length+' files':'Failed: '+(out.error||up.status))}catch(e){alert(e)}})();`;
+    }
 
-    $("downloadJson").addEventListener("click", () => {
-      if (!lastManifest) return;
-      const blob = new Blob([JSON.stringify(lastManifest, null, 2)], {
-        type: "application/json",
-      });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = manifestPath().split("/").pop();
-      a.click();
-    });
+    function showScreen() {
+      const { pin } = cfg();
+      if (!pin) {
+        $("setup").classList.remove("hidden");
+        $("main").classList.add("hidden");
+        $("uploadUrl").value = cfg().uploadUrl;
+        return;
+      }
+      $("setup").classList.add("hidden");
+      $("main").classList.remove("hidden");
+      const onNavi = /navi\.com$/i.test(location.hostname);
+      $("onNavi").classList.toggle("hidden", !onNavi);
+      $("offNavi").classList.toggle("hidden", onNavi);
+    }
 
-    $("openGithub").addEventListener("click", () => {
-      const path = manifestPath();
-      const url =
-        `https://github.com/${REPO}/new/${BRANCH}?filename=${encodeURIComponent(path)}`;
-      window.open(url, "_blank", "noopener");
-    });
+    $("saveSetup").onclick = () => {
+      const url = $("uploadUrl").value.trim() || DEFAULT_UPLOAD;
+      const pin = $("pin").value.trim();
+      if (pin.length < 4) { alert("PIN at least 4 digits"); return; }
+      localStorage.setItem("rh_upload", url);
+      localStorage.setItem("rh_pin", pin);
+      showScreen();
+    };
 
-    const params = new URLSearchParams(location.search);
-    if (params.get("amc")) $("amc").value = params.get("amc");
-    if (params.get("period")) $("period").value = params.get("period");
-    if (params.get("cadence")) $("cadence").value = params.get("cadence");
+    $("captureNow").onclick = () => runCapture($("captureNow"));
+
+    $("installBookmark").onclick = async () => {
+      const { uploadUrl, pin } = cfg();
+      const code = bookmarkletCode(uploadUrl, pin);
+      try {
+        await navigator.clipboard.writeText(code);
+        alert("Copied! Add a bookmark, paste this as the URL, name it Navi capture.");
+      } catch {
+        prompt("Copy bookmark URL:", code);
+      }
+    };
+
+    $("changePin").onclick = () => {
+      $("setup").classList.remove("hidden");
+      $("uploadUrl").value = cfg().uploadUrl;
+      $("pin").value = cfg().pin;
+    };
+
+    showScreen();
   </script>
 </body>
 </html>

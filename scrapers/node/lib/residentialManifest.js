@@ -13,6 +13,8 @@ const defaultRoot = join(__dirname, "../../..");
 const DEFAULT_REMOTE_BASE =
   "https://raw.githubusercontent.com/subscriptionmanager26-png/fund-disclosures/main/data/residential-capture/manifests";
 
+const DEFAULT_CAPTURE_WORKER = "";
+
 function manifestRelPath(slug, period, cadence) {
   return `${slug}/${period}.${cadence}.json`;
 }
@@ -79,17 +81,42 @@ function readLocalManifest(root, slug, period, cadence) {
   }
 }
 
+function captureWorkerManifestUrl(slug, period, cadence) {
+  const base = (
+    process.env.RESIDENTIAL_CAPTURE_URL || DEFAULT_CAPTURE_WORKER || ""
+  ).replace(/\/$/, "");
+  if (!base) return "";
+  return `${base}/manifest/${slug}/${period}/${cadence}`;
+}
+
+async function fetchJsonManifest(url) {
+  const res = await fetch(url, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(
+      Number(process.env.RESIDENTIAL_MANIFEST_TIMEOUT_MS) || 30_000,
+    ),
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+async function fetchWorkerManifest(slug, period, cadence) {
+  const url = captureWorkerManifestUrl(slug, period, cadence);
+  if (!url) return null;
+  try {
+    const raw = await fetchJsonManifest(url);
+    return normalizeManifest(raw, { slug, period, cadence });
+  } catch {
+    return null;
+  }
+}
+
 async function fetchRemoteManifest(slug, period, cadence) {
   const url = remoteManifestUrl(slug, period, cadence);
   try {
-    const res = await fetch(url, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(
-        Number(process.env.RESIDENTIAL_MANIFEST_TIMEOUT_MS) || 30_000,
-      ),
-    });
-    if (!res.ok) return null;
-    return normalizeManifest(await res.json(), { slug, period, cadence });
+    const raw = await fetchJsonManifest(url);
+    if (!raw) return null;
+    return normalizeManifest(raw, { slug, period, cadence });
   } catch {
     return null;
   }
@@ -112,6 +139,13 @@ export async function loadResidentialManifest({
       notes: `residential manifest (local ${manifestRelPath(slug, period, cadence)})`,
     };
   }
+  const worker = await fetchWorkerManifest(slug, period, cadence);
+  if (worker?.files?.length) {
+    return {
+      files: worker.files,
+      notes: `residential manifest (worker ${slug}/${period}/${cadence})`,
+    };
+  }
   const remote = await fetchRemoteManifest(slug, period, cadence);
   if (remote?.files?.length) {
     return {
@@ -125,7 +159,8 @@ export async function loadResidentialManifest({
 export function residentialManifestPaths(slug, period, cadence) {
   return {
     local: `data/residential-capture/manifests/${manifestRelPath(slug, period, cadence)}`,
+    worker: captureWorkerManifestUrl(slug, period, cadence),
     remote: remoteManifestUrl(slug, period, cadence),
-    pages: `https://subscriptionmanager26-png.github.io/fund-disclosures/residential-capture/?amc=${slug}&period=${period}&cadence=${cadence}`,
+    pages: `https://subscriptionmanager26-png.github.io/fund-disclosures/residential-capture/`,
   };
 }
