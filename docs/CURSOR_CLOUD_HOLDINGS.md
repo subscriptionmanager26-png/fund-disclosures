@@ -120,7 +120,7 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 1. Use `curl_cffi` with Chrome impersonation in the Python fetcher (`impersonate="chrome131"`).
 2. Add the script to `forceRealFetch` in `scrapers/node/adapters/pythonRef.js` so Node stages files via Python instead of re-fetching URLs.
 
-**If curl_cffi still 403/SSL from a Cloud Agent VM:** Navi (`navi.com`) and Union (`www.unionmf.com`) may block datacenter IPs at the edge. The fetcher code is correct; run a one-off fetch from a residential/non-cloud IP (or wait for the block to lift) and stage files under `data/staging/python/amcs/<slug>/<YYYY-MM>/`. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
+**If curl_cffi still 403/SSL from a Cloud Agent VM:** Navi (`navi.com`) and Union (`www.unionmf.com`) may block datacenter IPs at the edge. Use **residential capture** instead: open the [mobile capture page](https://subscriptionmanager26-png.github.io/fund-disclosures/residential-capture/) on your phone, paste API JSON or URLs, and commit `data/residential-capture/manifests/<slug>/<YYYY-MM>.<cadence>.json`. The cloud agent falls back to these manifests and downloads from CDN URLs. See `docs/RESIDENTIAL_CAPTURE.md`. Legacy: `scripts/fetch-navi-local.sh` / `fetch-union-local.sh`. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
 
 ### `excluded_non_portfolio` — Kotak Consolidated SEBI monthly
 
