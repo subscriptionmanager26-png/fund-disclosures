@@ -47,6 +47,12 @@ function baseName(url) {
   }
 }
 
+/** Cadence guards use the download name only — not parent URL folders (e.g. Shriram CDN paths). */
+function cadenceLabel(file) {
+  const { url, filename } = fileBlob(file);
+  return baseName(url) || filename;
+}
+
 /**
  * @param {{ url?: string, filename?: string, text?: string }} file
  * @param {{ type?: string, period?: { year: number, month: number } | null, storageKey?: string | null }} opts
@@ -70,10 +76,11 @@ export function classifyDisclosureFile(file, opts = {}) {
   }
 
   // Filename cadence must match job type even when trust_adapter_period is set.
-  if (type === "monthly" && /fortnight(?:ly)?/i.test(blob)) {
+  const cadence = cadenceLabel(file);
+  if (type === "monthly" && /fortnight(?:ly)?/i.test(cadence)) {
     return { keep: false, reason: "wrong_cadence", detail: "fortnightly_in_monthly" };
   }
-  if (type === "fortnightly" && /monthly/i.test(blob) && !/fortnight/i.test(blob)) {
+  if (type === "fortnightly" && /monthly/i.test(cadence) && !/fortnight/i.test(cadence)) {
     return { keep: false, reason: "wrong_cadence", detail: "monthly_in_fortnightly" };
   }
 
