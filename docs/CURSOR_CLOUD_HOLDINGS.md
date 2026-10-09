@@ -55,8 +55,12 @@ Optional env (defaults are fine):
 
 | Var | Default | Purpose |
 |-----|---------|---------|
-| `FETCH_TIMEOUT_MS` | `180000` | Per-request timeout (avoids false errors on slow AMC sites) |
-| `FETCH_CONCURRENCY` | `4` | Parallel AMC fetches (8 can hang Node with exit 13) |
+| `FETCH_TIMEOUT_MS` | `180000` | Per-request HTTP timeout (`httpFetch`) |
+| `FETCH_LIST_TIMEOUT_MS` | `900000` | Wall clock for whole `adapter.listFiles` (pagination / slow hubs) |
+| `FETCH_CONCURRENCY` | `2` | Parallel AMC fetches for fortnightly jobs |
+| `FETCH_MONTHLY_CONCURRENCY` | `1` | Monthly jobs run serially — avoids HDFC/ICICI/Axis timeouts under load |
+
+**Sep 2026 half-coverage:** the daily job used `FETCH_TIMEOUT_MS` as the **listFiles** wall clock (3m) with **concurrency 4**. Large CMS AMCs timed out during the September monthly fetch; FN-31 debt still merged, so the month looked half-full. Monthly now defaults to concurrency **1** with a separate **15m** list timeout and a serial retry pass for any remaining errors.
 
 ## What `holdings:cloud` does
 

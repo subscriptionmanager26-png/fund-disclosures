@@ -21,6 +21,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { filterFilesWithReport } from "./lib/portfolioFilter.js";
+import { resolveListTimeoutMs } from "./lib/fetchTimeouts.js";
 import { parsePeriod } from "./lib/period.js";
 import {
   parsePeriodInput,
@@ -164,10 +165,7 @@ const run = {
   results: [],
 };
 
-const listTimeoutMs = Math.max(
-  60_000,
-  Number(process.env.FETCH_TIMEOUT_MS) || 420_000,
-);
+const listTimeoutMs = resolveListTimeoutMs();
 
 function withTimeout(promise, ms, label) {
   let timer;
@@ -299,9 +297,29 @@ async function fetchOneAmc(amc) {
   return fetchOneAmcInner(amc);
 }
 
-run.results = await mapPool(amcs, concurrency, fetchOneAmc);
+async function retryErrorAmcsSerially(results, items, fn) {
+  const errorIds = results
+    .filter((r) => r?.status === "error")
+    .map((r) => r.id);
+  if (!errorIds.length || concurrency <= 1) return results;
+  const idToIndex = new Map(results.map((r, i) => [r.id, i]));
+  console.log(
+    `\nRetrying ${errorIds.length} error AMC(s) serially (after concurrency=${concurrency})…\n`,
+  );
+  for (const amc of items) {
+    if (!errorIds.includes(amc.id)) continue;
+    const idx = idToIndex.get(amc.id);
+    if (idx === undefined) continue;
+    results[idx] = await fn(amc);
+  }
+  return results;
+}
 
-const allRejected = [];
+async function main() {
+  run.results = await mapPool(amcs, concurrency, fetchOneAmc);
+  run.results = await retryErrorAmcsSerially(run.results, amcs, fetchOneAmc);
+
+  const allRejected = [];
 for (const r of run.results) {
   for (const row of r.rejected || []) {
     allRejected.push({
@@ -356,6 +374,17 @@ writeFileSync(rejectMd, mdLines.join("\n") + "\n");
 const ok = run.results.filter((r) => r.status === "ok").length;
 const empty = run.results.filter((r) => r.status === "empty").length;
 const err = run.results.filter((r) => r.status === "error").length;
-console.log(
-  `\nDone. ok=${ok} empty=${empty} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
-);
+  console.log(
+    `\nDone. ok=${ok} empty=${empty} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
+  );
+}
+
+const isCli =
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === process.argv[1];
+if (isCli) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
