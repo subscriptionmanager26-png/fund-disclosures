@@ -44,6 +44,11 @@ MONTH_RE = re.compile(
     r"\b(january|february|march|april|may|june|july|august|september|october|november|december)\b[\s,\-]+(\d{4})",
     re.I,
 )
+# Sep 2026+ monthly rows use extensionless media paths (XLS served without .xlsx in href).
+HSBC_DOCUMENT_PATH_RE = re.compile(
+    r"/portfolios/document-(\d{2})(\d{2})(\d{4})/",
+    re.I,
+)
 
 
 def safe_filename(url: str) -> str:
@@ -52,7 +57,28 @@ def safe_filename(url: str) -> str:
     base = unquote(base.split("?")[0])
     if not base or base in (".", ".."):
         base = "download.xlsx"
-    return re.sub(r"[^\w.\-() ]", "_", base).strip()[:200] or "download.xlsx"
+    base = re.sub(r"[^\w.\-() ]", "_", base).strip()[:200] or "download.xlsx"
+    if not re.search(r"\.(xlsx|xls)$", base, re.I):
+        base = f"{base}.xlsx"
+    return base
+
+
+def is_monthly_portfolio_href(href_l: str) -> bool:
+    if "/portfolios/" not in href_l:
+        return False
+    if re.search(r"\.(xlsx|xls)(?:\?|$)", href_l):
+        return True
+    return bool(HSBC_DOCUMENT_PATH_RE.search(href_l))
+
+
+def month_key_from_document_path(href: str) -> str | None:
+    m = HSBC_DOCUMENT_PATH_RE.search(href)
+    if not m:
+        return None
+    _day, month, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    if not (1 <= month <= 12):
+        return None
+    return f"{year:04d}-{month:02d}"
 
 
 def fetch_html() -> str:
@@ -134,12 +160,12 @@ def extract_rows(html: str) -> list[dict]:
     rows: list[dict] = []
     for href, label_html in LINK_RE.findall(block):
         href_l = href.lower()
-        if "/portfolios/" not in href_l or not re.search(r"\.(xlsx|xls)(?:\?|$)", href_l):
+        if not is_monthly_portfolio_href(href_l):
             continue
         label = re.sub(r"<[^>]+>", " ", label_html)
         label = re.sub(r"\s+", " ", label).strip()
         blob = f"{label} {href}"
-        mk = text_to_month_key(blob)
+        mk = text_to_month_key(blob) or month_key_from_document_path(href)
         if not mk:
             continue
         url = urljoin(BASE_URL, href)

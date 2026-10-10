@@ -78,12 +78,14 @@
           "script": "fetch_abakkus.py",
           "python_slug": "abakkus-mutual-fund",
           "extra_args": [],
+          "trust_adapter_period": true,
           "notes": "via reference/python-fetchers (AMC-direct)"
         },
         "fortnightly": {
           "adapter": "python_ref",
           "script": "fetch_abakkus.py",
           "python_slug": "abakkus-mutual-fund",
+          "trust_adapter_period": true,
           "extra_args": [],
           "notes": "python_ref fortnightly (fallback after empty HTML)"
         }
@@ -708,8 +710,10 @@
       "notes": "",
       "fetch": {
         "monthly": {
-          "adapter": "static_html",
-          "notes": ""
+          "adapter": "python_ref",
+          "script": "fetch_groww.py",
+          "python_slug": "groww-mutual-fund",
+          "notes": "NEXT_DATA filesData — one consolidated Monthly Portfolio workbook per month"
         },
         "fortnightly": {
           "adapter": "static_html",

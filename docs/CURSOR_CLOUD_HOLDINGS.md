@@ -45,7 +45,8 @@ Add these on [cursor.com/dashboard?tab=cloud-agents](https://cursor.com/dashboar
 | Secret | Purpose |
 |--------|---------|
 | `HOLDINGS_GH_TOKEN` | `kushagra-agarwal-a` PAT with `repo` write on `fund-holdings-data` |
-| `EDELWEISS_API_SECRET` | Edelweiss AMC fetch |
+| `EDELWEISS_API_SECRET` | Optional — only with `EDELWEISS_HASH_KEY` (paired SPA rotation). Fetcher uses current keys from the public `main.*.js` bundle when hash key is unset. |
+| `EDELWEISS_HASH_KEY` | Optional paired override for statutory API AES (see `fetch_edelweiss.py` DEFAULT_*). |
 
 **Do not rely on Cursor’s built-in `GH_TOKEN`.** That is `cursor[bot]` on the checkout repo (`subscriptionmanager26-png/fund-disclosures`). It **cannot** push to `kushagra-agarwal-a/fund-holdings-data` (403). The daily script requires `HOLDINGS_GH_TOKEN` and uses it for the data-repo push.
 
