@@ -116,6 +116,11 @@ _MONTH_UNDERSCORE_YEAR = re.compile(
     rf"(?<![A-Za-z])({MONTH_RE})[-_](\d{{2}})(?:_|\.xls)",
     re.I,
 )
+# Abakkus: Final_Monthly_Portolio_Sep30_2026_….xlsx
+_MONTH_DAY_UNDERSCORE_YEAR = re.compile(
+    rf"(?<![A-Za-z])({MONTH_RE})(\d{{1,2}})_(20\d{{2}})",
+    re.I,
+)
 # Kotak: FortnightlyPortfolioAugust312026.xlsx / July152026
 # Allow CamelCase boundary (…PortfolioAugust31…) as well as a normal word break.
 _MDY_GLUED = re.compile(
@@ -125,6 +130,11 @@ _MDY_GLUED = re.compile(
 # Edelweiss: EDEL_Fortnightly_Disclosure_31Aug2026_….xlsx / 15Jul2026
 _DMY_GLUED = re.compile(
     rf"(?<!\d)(\d{{1,2}})({MONTH_RE})(20\d{{2}})(?!\d)",
+    re.I,
+)
+# Abakkus: Final_Monthly_Portolio_Sep30_2026.xlsx
+_MDY_UNDERSCORE_YEAR = re.compile(
+    rf"(?<![A-Za-z])({MONTH_RE})(\d{{1,2}})_(20\d{{2}})(?!\d)",
     re.I,
 )
 _ISO = re.compile(r"(?<!\d)(20\d{2})-(\d{2})-(\d{2})(?!\d)")
@@ -194,6 +204,11 @@ def extract_dates(*parts: str) -> list[date]:
             year = 2000 + yy
             add(_valid(year, mon, last_day(year, mon)))
 
+    for m in _MONTH_DAY_UNDERSCORE_YEAR.finditer(blob):
+        mon = MONTH_NUM.get(m.group(1).lower())
+        if mon:
+            add(_valid(int(m.group(3)), mon, int(m.group(2))))
+
     for m in _MDY_GLUED.finditer(blob):
         mon = MONTH_NUM.get(m.group(1).lower())
         if mon:
@@ -203,6 +218,11 @@ def extract_dates(*parts: str) -> list[date]:
         mon = MONTH_NUM.get(m.group(2).lower())
         if mon:
             add(_valid(int(m.group(3)), mon, int(m.group(1))))
+
+    for m in _MDY_UNDERSCORE_YEAR.finditer(blob):
+        mon = MONTH_NUM.get(m.group(1).lower())
+        if mon:
+            add(_valid(int(m.group(3)), mon, int(m.group(2))))
 
     for m in _NUMERIC.finditer(blob):
         a, b, y = int(m.group(1)), int(m.group(2)), expand_year(m.group(3))
@@ -272,6 +292,11 @@ def extract_all_year_months(*parts: str) -> list[tuple[int, int]]:
         yy = int(m.group(2))
         if mon and 20 <= yy <= 29:
             add(2000 + yy, mon)
+
+    for m in _MONTH_DAY_UNDERSCORE_YEAR.finditer(blob):
+        mon = MONTH_NUM.get(m.group(1).lower())
+        if mon:
+            add(int(m.group(3)), mon)
 
     for m in re.finditer(
         r"(?:^|[/\\])monthly[/\\](20\d{2})[/\\](\d{1,2})(?:[/\\]|$)",

@@ -37,7 +37,7 @@ HEADERS = {
 }
 VERTICALS_INLINE_RE = re.compile(r"(?:const|var|let)\s+verticals\s*=\s*(\[.*?\]);", re.S)
 VERTICALS_DATA_RE = re.compile(
-    r'<script[^>]+id="verticals-data"[^>]*type="application/json"[^>]*>(.*?)</script>',
+    r'<script[^>]+id=["\']verticals-data["\'][^>]*>(.*?)</script>',
     re.S | re.I,
 )
 TITLE_YM_RE = re.compile(
@@ -157,7 +157,7 @@ def parse_ym_from_title(title: str) -> tuple[int, int] | None:
 def load_verticals_json(page_html: str) -> list:
     m = VERTICALS_DATA_RE.search(page_html)
     if m:
-        return json.loads(m.group(1))
+        return json.loads(m.group(1).strip())
     m = VERTICALS_INLINE_RE.search(page_html)
     if m:
         return json.loads(m.group(1))
