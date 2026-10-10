@@ -127,6 +127,12 @@ class DisclosureDateTests(unittest.TestCase):
         self.assertTrue(dates_match_as_of(url, as_of="2026-08-31"))
         self.assertFalse(dates_match_as_of(url, as_of="2026-08-15"))
 
+    def test_abakkus_sep30_underscore_year(self):
+        name = "Final_Monthly_Portolio_Sep30_2026_fd59e57829.xlsx"
+        self.assertEqual(extract_dates(name)[0], date(2026, 9, 30))
+        self.assertEqual(extract_year_month(name), (2026, 9))
+        self.assertTrue(blob_matches_year_month(name, year=2026, month=9))
+
     def test_abakkus_jul_31_hash_not_year_2031(self):
         name = "Final_Monthly_Portfolio_Jul_31_a313e9e6dd.xls"
         self.assertEqual(extract_dates(name), [])

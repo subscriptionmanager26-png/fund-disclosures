@@ -9,6 +9,9 @@ Monthly portfolio files live under folder path containing "Portfolio" and have n
   Monthly Portfolio- Jan 31, 2026.xlsx
 
 We intentionally skip fortnightly files and keep only records with "Monthly Portfolio" in file name.
+
+Expect one consolidated workbook per month (~60 parent schemes after parse), not one file per scheme.
+Do not project scheme totals from hub HTML link counts.
 """
 from __future__ import annotations
 

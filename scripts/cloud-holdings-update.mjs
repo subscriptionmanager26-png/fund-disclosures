@@ -123,8 +123,19 @@ if (holdingsToken) {
   process.env.GH_TOKEN = holdingsToken;
   process.env.GITHUB_TOKEN = holdingsToken;
 }
+if (
+  process.env.EDELWEISS_API_SECRET?.trim() &&
+  !process.env.EDELWEISS_HASH_KEY?.trim()
+) {
+  console.warn(
+    "Warning: clearing stale EDELWEISS_API_SECRET (set EDELWEISS_HASH_KEY too to override SPA keys).",
+  );
+  delete process.env.EDELWEISS_API_SECRET;
+}
 if (!process.env.EDELWEISS_API_SECRET) {
-  console.warn("Warning: EDELWEISS_API_SECRET is not set — Edelweiss fetches will be skipped.");
+  console.warn(
+    "Note: Edelweiss uses bundled SPA keys when EDELWEISS_API_SECRET is unset.",
+  );
 }
 
 // Fewer parallel AMC fetches + longer HTTP timeout reduces false "error" from timeouts.
@@ -242,24 +253,55 @@ run("npm", ["run", "holdings:enrich", "--", "--allow-incomplete"], {
 });
 run("npm", ["run", "holdings:assert-locks"], { label: "assert mapping locks" });
 
+let syncWindowFailed = false;
 try {
   const syncArgs = [
     join(ROOT, "scripts/sync-asof-window.mjs"),
     `--from=${fromYm}`,
     `--to=${toYm}`,
     "--merge",
+    "--continue-on-error",
     ...(doPush ? ["--push"] : ["--dry-run"]),
   ];
   run(process.execPath, syncArgs, { label: `sync window ${fromYm}..${toYm} (merge)` });
+} catch (e) {
+  syncWindowFailed = true;
+  report.push_error = String(e.message || e);
+  console.error("\nSync window failed:", report.push_error);
+}
 
+if (syncWindowFailed && doPush) {
+  for (const ym of periods) {
+    const monthlyAsOf = monthEndIso(ym);
+    if (isFutureMonthEnd(monthlyAsOf)) continue;
+    try {
+      run(
+        process.execPath,
+        [
+          join(ROOT, "scripts/sync-asof-holdings-to-github.mjs"),
+          `--asof=${monthlyAsOf}`,
+          "--cadence=monthly",
+          "--push",
+        ],
+        { label: `fallback sync monthly ${monthlyAsOf}` },
+      );
+      report.push_error = null;
+    } catch (e2) {
+      report.push_error = String(e2.message || e2);
+      console.error("Fallback monthly sync failed:", report.push_error);
+    }
+  }
+}
+
+try {
   if (doPush) {
     run(process.execPath, [join(ROOT, "scripts/refresh-filings-catalog.mjs"), "--push"], {
       label: "refresh filings catalog",
     });
   }
 } catch (e) {
-  report.push_error = String(e.message || e);
-  console.error("\nSync/push failed:", report.push_error);
+  if (!report.push_error) report.push_error = String(e.message || e);
+  console.error("\nFilings refresh failed:", e.message || e);
 }
 
 report.after_files = countAsOfFiles(outDir);

@@ -70,7 +70,7 @@ Optional env (defaults are fine):
    - Record the verdict (keep / move / drop) in `data/probes/` before continuing.
 3. Parse all AMCs (`--all`) — only after the cadence gate
 4. Enrich identifiers (`--allow-incomplete` — partial months are normal early in the month)
-5. **Merge-sync** to GitHub (skips empty slices; never deletes existing portfolio files unless an explicit verified `--keep-ids` + `--no-merge` repair)
+5. **Merge-sync** to GitHub via `sync-asof-window.mjs --merge --continue-on-error` (fortnightly slice failures do not block month-end monthly; fallback monthly sync if the window still aborts)
 6. Refresh `catalog/filings.json` + pin `meta.json`
 7. Verify `https://openfin.pocketedge.in/api/v1/filings`
 8. Write JSON report under `data/probes/cloud-holdings-report-*.json`
@@ -79,7 +79,9 @@ Optional env (defaults are fine):
 
 - **Never** use `--allow-regression` or prune scripts in the daily job
 - Sync always uses `--merge` (additive fortnightly; monthly only replaces schemes present in the new parse)
-- If regression guard blocks a push, investigate — do not bypass
+- If regression guard blocks a **monthly** push, investigate — do not bypass. Fortnightly sync only guards **on-disk portfolio file counts** (catalog `available_as_of` link counts can drop when phantom FN stamps are pruned).
+- **Ship fetch/parser fixes on `main` before expecting CDN gains** — feature branches do not affect `holdings:cloud` until merged.
+- **Groww monthly** uses one consolidated workbook (`fetch_groww.py`); expect ~60 parent schemes on CDN, not hub HTML link counts (~150+).
 - **Never publish** portfolios whose source workbook is not a real disclosure for that as-of/cadence (filename/date/type must agree). Heuristic filters help; they do not replace the LLM cadence gate above.
 
 ## Interpreting fetch results
@@ -102,7 +104,7 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 
 **Cause:** `portfolioFilter.js` rejects spreadsheets with no parseable month when a concrete `storageKey` (e.g. `2026-08-31`) is set. API adapters already filter rows to the target `YYYY-MM`.
 
-**Fix:** Set `"trust_adapter_period": true` on that AMC's `fetch.monthly` entry in `registry/amcs.json`. The filter then keeps adapter-scoped files (still drops PRC / half-yearly via `EXCLUDE`).
+**Fix:** Set `"trust_adapter_period": true` on that AMC's `fetch.monthly` entry in `registry/amcs.json`. The filter then keeps adapter-scoped files (still drops PRC / half-yearly via `EXCLUDE`). **Abakkus** also needs `Sep30_2026`-style tokens in `disclosureDates.js` / `disclosure_date.py` (see `test_abakkus_sep30_underscore_year`).
 
 ### `wrong_month` — LIC upload timestamp vs folder month
 

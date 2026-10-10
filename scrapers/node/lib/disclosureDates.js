@@ -120,6 +120,15 @@ export function extractDisclosureDates(...parts) {
     }
   }
 
+  const monthDayUnderscoreYear = new RegExp(
+    `(?<![A-Za-z])(${MONTH_TOKEN})(\\d{1,2})_(20\\d{2})`,
+    "gi",
+  );
+  for (const m of blob.matchAll(monthDayUnderscoreYear)) {
+    const mon = MONTH_NUM[m[1].toLowerCase()];
+    if (mon) add(validDate(Number(m[3]), mon, Number(m[2])));
+  }
+
   // Kotak: FortnightlyPortfolioAugust312026.xlsx / July152026
   // Allow CamelCase boundary (…PortfolioAugust31…) as well as a normal word break.
   const mdyGlued = new RegExp(
@@ -219,6 +228,16 @@ export function extractAllYearMonths(...parts) {
     const month = MONTH_NUM[m[1].toLowerCase()];
     const yy = Number(m[2]);
     if (month && yy >= 20 && yy <= 29) add(2000 + yy, month);
+  }
+
+  // Abakkus: Final_Monthly_Portolio_Sep30_2026_….xlsx
+  const monthDayUnderscoreYear = new RegExp(
+    `(?<![A-Za-z])(${MONTH_TOKEN})(\\d{1,2})_(20\\d{2})`,
+    "gi",
+  );
+  for (const m of blob.matchAll(monthDayUnderscoreYear)) {
+    const month = MONTH_NUM[m[1].toLowerCase()];
+    if (month) add(Number(m[3]), month);
   }
 
   // Mirae: sml250_aug2026.xlsx / largecap_aug2026.xlsx
