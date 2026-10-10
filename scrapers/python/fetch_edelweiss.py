@@ -7,7 +7,10 @@ API:  api.edelweissmf.com statutory-menus/single (Chrome TLS + AES body decrypt)
 
 Akamai blocks plain curl; curl_cffi Chrome impersonation works.
 Response body is OpenSSL-salted AES-CBC; passphrase =
-  HMAC-SHA256(SECRET + x-ip-address + x-timestamp, HASH_KEY).hexdigest()
+  HmacSHA256(SECRET + x-ip-address + x-timestamp, HASH_KEY).hexdigest()
+
+Keys are in the public SPA (`main.*.js` encryption block). Update DEFAULT_* when
+the bundle rotates. Set EDELWEISS_API_SECRET to that `secreat` or leave unset.
 """
 from __future__ import annotations
 
@@ -39,14 +42,26 @@ API_SINGLE = (
     "?type=Statutory&fundType=MF&menuName=Portfolio%20of%20scheme(s)"
 )
 
-# Client-side constants from the Edelweiss SPA
-SECRET = __import__("os").environ.get("EDELWEISS_API_SECRET", "").strip()
-if not SECRET:
-    raise SystemExit(
-        "Set EDELWEISS_API_SECRET in the environment (Edelweiss statutory API AES passphrase)."
-    )
-HASH_KEY = "r4vcos0ejvndsow95n"
+# Client-side constants from the Edelweiss SPA (see main.*.js encryption block).
+DEFAULT_SECRET = (
+    "97a9497605fa7f0ea64fbcbed6a9b7bea8f06650d771b84db0b5ffa2882d1000"
+)
+DEFAULT_HASH_KEY = (
+    "45de59a4bd24ceabe59c52775532e2cf7904f2b7457d73579eafd06bc1e02c41"
+)
+_env = __import__("os").environ
+# Override only when both env vars are set (paired rotation). A stale
+# EDELWEISS_API_SECRET alone must not block the current SPA defaults.
+if _env.get("EDELWEISS_HASH_KEY", "").strip():
+    SECRET = _env.get("EDELWEISS_API_SECRET", "").strip() or DEFAULT_SECRET
+    HASH_KEY = _env.get("EDELWEISS_HASH_KEY", "").strip()
+else:
+    SECRET = DEFAULT_SECRET
+    HASH_KEY = DEFAULT_HASH_KEY
 DEFAULT_IP = "103.0.123.175"
+
+# Main consolidated monthly workbook (skip allocation annexures in the same submenu).
+MONTHLY_PORTFOLIO_TITLE_RE = re.compile(r"^Monthly Portfolio\s*[-–]", re.I)
 
 MONTH_ABBR = {
     1: "Jan",
@@ -139,13 +154,19 @@ def monthly_files_for(payload: dict, year: int, month: int, *, fortnightly: bool
     abbr = MONTH_ABBR[month]
     y = str(year)
     out = []
-    submenu_needle = "Fortnightly" if fortnightly else "Monthly Portfolio"
     for f in payload.get("files") or []:
         if not isinstance(f, dict):
             continue
         submenu = (f.get("subMenuName") or f.get("heading") or "")
-        if submenu_needle not in submenu:
+        if fortnightly:
+            if "Fortnightly" not in submenu:
+                continue
+        elif "Monthly Portfolio" not in submenu:
             continue
+        else:
+            title = (f.get("fileTitle") or "").strip()
+            if title and not MONTHLY_PORTFOLIO_TITLE_RE.match(title):
+                continue
         if str(f.get("year") or "") != y:
             continue
         if str(f.get("month") or "") != abbr:
