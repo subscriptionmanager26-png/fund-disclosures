@@ -13,6 +13,7 @@ from disclosure_date import (
     extract_all_year_months,
     extract_dates,
     extract_year_month,
+    year_month_key,
 )
 from asof_filter import file_matches_asof_strict
 
@@ -132,6 +133,11 @@ class DisclosureDateTests(unittest.TestCase):
         self.assertEqual(extract_dates(name)[0], date(2026, 9, 30))
         self.assertEqual(extract_year_month(name), (2026, 9))
         self.assertTrue(blob_matches_year_month(name, year=2026, month=9))
+
+    def test_groww_sep_30_2026_filename_not_year_2030(self):
+        name = "Monthly Portfolio- Sep 30 2026.xlsx"
+        self.assertEqual(extract_year_month(name), (2026, 9))
+        self.assertEqual(year_month_key(name), "2026-09")
 
     def test_abakkus_jul_31_hash_not_year_2031(self):
         name = "Final_Monthly_Portfolio_Jul_31_a313e9e6dd.xls"

@@ -169,6 +169,9 @@ def _month_year_token_ok(sep: str, year_raw: str, blob: str, end: int) -> bool:
     # Hyphen day before a real year: as-on-August-31,-2026
     if _DAY_THEN_YEAR.match(blob[end : end + 10] or ""):
         return False
+    # Groww: "Monthly Portfolio- Sep 30 2026" — day 30 is not a 2-digit year.
+    if yy <= 31 and re.match(r"^\s+20\d{2}", blob[end : end + 8] or ""):
+        return False
     return True
 
 
@@ -314,11 +317,19 @@ def extract_year_month(*parts: str) -> tuple[int, int] | None:
     """Best calendar month from a label or filename.
 
     When several month-years appear (e.g. scheme maturity APR 2028 + as-of
-    Jul 2026), prefer the last one — disclosure as-of usually trails the name.
+    Jul 2026), prefer the last reasonable one — disclosure as-of usually trails
+    the name. Full calendar dates in the blob win over month-year tokens.
     """
+    dates = extract_dates(*parts)
+    if dates:
+        d = dates[-1]
+        return (d.year, d.month)
     yms = extract_all_year_months(*parts)
     if not yms:
         return None
+    reasonable = [ym for ym in yms if 2020 <= ym[0] <= 2035]
+    if reasonable:
+        return reasonable[-1]
     return yms[-1]
 
 

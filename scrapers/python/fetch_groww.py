@@ -25,7 +25,7 @@ from urllib.parse import unquote, urlparse
 from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "lib"))
-from disclosure_date import year_month_key
+from disclosure_date import extract_year_month, year_month_key
 
 PAGE_URL = "https://growwmf.in/statutory-disclosure/portfolio"
 
@@ -68,6 +68,9 @@ def fetch_next_data() -> dict:
 
 
 def infer_month_key(name: str) -> str | None:
+    ym = extract_year_month(name or "")
+    if ym:
+        return f"{ym[0]}-{ym[1]:02d}"
     return year_month_key(name or "")
 
 
@@ -160,8 +163,11 @@ def main() -> None:
         out_dir.mkdir(parents=True, exist_ok=True)
 
         batch = by_month.get(mk) or []
-        print(f"\n{mk}: {len(batch)} file(s)")
+        # Same month can appear under multiple titles (comma vs "Sep 30 2026").
+        # Keep unique downloads by content hash.
+        print(f"\n{mk}: {len(batch)} monthly row(s) before dedupe")
         manifest: list[dict] = []
+        seen_hash: set[str] = set()
 
         if not batch:
             print("  No matching monthly rows found")
@@ -183,6 +189,11 @@ def main() -> None:
             try:
                 body = download(url)
                 h = hashlib.sha256(body).hexdigest()
+                if h in seen_hash:
+                    print(f"  [{i}] SKIP duplicate content {fname}")
+                    manifest.append({**rec, "sha256": h, "skipped_duplicate": True})
+                    continue
+                seen_hash.add(h)
                 (out_dir / fname).write_bytes(body)
                 manifest.append({**rec, "sha256": h})
                 print(f"  [{i}] OK {fname} ({len(body)} bytes)")

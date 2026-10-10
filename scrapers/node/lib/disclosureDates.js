@@ -71,6 +71,8 @@ function monthYearTokenOk(sep, yearRaw, blob, end) {
   // Hyphen day before a real year: as-on-August-31,-2026
   const rest = String(blob).slice(end, end + 10);
   if (/^,\s*-?\s*20\d{2}/.test(rest) || /^[-/.]20\d{2}/.test(rest)) return false;
+  // Groww: "Monthly Portfolio- Sep 30 2026" — day 30 is not a 2-digit year.
+  if (yy <= 31 && /^\s+20\d{2}/.test(String(blob).slice(end, end + 8))) return false;
   return true;
 }
 
@@ -260,9 +262,15 @@ export function extractAllYearMonths(...parts) {
 }
 
 export function extractYearMonth(...parts) {
+  const dates = extractDisclosureDates(...parts);
+  if (dates.length) {
+    const d = dates[dates.length - 1];
+    return { year: d.year, month: d.month };
+  }
   const yms = extractAllYearMonths(...parts);
   if (!yms.length) return null;
-  // Prefer the last token — scheme maturity often precedes disclosure as-of.
+  const reasonable = yms.filter((d) => d.year >= 2020 && d.year <= 2035);
+  if (reasonable.length) return reasonable[reasonable.length - 1];
   return yms[yms.length - 1];
 }
 
