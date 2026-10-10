@@ -11,6 +11,7 @@ import { randomBytes } from "node:crypto";
 import {
   attachAvailableAsOf,
   assertNoPhantomAsOfLinks,
+  buildFilingsFromAsOfDirs,
   scanExistingAsOfDirs,
 } from "./asof-portfolios.mjs";
 
@@ -52,6 +53,28 @@ test("attachAvailableAsOf ignores phantom dates injected into asOfMap", () => {
 
     const phantom = assertNoPhantomAsOfLinks(outDir, fixed);
     assert.equal(phantom.ok, true);
+  } finally {
+    rmSync(outDir, { recursive: true, force: true });
+  }
+});
+
+test("buildFilingsFromAsOfDirs keeps baseline rows when local tree is partial", () => {
+  const outDir = join(tmpdir(), `asof-test-${randomBytes(6).toString("hex")}`);
+  mkdirSync(join(outDir, "portfolios/asof/2026-09-30"), { recursive: true });
+  writeFileSync(
+    join(outDir, "portfolios/asof/2026-09-30/100001.json"),
+    '{"portfolio_id":"100001"}',
+  );
+  try {
+    const baseline = {
+      filings: [
+        { as_of: "2026-09-30", cadence: "monthly", portfolio_count: 1 },
+        { as_of: "2026-09-15", cadence: "fortnightly", portfolio_count: 540 },
+      ],
+    };
+    const doc = buildFilingsFromAsOfDirs(outDir, {}, { baselineFilings: baseline });
+    assert.equal(doc.filings.length, 2);
+    assert.equal(doc.filings.find((r) => r.as_of === "2026-09-15").portfolio_count, 540);
   } finally {
     rmSync(outDir, { recursive: true, force: true });
   }

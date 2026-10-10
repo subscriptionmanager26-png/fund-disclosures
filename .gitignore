@@ -51,6 +51,7 @@ scripts/*.mjs
 !scripts/push-pipeline-to-holdings.mjs
 !scripts/run-portfolio-update-report.mjs
 !scripts/verify-catalog-coverage.mjs
+!scripts/verify-filings-index.mjs
 !scripts/lib/resolve-holdings-out-dir.mjs
 !scripts/lib/asof-portfolios.test.mjs
 

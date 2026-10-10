@@ -45,7 +45,10 @@ import {
   sourcePeriodFromAsOf,
 } from "./lib/asof-portfolios.mjs";
 import {
+  assertFilingsCoverOnDisk,
+  assertFilingsIndexNotShrunk,
   assertNoHoldingsRegression,
+  ensureFullPortfoliosAsOfCheckout,
   loadRepoCatalog,
   mergeCatalogAsOfFromRepo,
 } from "./lib/holdings-guard.mjs";
@@ -183,6 +186,7 @@ function initOrClone() {
         BRANCH,
         `origin/${BRANCH}`,
       ]);
+      ensureFullPortfoliosAsOfCheckout(outDir);
     }
     return;
   }
@@ -359,8 +363,17 @@ function writeFilingsAndCatalogAvailability(
   writeJson(join(outDir, "catalog/amfi-lookup.json"), withDates);
   writeJson(join(outDir, "catalog/amfi-public.json"), publicCatalogFromLookup(withDates));
 
+  const baselineFilings = loadExistingFilings();
   const merged = buildFilingsFromAsOfDirs(outDir, withDates, {
-    baselineFilings: loadExistingFilings(),
+    baselineFilings,
+  });
+  assertFilingsIndexNotShrunk(baselineFilings, merged, {
+    allowRegression,
+    label: "writeFilingsAndCatalogAvailability",
+  });
+  assertFilingsCoverOnDisk(outDir, merged, {
+    allowRegression,
+    label: "writeFilingsAndCatalogAvailability",
   });
   writeJson(join(outDir, "catalog/filings.json"), merged);
 

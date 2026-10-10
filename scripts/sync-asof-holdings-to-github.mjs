@@ -35,8 +35,10 @@ import {
   sourcePeriodFromAsOf,
 } from "./lib/asof-portfolios.mjs";
 import {
+  assertFilingsCoverOnDisk,
   assertFilingsIndexNotShrunk,
   assertNoHoldingsRegression,
+  ensureFullPortfoliosAsOfCheckout,
   loadRepoCatalog,
   loadRepoFilings,
 } from "./lib/holdings-guard.mjs";
@@ -134,6 +136,7 @@ function initOrClone() {
       run("git", ["-C", outDir, "remote", "set-url", "origin", gitTokenUrl()]);
       run("git", ["-C", outDir, "fetch", "origin", BRANCH]);
       run("git", ["-C", outDir, "checkout", "-B", BRANCH, `origin/${BRANCH}`]);
+      ensureFullPortfoliosAsOfCheckout(outDir);
     }
     return;
   }
@@ -186,6 +189,10 @@ function refreshFilings(catalog, { baselineCatalog = null } = {}) {
 
   const doc = buildFilingsFromAsOfDirs(outDir, withDates, { baselineFilings });
   assertFilingsIndexNotShrunk(baselineFilings, doc, {
+    allowRegression,
+    label: `sync-asof(${asof}/${cadence})`,
+  });
+  assertFilingsCoverOnDisk(outDir, doc, {
     allowRegression,
     label: `sync-asof(${asof}/${cadence})`,
   });

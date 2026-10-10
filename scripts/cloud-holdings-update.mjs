@@ -18,6 +18,7 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { ensureFullPortfoliosAsOfCheckout } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -179,6 +180,9 @@ const periods = [fromYm, toYm].filter((v, i, a) => a.indexOf(v) === i);
 const fetchJobs = buildFetchParseJobs(periods);
 
 const outDir = defaultHoldingsOutDir(ROOT);
+if (existsSync(join(outDir, ".git"))) {
+  ensureFullPortfoliosAsOfCheckout(outDir);
+}
 const report = {
   started_at: new Date().toISOString(),
   mode: doPush ? "push" : "dry-run",
@@ -298,10 +302,15 @@ try {
     run(process.execPath, [join(ROOT, "scripts/refresh-filings-catalog.mjs"), "--push"], {
       label: "refresh filings catalog",
     });
+    run(
+      process.execPath,
+      [join(ROOT, "scripts/verify-filings-index.mjs"), `--out=${outDir}`],
+      { label: "verify filings index vs on-disk as-of" },
+    );
   }
 } catch (e) {
   if (!report.push_error) report.push_error = String(e.message || e);
-  console.error("\nFilings refresh failed:", e.message || e);
+  console.error("\nFilings refresh/verify failed:", e.message || e);
 }
 
 report.after_files = countAsOfFiles(outDir);

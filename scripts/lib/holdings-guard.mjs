@@ -2,10 +2,12 @@
 /**
  * Guards against accidental holdings-data regression (catalog links or on-disk as-of trees).
  */
+import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
   countDedupedAsOfDir,
+  countRawAsOfJsonFiles,
   parentPortfolioIds,
   scanExistingAsOfDirs,
 } from "./asof-portfolios.mjs";
@@ -160,6 +162,101 @@ export function assertFilingsIndexNotShrunk(beforeDoc, afterDoc, { allowRegressi
     `Filings index regression blocked (${label}): dropped as-of row(s): ${dropped.join(", ")}.\n` +
     "Re-run with --allow-regression only if those slices were intentionally removed.";
   throw new Error(msg);
+}
+
+/** As-of dates that have at least one portfolio JSON on disk. */
+export function listAsOfDirsWithPortfolios(outDir) {
+  const root = join(outDir, "portfolios", "asof");
+  const dates = [];
+  if (!existsSync(root)) return dates;
+  for (const date of readdirSync(root)) {
+    if (!AS_OF_RE.test(date)) continue;
+    const dir = join(root, date);
+    try {
+      if (!statSync(dir).isDirectory()) continue;
+    } catch {
+      continue;
+    }
+    if (countRawAsOfJsonFiles(dir) > 0) dates.push(date);
+  }
+  return dates.sort();
+}
+
+/** Top-level as-of folders tracked in git HEAD (when outDir is a clone). */
+export function listGitTrackedAsOfDates(outDir) {
+  if (!existsSync(join(outDir, ".git"))) return [];
+  const res = spawnSync(
+    "git",
+    ["-C", outDir, "ls-tree", "--name-only", "HEAD:portfolios/asof"],
+    { encoding: "utf8" },
+  );
+  if (res.status !== 0) return [];
+  return (res.stdout || "")
+    .split("\n")
+    .map((s) => s.trim())
+    .filter((d) => AS_OF_RE.test(d))
+    .sort();
+}
+
+/**
+ * Materialize every portfolios/asof/* tree from HEAD before rebuilding filings.json.
+ * Prevents a sparse/partial working tree from writing a truncated filings index.
+ */
+export function ensureFullPortfoliosAsOfCheckout(outDir) {
+  if (!existsSync(join(outDir, ".git"))) return { ok: true, skipped: true };
+  spawnSync("git", ["-C", outDir, "sparse-checkout", "disable"], {
+    stdio: "pipe",
+  });
+  const co = spawnSync(
+    "git",
+    ["-C", outDir, "checkout", "HEAD", "--", "portfolios/asof"],
+    { encoding: "utf8", stdio: "pipe" },
+  );
+  if (co.status !== 0) {
+    console.warn(
+      "Warning: could not fully checkout portfolios/asof:",
+      (co.stderr || co.stdout || "").slice(0, 240),
+    );
+  }
+  return { ok: co.status === 0 };
+}
+
+/**
+ * Every on-disk as-of folder with portfolios must appear in catalog/filings.json.
+ * OpenFin / holdings-browser read this file — not a scan of portfolios/asof/.
+ */
+export function assertFilingsCoverOnDisk(
+  outDir,
+  filingsDoc,
+  { allowRegression = false, label = "filings" } = {},
+) {
+  if (allowRegression) return { ok: true };
+  const indexed = new Set((filingsDoc?.filings || []).map((r) => String(r.as_of)));
+  const onDisk = listAsOfDirsWithPortfolios(outDir);
+  const missing = onDisk.filter((d) => !indexed.has(d));
+  if (missing.length) {
+    throw new Error(
+      `Filings index missing on-disk as-of slice(s) (${label}): ${missing.join(", ")}. ` +
+        "Run npm run holdings:refresh-filings -- --push after ensureFullPortfoliosAsOfCheckout.",
+    );
+  }
+  const gitDates = listGitTrackedAsOfDates(outDir);
+  const gitOnlyMissing = gitDates.filter((d) => {
+    if (indexed.has(d)) return false;
+    const dir = join(outDir, "portfolios", "asof", d);
+    return existsSync(dir) && countRawAsOfJsonFiles(dir) > 0;
+  });
+  if (gitOnlyMissing.length) {
+    throw new Error(
+      `Filings index incomplete vs git as-of tree (${label}): ${gitOnlyMissing.join(", ")}`,
+    );
+  }
+  return {
+    ok: true,
+    on_disk_slices: onDisk.length,
+    index_slices: indexed.size,
+    git_slices: gitDates.length,
+  };
 }
 
 /**

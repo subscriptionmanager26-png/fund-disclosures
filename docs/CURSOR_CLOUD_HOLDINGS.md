@@ -75,6 +75,21 @@ Optional env (defaults are fine):
 7. Verify `https://openfin.pocketedge.in/api/v1/filings`
 8. Write JSON report under `data/probes/cloud-holdings-report-*.json`
 
+## Filings API vs portfolio files
+
+OpenFin (`/api/v1/filings`) and the holdings browser **do not scan** `portfolios/asof/*`. They read **`catalog/filings.json`** only — one row per disclosure date (as-of, cadence, portfolio count).
+
+If a sync rebuilds that file from a **partial local** `portfolios/asof` tree (sparse checkout, or only the date being synced materialized on disk), the index can list **only the latest month-ends** while **fortnightly and older slices still exist on GitHub**. The API then looks “empty” for those dates even though CDN JSON is intact.
+
+**Prevention (in repo):**
+
+1. Before sync/refresh: `ensureFullPortfoliosAsOfCheckout` materializes all `portfolios/asof/*` from git HEAD.
+2. When rebuilding filings: merge prior `filings.json` rows + block row drops (`assertFilingsIndexNotShrunk`).
+3. After rebuild: `assertFilingsCoverOnDisk` — every on-disk as-of folder must have an index row.
+4. Daily `holdings:cloud --push` runs `holdings:verify-filings` after refresh; the job **fails** if the index drifts again.
+
+Manual check: `npm run holdings:verify-filings` (uses `.tmp/fund-holdings-data` or monorepo root).
+
 ## Safety rules
 
 - **Never** use `--allow-regression` or prune scripts in the daily job

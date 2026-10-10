@@ -35,6 +35,7 @@
     "holdings:sync-window": "node scripts/sync-asof-window.mjs",
     "holdings:prune-retention": "node scripts/prune-retention-asof.mjs",
     "holdings:refresh-filings": "node scripts/refresh-filings-catalog.mjs",
+    "holdings:verify-filings": "node scripts/verify-filings-index.mjs",
     "holdings:cloud": "node scripts/cloud-holdings-update.mjs",
     "parser:push-both": "node scripts/push-parser-both.mjs",
     "parser:mirror-subscriptionmanager": "node scripts/push-parser-both.mjs"
