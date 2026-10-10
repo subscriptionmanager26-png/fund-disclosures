@@ -21,9 +21,10 @@ export const miraeAdapter = {
     const seen = new Set();
     let page = 1;
     const pageSize = 50;
-    let emptyStreak = 0;
 
-    while (page <= 40 && emptyStreak < 2) {
+    // Walk the full Ajax listing (newest first). Do not stop after a few pages with
+    // zero period matches — September rows can span pages 1–2 while page 3+ is older months.
+    while (page <= 40) {
       const res = await httpFetch(endpoint, {
         method: "POST",
         headers: {
@@ -77,9 +78,9 @@ export const miraeAdapter = {
         });
       }
 
-      // Mirae lists newest first; stop once a full page has zero matches after we already found some
-      if (files.length && matchedOnPage === 0) emptyStreak++;
-      else emptyStreak = 0;
+      if (list.length < pageSize) break;
+      // Newest-first listing: after the target month, the next full page has zero matches.
+      if (files.length > 0 && matchedOnPage === 0) break;
       page++;
     }
 
