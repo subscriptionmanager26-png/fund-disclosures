@@ -58,13 +58,18 @@ function formatDelta(before, after) {
 
 /**
  * Fail when catalog or on-disk as-of coverage shrinks vs baseline.
- * @param {{ allowRegression?: boolean, label?: string, syncedDates?: string[] }} opts
+ * @param {{ allowRegression?: boolean, label?: string, syncedDates?: string[], checkCatalogLinks?: boolean }} opts
  */
 export function assertNoHoldingsRegression(
   outDir,
   beforeCatalog,
   afterCatalog,
-  { allowRegression = false, label = "sync", syncedDates = [] } = {},
+  {
+    allowRegression = false,
+    label = "sync",
+    syncedDates = [],
+    checkCatalogLinks = true,
+  } = {},
 ) {
   if (allowRegression) return { ok: true, regressions: [] };
 
@@ -96,7 +101,9 @@ export function assertNoHoldingsRegression(
     }
 
     // Catalog link checks only for dates being written in this sync.
-    if (synced.has(date)) {
+    // Fortnightly sync rebuilds available_as_of from on-disk files and often
+    // drops stale phantom FN stamps — compare portfolio files, not link counts.
+    if (checkCatalogLinks && synced.has(date)) {
       const prevSchemes = beforeCat.get(date) || 0;
       const nextSchemes = afterCat.get(date) || 0;
       if (prevSchemes > 0 && nextSchemes < prevSchemes) {
