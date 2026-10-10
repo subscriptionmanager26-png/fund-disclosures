@@ -321,12 +321,18 @@ export function scanExistingAsOfDirs(outDir, catalog = null) {
   return map;
 }
 
+/** Raw portfolio JSON files in one as-of directory (no catalog dedupe). */
+export function countRawAsOfJsonFiles(asOfDir) {
+  if (!existsSync(asOfDir)) return 0;
+  return readdirSync(asOfDir).filter((n) => n.endsWith(".json")).length;
+}
+
 /** Count deduped parent portfolio files in one asof directory. */
 export function countDedupedAsOfDir(asOfDir, catalog) {
   if (!existsSync(asOfDir)) return 0;
   const parentIds = parentPortfolioIds(catalog);
   if (!parentIds.size) {
-    return readdirSync(asOfDir).filter((n) => n.endsWith(".json")).length;
+    return countRawAsOfJsonFiles(asOfDir);
   }
   let count = 0;
   for (const name of readdirSync(asOfDir)) {
@@ -334,6 +340,8 @@ export function countDedupedAsOfDir(asOfDir, catalog) {
     const id = name.replace(/\.json$/, "");
     if (parentIds.has(id)) count += 1;
   }
+  const raw = countRawAsOfJsonFiles(asOfDir);
+  if (count <= 0 && raw > 0) return raw;
   return count;
 }
 
@@ -381,35 +389,65 @@ export function cadenceForAsOf(asOf) {
   return day <= 15 ? "fortnightly" : "monthly";
 }
 
-/** Rebuild catalog/filings.json rows from on-disk as-of dirs (deduped counts). */
-export function buildFilingsFromAsOfDirs(outDir, catalog) {
+/**
+ * Rebuild catalog/filings.json rows from on-disk as-of dirs (deduped counts).
+ * When baselineFilings is set, keep index rows for dates absent from the local
+ * working tree (partial clone / sparse checkout) so OpenFin does not lose slices.
+ */
+export function buildFilingsFromAsOfDirs(outDir, catalog, { baselineFilings = null } = {}) {
   const asofRoot = join(outDir, "portfolios", "asof");
-  const filings = [];
-  if (!existsSync(asofRoot)) {
-    return {
-      generated_at: new Date().toISOString(),
-      filings,
-    };
+  /** @type {Map<string, { as_of: string, cadence: string, portfolio_count: number }>} */
+  const byDate = new Map();
+
+  if (existsSync(asofRoot)) {
+    for (const date of readdirSync(asofRoot)) {
+      if (!AS_OF_RE.test(date)) continue;
+      const dir = join(asofRoot, date);
+      let st;
+      try {
+        st = statSync(dir);
+      } catch {
+        continue;
+      }
+      if (!st.isDirectory()) continue;
+      const count = countDedupedAsOfDir(dir, catalog);
+      if (count <= 0) continue;
+      byDate.set(date, {
+        as_of: date,
+        cadence: cadenceForAsOf(date),
+        portfolio_count: count,
+      });
+    }
   }
-  for (const date of readdirSync(asofRoot)) {
+
+  for (const row of baselineFilings?.filings || []) {
+    const date = String(row?.as_of || "").trim();
     if (!AS_OF_RE.test(date)) continue;
+    if (byDate.has(date)) continue;
     const dir = join(asofRoot, date);
-    let st;
-    try {
-      st = statSync(dir);
-    } catch {
+    if (!existsSync(dir)) {
+      byDate.set(date, {
+        as_of: date,
+        cadence: row.cadence || cadenceForAsOf(date),
+        portfolio_count: Number(row.portfolio_count) || 0,
+      });
       continue;
     }
-    if (!st.isDirectory()) continue;
     const count = countDedupedAsOfDir(dir, catalog);
-    if (count <= 0) continue;
-    filings.push({
-      as_of: date,
-      cadence: cadenceForAsOf(date),
-      portfolio_count: count,
-    });
+    if (count > 0) {
+      byDate.set(date, {
+        as_of: date,
+        cadence: cadenceForAsOf(date),
+        portfolio_count: count,
+      });
+    } else if (Number(row.portfolio_count) > 0) {
+      byDate.set(date, { ...row, as_of: date });
+    }
   }
-  filings.sort((a, b) => String(b.as_of).localeCompare(String(a.as_of)));
+
+  const filings = [...byDate.values()].sort((a, b) =>
+    String(b.as_of).localeCompare(String(a.as_of)),
+  );
   return {
     generated_at: new Date().toISOString(),
     filings,

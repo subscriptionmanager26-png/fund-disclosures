@@ -135,6 +135,33 @@ export function loadRepoCatalog(outDir) {
   }
 }
 
+/** Load published filings index if present. */
+export function loadRepoFilings(outDir) {
+  const p = join(outDir, "catalog/filings.json");
+  if (!existsSync(p)) return null;
+  try {
+    return JSON.parse(readFileSync(p, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Block accidental shrink of catalog/filings.json (UI/API date picker).
+ * @param {{ allowRegression?: boolean, label?: string }} opts
+ */
+export function assertFilingsIndexNotShrunk(beforeDoc, afterDoc, { allowRegression = false, label = "filings" } = {}) {
+  if (allowRegression) return { ok: true };
+  const before = new Set((beforeDoc?.filings || []).map((r) => String(r.as_of)));
+  const after = new Set((afterDoc?.filings || []).map((r) => String(r.as_of)));
+  const dropped = [...before].filter((d) => !after.has(d)).sort();
+  if (!dropped.length) return { ok: true };
+  const msg =
+    `Filings index regression blocked (${label}): dropped as-of row(s): ${dropped.join(", ")}.\n` +
+    "Re-run with --allow-regression only if those slices were intentionally removed.";
+  throw new Error(msg);
+}
+
 /**
  * Merge available_as_of / latest_as_of from an existing published catalog into a
  * freshly built lookup, keeping only dates whose portfolio files still exist.

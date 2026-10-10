@@ -35,8 +35,10 @@ import {
   sourcePeriodFromAsOf,
 } from "./lib/asof-portfolios.mjs";
 import {
+  assertFilingsIndexNotShrunk,
   assertNoHoldingsRegression,
   loadRepoCatalog,
+  loadRepoFilings,
 } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
 import { publicCatalogFromLookup } from "./lib/catalog-public.mjs";
@@ -162,6 +164,7 @@ function schemeFromMeta(meta, portfolioId) {
 
 function refreshFilings(catalog, { baselineCatalog = null } = {}) {
   const beforeCatalog = baselineCatalog || loadRepoCatalog(outDir);
+  const baselineFilings = loadRepoFilings(outDir);
   const asOfMap = scanExistingAsOfDirs(outDir, catalog);
   for (const dates of asOfMap.values()) dates.add(asof);
 
@@ -181,7 +184,11 @@ function refreshFilings(catalog, { baselineCatalog = null } = {}) {
     publicCatalogFromLookup(withDates),
   );
 
-  const doc = buildFilingsFromAsOfDirs(outDir, withDates);
+  const doc = buildFilingsFromAsOfDirs(outDir, withDates, { baselineFilings });
+  assertFilingsIndexNotShrunk(baselineFilings, doc, {
+    allowRegression,
+    label: `sync-asof(${asof}/${cadence})`,
+  });
   writeJson(join(outDir, "catalog/filings.json"), doc);
 
   const coverage = assertCatalogPortfolioCoverage(outDir, withDates);

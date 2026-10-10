@@ -24,6 +24,7 @@ import {
   buildFilingsFromAsOfDirs,
   scanExistingAsOfDirs,
 } from "./lib/asof-portfolios.mjs";
+import { loadRepoFilings } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
 import { publicCatalogFromLookup } from "./lib/catalog-public.mjs";
 
@@ -212,7 +213,9 @@ if (!dryRun) {
     publicCatalogFromLookup(withDates),
   );
 
-  const filingsDoc = buildFilingsFromAsOfDirs(outDir, withDates);
+  const filingsDoc = buildFilingsFromAsOfDirs(outDir, withDates, {
+    baselineFilings: loadRepoFilings(outDir),
+  });
   writeJson(join(outDir, "catalog/filings.json"), filingsDoc);
 
   const metaPath = join(outDir, "meta.json");

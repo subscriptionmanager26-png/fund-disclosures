@@ -23,8 +23,10 @@ import {
   scanExistingAsOfDirs,
 } from "./lib/asof-portfolios.mjs";
 import {
+  assertFilingsIndexNotShrunk,
   assertNoHoldingsRegression,
   loadRepoCatalog,
+  loadRepoFilings,
 } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
 import { publicCatalogFromLookup } from "./lib/catalog-public.mjs";
@@ -134,6 +136,7 @@ if (!Object.keys(catalog).length && existsSync(catalogPath)) {
   }
 }
 
+const baselineFilings = loadRepoFilings(outDir);
 const asOfMap = scanExistingAsOfDirs(outDir, catalog);
 const withDates = attachAvailableAsOf(catalog, asOfMap, {
   cdnUrlFn: cdnUrl,
@@ -143,7 +146,11 @@ assertNoHoldingsRegression(outDir, baselineCatalog, withDates, {
   allowRegression,
   label: "refresh-filings-catalog",
 });
-const filingsDoc = buildFilingsFromAsOfDirs(outDir, withDates);
+const filingsDoc = buildFilingsFromAsOfDirs(outDir, withDates, { baselineFilings });
+assertFilingsIndexNotShrunk(baselineFilings, filingsDoc, {
+  allowRegression,
+  label: "refresh-filings-catalog",
+});
 
 console.log(JSON.stringify(filingsDoc, null, 2));
 

@@ -359,7 +359,9 @@ function writeFilingsAndCatalogAvailability(
   writeJson(join(outDir, "catalog/amfi-lookup.json"), withDates);
   writeJson(join(outDir, "catalog/amfi-public.json"), publicCatalogFromLookup(withDates));
 
-  const merged = buildFilingsFromAsOfDirs(outDir, withDates);
+  const merged = buildFilingsFromAsOfDirs(outDir, withDates, {
+    baselineFilings: loadExistingFilings(),
+  });
   writeJson(join(outDir, "catalog/filings.json"), merged);
 
   const coverage = assertCatalogPortfolioCoverage(outDir, withDates);
