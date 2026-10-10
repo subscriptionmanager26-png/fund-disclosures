@@ -5783,7 +5783,7 @@
     {
       "amc_id": "dsp-mutual-fund",
       "shortcode": "NIFTY MIDCAP 150 Q50",
-      "aliases": [],
+      "aliases": ["MIDCAP 150 Q50 IDX"],
       "canonical_amfi_code": "150428",
       "amfi_base_name": "DSP Nifty Midcap 150 Quality 50 Index Fund",
       "disclosure_label": "DSP Nifty Midcap 150 Quality 50 Index Fund",
@@ -5791,6 +5791,18 @@
       "source": "shortcode",
       "first_seen_period": "latest",
       "last_verified_period": "latest"
+    },
+    {
+      "amc_id": "dsp-mutual-fund",
+      "shortcode": "MIDCAP 150 Q50 IDX",
+      "aliases": [],
+      "canonical_amfi_code": "150427",
+      "amfi_base_name": "DSP Nifty Midcap 150 Quality 50 Index Fund",
+      "disclosure_label": "DSP Nifty Midcap 150 Qlty 50 Index Fund",
+      "confidence": "seeded",
+      "source": "shortcode",
+      "first_seen_period": "2026-09-30",
+      "last_verified_period": "2026-09-30"
     },
     {
       "amc_id": "dsp-mutual-fund",

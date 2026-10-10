@@ -127,6 +127,11 @@ _DMY_GLUED = re.compile(
     rf"(?<!\d)(\d{{1,2}})({MONTH_RE})(20\d{{2}})(?!\d)",
     re.I,
 )
+# Abakkus: Final_Monthly_Portolio_Sep30_2026.xlsx
+_MDY_UNDERSCORE_YEAR = re.compile(
+    rf"(?<![A-Za-z])({MONTH_RE})(\d{{1,2}})_(20\d{{2}})(?!\d)",
+    re.I,
+)
 _ISO = re.compile(r"(?<!\d)(20\d{2})-(\d{2})-(\d{2})(?!\d)")
 _NUMERIC = re.compile(r"(?<!\d)(\d{1,2})[-_/.](\d{1,2})[-_/.](\d{2}|\d{4})(?!\d)")
 _COMPACT = re.compile(r"(?<!\d)(\d{2})(\d{2})(20\d{2})(?!\d)")
@@ -203,6 +208,11 @@ def extract_dates(*parts: str) -> list[date]:
         mon = MONTH_NUM.get(m.group(2).lower())
         if mon:
             add(_valid(int(m.group(3)), mon, int(m.group(1))))
+
+    for m in _MDY_UNDERSCORE_YEAR.finditer(blob):
+        mon = MONTH_NUM.get(m.group(1).lower())
+        if mon:
+            add(_valid(int(m.group(3)), mon, int(m.group(2))))
 
     for m in _NUMERIC.finditer(blob):
         a, b, y = int(m.group(1)), int(m.group(2)), expand_year(m.group(3))

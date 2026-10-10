@@ -141,6 +141,16 @@ export function extractDisclosureDates(...parts) {
     if (mon) add(validDate(Number(m[3]), mon, Number(m[1])));
   }
 
+  // Abakkus: Final_Monthly_Portolio_Sep30_2026.xlsx
+  const mdyUnderscoreYear = new RegExp(
+    `(?<![A-Za-z])(${MONTH_TOKEN})(\\d{1,2})_(20\\d{2})(?!\\d)`,
+    "gi",
+  );
+  for (const m of blob.matchAll(mdyUnderscoreYear)) {
+    const mon = MONTH_NUM[m[1].toLowerCase()];
+    if (mon) add(validDate(Number(m[3]), mon, Number(m[2])));
+  }
+
   for (const m of blob.matchAll(/(?<!\d)(\d{1,2})[-_/.](\d{1,2})[-_/.](\d{2}|\d{4})(?!\d)/g)) {
     const a = Number(m[1]);
     const b = Number(m[2]);

@@ -48,6 +48,28 @@ def month_search_key(month_key: str) -> tuple[str, str]:
     return frag, frag
 
 
+def month_search_fragments(month_key: str) -> list[str]:
+    """
+    WP media slugs for Bajaj AMC sometimes omit the hyphen before the year
+    (e.g. as-on-30-sep2026 vs as-on-30-sep-2026). Search all variants.
+    """
+    frag, _ = month_search_key(month_key)
+    frags = [frag]
+    m = re.match(r"^as-on-(\d+)-([a-z]+)-(\d{4})$", frag)
+    if m:
+        day, mon, year = m.group(1), m.group(2), m.group(3)
+        frags.append(f"as-on-{day}-{mon}{year}")
+        if mon == "sep":
+            frags.append(f"as-on-{day}-september-{year}")
+    seen: set[str] = set()
+    out: list[str] = []
+    for f in frags:
+        if f not in seen:
+            seen.add(f)
+            out.append(f)
+    return out
+
+
 def fortnightly_search_key(month_key: str, as_of: str = "") -> str:
     """Mid-month fortnightly slug fragment, e.g. as-on-15-jul-2026."""
     if as_of:
@@ -102,10 +124,12 @@ def is_monthly_for(item: dict, frag: str) -> bool:
     title = (item.get("title") or {}).get("rendered") or ""
     url = pick_download_url(item) or ""
     blob = f"{slug} {title} {url}".lower()
-    if frag not in blob.replace("_", "-"):
-        # also allow underscore form as_on_30_jun_2026
-        alt = frag.replace("-", "_")
-        if alt not in blob:
+    norm_blob = blob.replace("_", "-")
+    if frag not in norm_blob:
+        # Bajaj slugs sometimes use as-on-30-sep2026 (no hyphen before year)
+        alt = re.sub(r"-(\d{4})$", r"\1", frag)
+        alt2 = frag.replace("-", "_")
+        if alt not in norm_blob and alt2 not in norm_blob:
             return False
     if "monthly" not in blob and "portfolio" not in blob:
         return False
@@ -172,27 +196,33 @@ def main() -> None:
 
     for month_key in args.months:
         if args.fortnightly:
-            frag = fortnightly_search_key(month_key, args.as_of)
+            search_frags = [fortnightly_search_key(month_key, args.as_of)]
             matcher = is_fortnightly_for
         else:
-            frag, _ = month_search_key(month_key)
+            search_frags = month_search_fragments(month_key)
             matcher = is_monthly_for
 
         out_dir = amc_dir / month_key
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        items = [it for it in fetch_media_search(frag) if matcher(it, frag)]
-        # de-dupe by url
+        # de-dupe by url across all search fragments
         seen: set[str] = set()
         uniq = []
-        for it in items:
-            u = pick_download_url(it)
-            if not u or u in seen:
-                continue
-            seen.add(u)
-            uniq.append(it)
+        for frag in search_frags:
+            for it in fetch_media_search(frag):
+                if not matcher(it, frag):
+                    # also accept sibling slug variant (sep vs sep2026)
+                    if not any(matcher(it, alt) for alt in search_frags):
+                        continue
+                u = pick_download_url(it)
+                if not u or u in seen:
+                    continue
+                seen.add(u)
+                uniq.append(it)
 
-        print(f"\n{month_key} {label} search={frag!r}: {len(uniq)} media object(s)")
+        print(
+            f"\n{month_key} {label} search={search_frags!r}: {len(uniq)} media object(s)",
+        )
         manifest: list[dict] = []
         if not uniq:
             (out_dir / "manifest.json").write_text("[]\n", encoding="utf-8")
