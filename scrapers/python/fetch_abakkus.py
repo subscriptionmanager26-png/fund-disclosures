@@ -36,6 +36,10 @@ HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 VERTICALS_RE = re.compile(r"(?:const|var|let)\s+verticals\s*=\s*(\[.*?\]);", re.S)
+VERTICALS_JSON_RE = re.compile(
+    r'<script[^>]+id=["\']verticals-data["\'][^>]*>(\[.*?\])</script>',
+    re.S | re.I,
+)
 TITLE_YM_RE = re.compile(
     r"\b"
     r"(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
@@ -150,11 +154,20 @@ def parse_ym_from_title(title: str) -> tuple[int, int] | None:
     return None
 
 
-def extract_rows_from_verticals(page_html: str, *, fortnightly: bool = False) -> list[dict]:
+def load_verticals(page_html: str) -> list[dict]:
     m = VERTICALS_RE.search(page_html)
-    if not m:
+    if m:
+        return json.loads(m.group(1))
+    m = VERTICALS_JSON_RE.search(page_html)
+    if m:
+        return json.loads(m.group(1))
+    return []
+
+
+def extract_rows_from_verticals(page_html: str, *, fortnightly: bool = False) -> list[dict]:
+    data = load_verticals(page_html)
+    if not data:
         return []
-    data = json.loads(m.group(1))
     want = "fortnightly portfolio" if fortnightly else "monthly portfolio disclosures"
     target = None
     for vertical in data:

@@ -74,6 +74,11 @@ class DisclosureDateTests(unittest.TestCase):
             file_matches_asof_strict("Helios-OV-August-2026.xls", "", "2026-08-15")
         )
 
+    def test_abakkus_sep30_underscore_year(self):
+        name = "Final_Monthly_Portolio_Sep30_2026.xlsx"
+        self.assertEqual(extract_dates(name)[0], date(2026, 9, 30))
+        self.assertTrue(file_matches_asof_strict(name, name, "2026-09-30"))
+
     def test_kotak_glued_month_day_year(self):
         for name, want in [
             ("FortnightlyPortfolioJuly312026.xlsx", date(2026, 7, 31)),
