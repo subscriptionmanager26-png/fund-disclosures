@@ -171,8 +171,9 @@ function refreshFilings(catalog, { baselineCatalog = null } = {}) {
   });
   assertNoHoldingsRegression(outDir, beforeCatalog, withDates, {
     allowRegression,
-    label: `sync-asof(${asof})`,
+    label: `sync-asof(${asof}/${cadence})`,
     syncedDates: [asof],
+    checkCatalogLinks: cadence === "monthly",
   });
   writeJson(join(outDir, "catalog/amfi-lookup.json"), withDates);
   writeJson(

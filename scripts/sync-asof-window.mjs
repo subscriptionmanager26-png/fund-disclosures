@@ -81,6 +81,9 @@ console.log(
   ),
 );
 
+const continueOnError = hasFlag("continue-on-error");
+const failed = [];
+
 for (const { asof, cadence } of specs) {
   const args = [
     SYNC,
@@ -94,8 +97,18 @@ for (const { asof, cadence } of specs) {
   const res = spawnSync(process.execPath, args, { stdio: "inherit", cwd: ROOT });
   if (res.status !== 0) {
     console.error(`FAIL ${asof} ${cadence}`);
-    process.exit(res.status || 1);
+    failed.push({ asof, cadence, status: res.status || 1 });
+    if (!continueOnError) process.exit(res.status || 1);
   }
+}
+
+if (failed.length) {
+  console.error(
+    `\n${failed.length} slice(s) failed:`,
+    failed.map((f) => `${f.asof}/${f.cadence}`).join(", "),
+  );
+  const monthlyFailed = failed.some((f) => f.cadence === "monthly");
+  process.exit(monthlyFailed ? failed[0]?.status || 1 : 0);
 }
 
 console.log("\nDone.");
