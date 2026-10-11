@@ -106,6 +106,21 @@ test("rejects fortnightly filename on monthly job even with trust_adapter_period
   assert.equal(v.reason, "wrong_cadence");
 });
 
+test("keeps Shriram monthly when CDN path contains Fortnightly folder token", () => {
+  const file = {
+    filename: "Monthly-Portfolio-Shriram-Mutual-Fund-September-2026.xls",
+    url:
+      "https://cdn.shriramamc.in/uploads/Statutory-disclosure/Monthly--Fortnightly--Weekly-Portfolio-of-Scheme(s)/Monthly-Portfolio-for-the-Financial-Year/2026-2027/Monthly-Portfolio-Shriram-Mutual-Fund-September-2026.xls",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "monthly",
+    period: sepPeriod,
+    storageKey: "2026-09-30",
+  });
+  assert.equal(v.keep, true);
+  assert.match(v.reason, /month_in_name|as_of_slice/);
+});
+
 test("LIC monthly path month beats upload timestamp in filename", () => {
   const file = {
     filename: "LEFE3009-09-2026-09_58_30.xlsx",
