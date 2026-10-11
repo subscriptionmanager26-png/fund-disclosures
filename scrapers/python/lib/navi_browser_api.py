@@ -211,12 +211,21 @@ def browser_credentials_configured() -> bool:
     return bool(cloudflare_account_id() and cloudflare_api_token())
 
 
+def _browser_wait_ms() -> int:
+    raw = (os.environ.get("NAVI_CF_WAIT_MS") or "35000").strip()
+    try:
+        ms = int(raw)
+    except ValueError:
+        ms = 35000
+    return min(max(ms, 5000), 60000)
+
+
 def fetch_documents_via_browser(
     month_targets: list[tuple[int, int]],
     *,
     fortnightly: bool,
     walk_back_months: int = 6,
-    timeout_s: float = 120.0,
+    timeout_s: float = 60.0,
     max_retries: int = 3,
 ) -> dict[str, list[dict]]:
     """
@@ -230,34 +239,83 @@ def fetch_documents_via_browser(
             "Set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for Navi fetch from cloud VMs."
         )
 
+    by_month = _fetch_documents_browser_payload(
+        month_targets,
+        cadences=[fortnightly],
+        walk_back_months=walk_back_months,
+        timeout_s=timeout_s,
+        max_retries=max_retries,
+        account_id=account_id,
+        token=token,
+    )
+    return by_month
+
+
+def fetch_documents_both_cadences_via_browser(
+    month_targets: list[tuple[int, int]],
+    *,
+    walk_back_months: int = 0,
+    timeout_s: float = 60.0,
+    max_retries: int = 3,
+) -> dict[str, list[dict]]:
+    """One Browser Rendering call; keys like ``2026-09|monthly`` and ``2026-09|fortnightly``."""
+    account_id = cloudflare_account_id()
+    token = cloudflare_api_token()
+    if not account_id or not token:
+        raise RuntimeError(
+            "Set CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN for Navi fetch from cloud VMs."
+        )
+    return _fetch_documents_browser_payload(
+        month_targets,
+        cadences=[False, True],
+        walk_back_months=walk_back_months,
+        timeout_s=timeout_s,
+        max_retries=max_retries,
+        account_id=account_id,
+        token=token,
+        compound_keys=True,
+    )
+
+
+def _fetch_documents_browser_payload(
+    month_targets: list[tuple[int, int]],
+    *,
+    cadences: list[bool],
+    walk_back_months: int,
+    timeout_s: float,
+    max_retries: int,
+    account_id: str,
+    token: str,
+    compound_keys: bool = False,
+) -> dict[str, list[dict]]:
     targets = []
     for year, month in month_targets:
         mk = f"{year}-{month:02d}"
-        targets.append(
-            {
-                "month_key": mk,
-                "attempts": build_attempt_queries(
-                    year,
-                    month,
-                    fortnightly=fortnightly,
-                    walk_back_months=walk_back_months,
-                ),
-            }
-        )
+        for fn in cadences:
+            label = f"{mk}|{'fortnightly' if fn else 'monthly'}" if compound_keys else mk
+            if compound_keys or fn == cadences[0]:
+                targets.append(
+                    {
+                        "month_key": label,
+                        "attempts": build_attempt_queries(
+                            year,
+                            month,
+                            fortnightly=fn,
+                            walk_back_months=walk_back_months,
+                        ),
+                    }
+                )
 
     script = build_injected_script(targets)
     url = (
         f"https://api.cloudflare.com/client/v4/accounts/{account_id}/browser-rendering/content"
     )
+    goto_ms = min(int(timeout_s * 1000), 60000)
     body = {
         "url": PAGE_URL,
-        "gotoOptions": {"waitUntil": "networkidle2", "timeout": int(timeout_s * 1000)},
+        "gotoOptions": {"waitUntil": "networkidle2", "timeout": goto_ms},
         "addScriptTag": [{"content": script}],
-        "waitForSelector": {
-            "selector": f"#{RESULT_ELEMENT_ID}",
-            "timeout": int(timeout_s * 1000),
-            "visible": False,
-        },
+        "waitForTimeout": _browser_wait_ms(),
     }
 
     last_err: Exception | None = None
@@ -296,3 +354,83 @@ def fetch_documents_via_browser(
             if attempt + 1 < max_retries:
                 time.sleep(2 ** attempt * 3)
     raise RuntimeError(f"Cloudflare Browser Rendering failed after retries: {last_err}")
+
+
+# --- Same-day cache: one CF browser job warms monthly + fortnightly for each month ---
+
+_CACHE_VERSION = 1
+
+
+def _cache_path() -> Path:
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[3]
+    return root / "data" / "staging" / "python" / "navi_cf_cache.json"
+
+
+def _cache_ttl_sec() -> int:
+    raw = (os.environ.get("NAVI_CF_CACHE_TTL_SEC") or "3600").strip()
+    try:
+        return max(60, int(raw))
+    except ValueError:
+        return 3600
+
+
+def _load_cache() -> dict[str, Any]:
+    path = _cache_path()
+    if not path.is_file():
+        return {"version": _CACHE_VERSION, "fetched_at": 0, "rows": {}}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if data.get("version") != _CACHE_VERSION:
+            return {"version": _CACHE_VERSION, "fetched_at": 0, "rows": {}}
+        return data
+    except Exception:
+        return {"version": _CACHE_VERSION, "fetched_at": 0, "rows": {}}
+
+
+def _save_cache(data: dict[str, Any]) -> None:
+    path = _cache_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def _cache_key(mk: str, fortnightly: bool) -> str:
+    return f"{mk}|{'fortnightly' if fortnightly else 'monthly'}"
+
+
+def fetch_documents_via_browser_cached(
+    month_targets: list[tuple[int, int]],
+    *,
+    fortnightly: bool,
+    walk_back_months: int = 0,
+) -> dict[str, list[dict]]:
+    """Use on-disk cache so monthly + fortnightly fetches share one Browser Rendering call."""
+    now = time.time()
+    cache = _load_cache()
+    needed_keys = [_cache_key(f"{y}-{m:02d}", fortnightly) for y, m in month_targets]
+    stale = (now - float(cache.get("fetched_at") or 0)) > _cache_ttl_sec()
+    rows_map: dict[str, list[dict]] = dict(cache.get("rows") or {})
+
+    if not stale and all(k in rows_map for k in needed_keys):
+        out: dict[str, list[dict]] = {}
+        for y, m in month_targets:
+            mk = f"{y}-{m:02d}"
+            out[mk] = rows_map.get(_cache_key(mk, fortnightly), [])
+        return out
+
+    fresh = fetch_documents_both_cadences_via_browser(
+        month_targets,
+        walk_back_months=walk_back_months,
+    )
+    rows_map.update(fresh)
+    cache["fetched_at"] = now
+    cache["rows"] = rows_map
+    cache["version"] = _CACHE_VERSION
+    _save_cache(cache)
+
+    out: dict[str, list[dict]] = {}
+    for y, m in month_targets:
+        mk = f"{y}-{m:02d}"
+        out[mk] = rows_map.get(_cache_key(mk, fortnightly), [])
+    return out

@@ -41,7 +41,7 @@ from urllib.parse import unquote, urlparse
 
 from lib.navi_browser_api import (
     browser_credentials_configured,
-    fetch_documents_via_browser,
+    fetch_documents_via_browser_cached,
 )
 
 BASE = "https://navi.com"
@@ -380,7 +380,7 @@ def main() -> None:
             "Cloudflare Browser Rendering: one session for Navi documents API",
             flush=True,
         )
-        browser_rows = fetch_documents_via_browser(
+        browser_rows = fetch_documents_via_browser_cached(
             list(targets.keys()),
             fortnightly=args.fortnightly,
             walk_back_months=max(0, walk_back),

@@ -59,7 +59,7 @@ class TestNaviBrowserApi(unittest.TestCase):
 
     @patch("navi_browser_api.httpx.Client")
     def test_fetch_documents_via_browser_mock(self, client_cls) -> None:
-        from navi_browser_api import fetch_documents_via_browser
+        from navi_browser_api import fetch_documents_via_browser  # noqa: PLC0415
 
         payload = {
             "targets": [
