@@ -11,10 +11,20 @@ Browser XHR (captured):
   headers: wp-nonce, x-requested-with: XMLHttpRequest
   body: financial_year=YYYY-YYYY&value=MonthName&category=884&type=Monthly&order=DESC
 
-Residential egress is required — Cloudflare blocks datacenter IPs.
-Optional overrides: NAVI_WP_NONCE, NAVI_COOKIE.
+Cloudflare blocks datacenter `curl` to navi.com. From cloud VMs, set
+`CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` (Browser Rendering) — one browser
+session loads the portfolio page, polls `window.navi_property.nonce`, POSTs
+`/wp-json/nv/v1/documents`, then downloads `.xlsx` from `public-assets.prod.navi-tech.in`.
+
+Optional overrides: NAVI_WP_NONCE, NAVI_COOKIE (manual laptop session).
+See docs/NAVI_PORTFOLIO_AUTOMATION.md.
 """
 from __future__ import annotations
+
+import sys
+from pathlib import Path as _Path
+
+sys.path.insert(0, str(_Path(__file__).resolve().parent))
 
 import argparse
 import hashlib
@@ -28,6 +38,11 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 from urllib.parse import unquote, urlparse
+
+from lib.navi_browser_api import (
+    browser_credentials_configured,
+    fetch_documents_via_browser,
+)
 
 BASE = "https://navi.com"
 PAGE_URL = f"{BASE}/mutual-fund/downloads/portfolio"
@@ -356,16 +371,36 @@ def main() -> None:
     amc_dir = Path(args.root) / "amcs" / "navi-mutual-fund"
     targets = {month_key_to_ym(mk): mk for mk in args.months}
 
-    print(f"GET {PAGE_URL} (nonce bootstrap)", flush=True)
-    try:
+    walk_back = int(os.environ.get("NAVI_WALK_BACK_MONTHS", "0") or "0")
+    browser_rows: dict[str, list[dict]] | None = None
+    nonce: str | None = None
+
+    if browser_credentials_configured():
+        print(
+            "Cloudflare Browser Rendering: one session for Navi documents API",
+            flush=True,
+        )
+        browser_rows = fetch_documents_via_browser(
+            list(targets.keys()),
+            fortnightly=args.fortnightly,
+            walk_back_months=max(0, walk_back),
+        )
+    elif (os.environ.get("NAVI_WP_NONCE") or "").strip():
+        print(f"GET {PAGE_URL} (nonce bootstrap via NAVI_WP_NONCE)", flush=True)
         nonce = fetch_nonce(ctx=ctx)
-    except urllib.error.URLError as e:
-        if not args.insecure_ssl and "CERTIFICATE_VERIFY_FAILED" in str(e).upper():
+        print(f"  nonce={nonce}", flush=True)
+    else:
+        print(f"GET {PAGE_URL} (nonce bootstrap)", flush=True)
+        try:
+            nonce = fetch_nonce(ctx=ctx)
+            print(f"  nonce={nonce}", flush=True)
+        except Exception as e:
             raise SystemExit(
-                f"{e}\n\nRetry with:  python3 scrapers/python/fetch_navi.py ... --insecure-ssl"
+                "Navi portfolio page blocked from this network (Cloudflare 403). "
+                "Set CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN for Browser Rendering, "
+                "or NAVI_WP_NONCE from a browser session on navi.com.\n"
+                f"Underlying error: {e}"
             ) from e
-        raise
-    print(f"  nonce={nonce}", flush=True)
 
     for ym, mk in targets.items():
         out_dir = amc_dir / mk
@@ -374,14 +409,18 @@ def main() -> None:
             if p.is_file():
                 p.unlink()
 
-        print(f"\n{mk}: POST {API_URL}", flush=True)
-        rows = fetch_rows_for_month(
-            ctx=ctx,
-            nonce=nonce,
-            year=ym[0],
-            month=ym[1],
-            fortnightly=args.fortnightly,
-        )
+        if browser_rows is not None:
+            print(f"\n{mk}: documents from browser session", flush=True)
+            rows = browser_rows.get(mk, [])
+        else:
+            print(f"\n{mk}: POST {API_URL}", flush=True)
+            rows = fetch_rows_for_month(
+                ctx=ctx,
+                nonce=nonce or "",
+                year=ym[0],
+                month=ym[1],
+                fortnightly=args.fortnightly,
+            )
         selected: list[dict] = []
         for row in rows:
             title = str(row.get("title") or "")

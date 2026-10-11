@@ -138,7 +138,9 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 1. Use `curl_cffi` with Chrome impersonation in the Python fetcher (`impersonate="chrome131"`).
 2. Add the script to `forceRealFetch` in `scrapers/node/adapters/pythonRef.js` so Node stages files via Python instead of re-fetching URLs.
 
-**If curl_cffi still 403/SSL from a Cloud Agent VM:** Navi (`navi.com`) and Union (`www.unionmf.com`) may block datacenter IPs at the edge. The fetcher code is correct; run a one-off fetch from a residential/non-cloud IP (or wait for the block to lift) and stage files under `data/staging/python/amcs/<slug>/<YYYY-MM>/`. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
+**Navi (`navi.com`):** Use Cloudflare Browser Rendering — set `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` on the Cloud Agent (see `docs/NAVI_PORTFOLIO_AUTOMATION.md`). `fetch_navi.py` runs one browser session per fetch, polls `window.navi_property.nonce`, POSTs `/wp-json/nv/v1/documents`, then downloads xlsx from `public-assets.prod.navi-tech.in` over plain HTTP.
+
+**If curl_cffi still 403/SSL from a Cloud Agent VM (Union, etc.):** Union (`www.unionmf.com`) may block datacenter IPs at the edge. Stage files under `data/staging/python/amcs/<slug>/<YYYY-MM>/` or fix the adapter. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
 
 ### `excluded_non_portfolio` — Kotak Consolidated SEBI monthly
 
