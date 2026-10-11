@@ -47,6 +47,10 @@ Add these on [cursor.com/dashboard?tab=cloud-agents](https://cursor.com/dashboar
 | `HOLDINGS_GH_TOKEN` | `kushagra-agarwal-a` PAT with `repo` write on `fund-holdings-data` |
 | `CLOUDFLARE_ACCOUNT_ID` | **Required for Navi MF** — Browser Rendering account id |
 | `CLOUDFLARE_API_TOKEN` | **Required for Navi MF** — `cfat_…` with Browser Rendering / Browser Run **Edit** |
+| `UNION_WEBSHARE_PROXY_USER` | **Required for Union MF** — Webshare proxy username |
+| `UNION_WEBSHARE_PROXY_PASSWORD` | **Required for Union MF** — Webshare proxy password |
+| `UNION_WEBSHARE_PROXY_HOSTS` | Optional — comma-separated `host:port` (defaults in `docs/UNION_MF_WEBSHARE_PROXY.md`) |
+| `UNION_WEBSHARE_PROXY_URL` | Optional alternative to user/password — full `http://user:pass@host:port` |
 | `EDELWEISS_API_SECRET` | Optional — only with `EDELWEISS_HASH_KEY` (paired SPA rotation). Fetcher uses current keys from the public `main.*.js` bundle when hash key is unset. |
 | `EDELWEISS_HASH_KEY` | Optional paired override for statutory API AES (see `fetch_edelweiss.py` DEFAULT_*). |
 
@@ -142,7 +146,7 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 
 **Navi (`navi.com`):** Follow **`docs/NAVI_PORTFOLIO_AUTOMATION.md`** — Cloudflare Browser Rendering is the primary path (monthly + fortnightly). One cached browser job per hour warms both cadences; CDN downloads use curl_cffi. If Browser Rendering fails, use the desktop backup section in that doc (manual); do not bypass regression guards.
 
-**If curl_cffi still 403/SSL from a Cloud Agent VM (Union, etc.):** Union (`www.unionmf.com`) may block datacenter IPs at the edge. Stage files under `data/staging/python/amcs/<slug>/<YYYY-MM>/` or fix the adapter. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
+**Union (`unionmf.com`):** Follow **`docs/UNION_MF_WEBSHARE_PROXY.md`** — route all Union traffic through Webshare (`UNION_WEBSHARE_PROXY_USER` / `UNION_WEBSHARE_PROXY_PASSWORD`). Datacenter egress without proxy fails with SSL EOF / connection refused; Browser Rendering does not help.
 
 ### `excluded_non_portfolio` — Kotak Consolidated SEBI monthly
 

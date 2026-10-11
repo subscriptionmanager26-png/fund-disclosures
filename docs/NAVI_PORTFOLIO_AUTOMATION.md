@@ -121,6 +121,10 @@ Alternative: export `NAVI_WP_NONCE` (+ `NAVI_COOKIE` if needed) from the same se
 
 ---
 
+## Related
+
+Union MF uses a **Webshare HTTP proxy** instead of Browser Rendering — see `docs/UNION_MF_WEBSHARE_PROXY.md`.
+
 ## 3. Automation checklist
 
 - [ ] `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` on the Cloud Agent

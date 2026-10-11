@@ -19,10 +19,10 @@ import re
 import sys
 from pathlib import Path
 from urllib.parse import unquote, urljoin
-from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib import asof_filter
+from lib.union_webshare_proxy import http_get, proxy_configured
 
 FOLDER_ID = "b6cafa81-47fb-4935-bc54-b752b9e7d797"
 API_URL = (
@@ -67,34 +67,8 @@ DATE_TAIL_RE = re.compile(
     re.I,
 )
 
-HTTP_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-    ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-}
-
-
 def _http_get(url: str, *, referer: str, accept: str = "*/*") -> bytes:
-    try:
-        from curl_cffi import requests as creq  # type: ignore
-
-        r = creq.get(
-            url,
-            headers={**HTTP_HEADERS, "Accept": accept, "Referer": referer},
-            impersonate="chrome131",
-            timeout=120,
-        )
-        r.raise_for_status()
-        return r.content
-    except Exception:
-        req = Request(
-            url,
-            headers={**HTTP_HEADERS, "Accept": accept, "Referer": referer},
-        )
-        with urlopen(req, timeout=120) as resp:
-            return resp.read()
+    return http_get(url, referer=referer, accept=accept)
 
 
 def month_key_to_path_segment(month_key: str) -> str:
@@ -264,6 +238,13 @@ def main() -> None:
         help="Calendar as-of YYYY-MM-DD (filters fortnightly filenames)",
     )
     args = parser.parse_args()
+
+    if not proxy_configured():
+        print(
+            "Warning: UNION_WEBSHARE_PROXY_* not set — unionmf.com usually fails from cloud VMs. "
+            "See docs/UNION_MF_WEBSHARE_PROXY.md",
+            flush=True,
+        )
 
     amc_dir = args.root / "amcs" / "union-mutual-fund"
 
