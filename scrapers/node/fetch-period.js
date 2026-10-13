@@ -299,63 +299,69 @@ async function fetchOneAmc(amc) {
   return fetchOneAmcInner(amc);
 }
 
-run.results = await mapPool(amcs, concurrency, fetchOneAmc);
+(async () => {
+  run.results = await mapPool(amcs, concurrency, fetchOneAmc);
 
-const allRejected = [];
-for (const r of run.results) {
-  for (const row of r.rejected || []) {
-    allRejected.push({
-      amc_id: r.id,
-      amc_name: r.name,
-      ...row,
-    });
+  const allRejected = [];
+  for (const r of run.results) {
+    for (const row of r.rejected || []) {
+      allRejected.push({
+        amc_id: r.id,
+        amc_name: r.name,
+        ...row,
+      });
+    }
   }
-}
-run.rejectedCount = allRejected.length;
-run.rejected = allRejected;
+  run.rejectedCount = allRejected.length;
+  run.rejected = allRejected;
 
-const outDir = join(root, "data/probes");
-mkdirSync(outDir, { recursive: true });
-const outPath = join(outDir, `fetch-${type}-${storageKey}.json`);
-writeFileSync(outPath, JSON.stringify(run, null, 2) + "\n");
+  const outDir = join(root, "data/probes");
+  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, `fetch-${type}-${storageKey}.json`);
+  writeFileSync(outPath, JSON.stringify(run, null, 2) + "\n");
 
-const rejectPath = join(outDir, `fetch-rejections-${type}-${storageKey}.json`);
-writeFileSync(
-  rejectPath,
-  JSON.stringify(
-    {
-      ran_at: run.ran_at,
-      type,
-      period: parsed.period,
-      storageKey,
-      count: allRejected.length,
-      rejected: allRejected,
-    },
-    null,
-    2,
-  ) + "\n",
-);
-
-const mdLines = [
-  `# Fetch rejections — ${type} ${storageKey}`,
-  "",
-  `Generated ${run.ran_at}. ${allRejected.length} file(s) listed on a disclosure page but not downloaded.`,
-  "",
-  "| AMC | File | Reason | Detail | Stage |",
-  "|-----|------|--------|--------|-------|",
-];
-for (const row of allRejected) {
-  const name = (row.filename || row.url || "").replace(/\|/g, "\\|");
-  mdLines.push(
-    `| ${row.amc_id} | ${name} | ${row.reason} | ${String(row.detail || "").replace(/\|/g, "\\|")} | ${row.stage || ""} |`,
+  const rejectPath = join(outDir, `fetch-rejections-${type}-${storageKey}.json`);
+  writeFileSync(
+    rejectPath,
+    JSON.stringify(
+      {
+        ran_at: run.ran_at,
+        type,
+        period: parsed.period,
+        storageKey,
+        count: allRejected.length,
+        rejected: allRejected,
+      },
+      null,
+      2,
+    ) + "\n",
   );
-}
-const rejectMd = join(outDir, `fetch-rejections-${type}-${storageKey}.md`);
-writeFileSync(rejectMd, mdLines.join("\n") + "\n");
 
-const ok = run.results.filter((r) => r.status === "ok").length;
-const empty = run.results.filter((r) => r.status === "empty").length;
-const err = run.results.filter((r) => r.status === "error").length;
-console.log(
-  `\nDone. ok=${ok} empty=${empty} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
-);
+  const mdLines = [
+    `# Fetch rejections — ${type} ${storageKey}`,
+    "",
+    `Generated ${run.ran_at}. ${allRejected.length} file(s) listed on a disclosure page but not downloaded.`,
+    "",
+    "| AMC | File | Reason | Detail | Stage |",
+    "|-----|------|--------|--------|-------|",
+  ];
+  for (const row of allRejected) {
+    const name = (row.filename || row.url || "").replace(/\|/g, "\\|");
+    mdLines.push(
+      `| ${row.amc_id} | ${name} | ${row.reason} | ${String(row.detail || "").replace(/\|/g, "\\|")} | ${row.stage || ""} |`,
+    );
+  }
+  const rejectMd = join(outDir, `fetch-rejections-${type}-${storageKey}.md`);
+  writeFileSync(rejectMd, mdLines.join("\n") + "\n");
+
+  const ok = run.results.filter((r) => r.status === "ok").length;
+  const empty = run.results.filter((r) => r.status === "empty").length;
+  const err = run.results.filter((r) => r.status === "error").length;
+  console.log(
+    `\nDone. ok=${ok} empty=${empty} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
+  );
+  process.exit(0);
+})().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
