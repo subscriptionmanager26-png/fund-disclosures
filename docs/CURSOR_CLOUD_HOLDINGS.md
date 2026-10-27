@@ -176,6 +176,10 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 | AMC `empty` after month-end + peers published | Investigate adapter (API change, TLS, regex) |
 | Files fetched but `rejectedCount` high | See rejection reasons above; do **not** bypass with `--allow-regression` |
 
+## Runtime / splitting the daily job
+
+If the monolithic `holdings:cloud --push` run is too slow (~1h+ pipeline, more with cold setup), see **[`CLOUD_HOLDINGS_OPTIMIZATION.md`](./CLOUD_HOLDINGS_OPTIMIZATION.md)** for trace-based breakdown and parallel automation layouts.
+
 ## Slack / Cloud Agent prompt
 
 Keep the prompt short. After setup:
