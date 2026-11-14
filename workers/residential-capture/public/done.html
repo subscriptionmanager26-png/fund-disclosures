@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Capture complete</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #052e16;
+      color: #ecfdf5;
+      padding: 2rem 1.25rem;
+      text-align: center;
+      margin: 0;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: .5rem; }
+    p { color: #a7f3d0; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <h1>All AMCs captured</h1>
+  <p id="detail">Manifests uploaded from your phone.</p>
+  <p>The cloud agent will download and parse these on the next run.<br>You can close this tab.</p>
+  <script>
+    const n = new URLSearchParams(location.search).get("amcs");
+    if (n) document.getElementById("detail").textContent =
+      n + " AMC manifest(s) uploaded from your phone browser.";
+  </script>
+</body>
+</html>

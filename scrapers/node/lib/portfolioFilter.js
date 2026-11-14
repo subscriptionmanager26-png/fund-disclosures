@@ -33,6 +33,18 @@ function isExcludedNonPortfolio(blob) {
   return EXCLUDE.test(blob);
 }
 
+const MONTH_WORD =
+  /(?<![a-z])(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?![a-z])/i;
+
+/** Label for quarantine reports: "month_without_year:october" when a month name has no year. */
+function yearlessMonthDetail(name) {
+  const m = MONTH_WORD.exec(String(name || "").toLowerCase().replace(/[_\-.]+/g, " "));
+  return m ? `month_without_year:${m[1]}` : "";
+}
+
+/** Names that are worth downloading for a content-date check (vs. obvious junk). */
+export const PORTFOLIO_HINT = /portfolio|portolio|holding|fortnight|monthly|scheme|fund/i;
+
 function fileBlob(file) {
   const url = String(file?.url || "");
   const filename = String(file?.filename || file?.text || "");
@@ -45,6 +57,12 @@ function baseName(url) {
   } catch {
     return String(url).split("/").pop() || "";
   }
+}
+
+/** Cadence guards use the download name only — not parent URL folders (e.g. Shriram CDN paths). */
+function cadenceLabel(file) {
+  const { url, filename } = fileBlob(file);
+  return baseName(url) || filename;
 }
 
 /**
@@ -69,11 +87,21 @@ export function classifyDisclosureFile(file, opts = {}) {
     return { keep: false, reason: "excluded_non_portfolio" };
   }
 
-  // Filename cadence must match job type even when trust_adapter_period is set.
-  if (type === "monthly" && /fortnight(?:ly)?/i.test(blob)) {
+  // Cadence guards use the download name only (not CDN folders such as
+  // Shriram's ".../Monthly--Fortnightly--Weekly-Portfolio.../"). Monthly jobs
+  // always reject fortnightly filenames, even when the adapter scoped the
+  // period. Fortnightly jobs may trust the adapter when filenames are CMS
+  // hashes (e.g. Sundaram monthlyportfolio_* on Catid=Fortnightly).
+  const cadence = cadenceLabel(file);
+  if (type === "monthly" && /fortnight(?:ly)?/i.test(cadence)) {
     return { keep: false, reason: "wrong_cadence", detail: "fortnightly_in_monthly" };
   }
-  if (type === "fortnightly" && /monthly/i.test(blob) && !/fortnight/i.test(blob)) {
+  if (
+    !trustAdapterPeriod &&
+    type === "fortnightly" &&
+    /monthly/i.test(cadence) &&
+    !/fortnight/i.test(cadence)
+  ) {
     return { keep: false, reason: "wrong_cadence", detail: "monthly_in_fortnightly" };
   }
 
@@ -119,9 +147,17 @@ export function classifyDisclosureFile(file, opts = {}) {
     if (period && blobMatchesYearMonth(blob, period.year, period.month)) {
       return { keep: true, reason: "month_in_name" };
     }
-    // Undated / unparseable names get stamped with the job as-of (caused
+    // Undated / unparseable names are NOT stamped with the job as-of (caused
     // Sep-2026 false positives from 2019 half-yearlies and PRC matrices).
-    return { keep: false, reason: "undated_no_month", detail: dateDetail };
+    // They are not silently dropped either: fetch-period downloads them to
+    // data/quarantine/ and resolve_quarantine.py promotes a file only when the
+    // as-of date printed inside the workbook matches this slice.
+    return {
+      keep: false,
+      reason: "undated_no_month",
+      detail: dateDetail || yearlessMonthDetail(base),
+      quarantine: true,
+    };
   }
 
   if (period && blobMatchesYearMonth(blob, period.year, period.month)) {
@@ -145,11 +181,14 @@ export function isPeriodPortfolioFile(url, text, matchers, type = "monthly", per
 }
 
 /**
- * @returns {{ kept: object[], rejected: object[] }}
+ * @returns {{ kept: object[], rejected: object[], quarantined: object[] }}
+ *   quarantined: original file objects whose date could not be read from the
+ *   name (also listed in `rejected` with quarantine: true).
  */
 export function filterFilesWithReport(files, opts) {
   const kept = [];
   const rejected = [];
+  const quarantined = [];
   for (const file of files || []) {
     const verdict = classifyDisclosureFile(file, opts);
     if (verdict.keep) kept.push(file);
@@ -159,10 +198,12 @@ export function filterFilesWithReport(files, opts) {
         filename: file.filename || file.text || "",
         reason: verdict.reason,
         detail: verdict.detail || "",
+        ...(verdict.quarantine ? { quarantine: true } : {}),
       });
+      if (verdict.quarantine) quarantined.push(file);
     }
   }
-  return { kept, rejected };
+  return { kept, rejected, quarantined };
 }
 
 export { FILE_EXT };

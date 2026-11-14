@@ -76,6 +76,36 @@ test("trust_adapter_period keeps API-filtered undated per-scheme files", () => {
   assert.equal(v.reason, "adapter_period");
 });
 
+test("trust_adapter_period keeps Sundaram hash filename on fortnightly Catid", () => {
+  const file = {
+    filename: "monthlyportfolio_180926185545.xlsx",
+    url: "https://www.sundarammutual.com/monthlyportfolio_180926185545.xlsx",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "fortnightly",
+    period: sepPeriod,
+    storageKey: "2026-09-15",
+    trustAdapterPeriod: true,
+  });
+  assert.equal(v.keep, true);
+  assert.equal(v.reason, "adapter_period");
+});
+
+test("trust_adapter_period keeps undated fortnightly zip when adapter scoped", () => {
+  const file = {
+    filename: "absl_fortnightly_portfolio_report_150926.zip",
+    url: "https://example.com/absl_fortnightly_portfolio_report_150926.zip",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "fortnightly",
+    period: { year: 2026, month: 9 },
+    storageKey: "2026-09-15",
+    trustAdapterPeriod: true,
+  });
+  assert.equal(v.keep, true);
+  assert.equal(v.reason, "adapter_period");
+});
+
 test("keeps Kotak consolidated SEBI monthly (SEBI in path is not regulatory junk)", () => {
   const file = {
     filename: "ConsolidatedSEBIPortfolioJuly2026.xlsx",
@@ -104,6 +134,21 @@ test("rejects fortnightly filename on monthly job even with trust_adapter_period
   });
   assert.equal(v.keep, false);
   assert.equal(v.reason, "wrong_cadence");
+});
+
+test("keeps Shriram monthly when CDN path contains Fortnightly folder token", () => {
+  const file = {
+    filename: "Monthly-Portfolio-Shriram-Mutual-Fund-September-2026.xls",
+    url:
+      "https://cdn.shriramamc.in/uploads/Statutory-disclosure/Monthly--Fortnightly--Weekly-Portfolio-of-Scheme(s)/Monthly-Portfolio-for-the-Financial-Year/2026-2027/Monthly-Portfolio-Shriram-Mutual-Fund-September-2026.xls",
+  };
+  const v = classifyDisclosureFile(file, {
+    type: "monthly",
+    period: sepPeriod,
+    storageKey: "2026-09-30",
+  });
+  assert.equal(v.keep, true);
+  assert.match(v.reason, /month_in_name|as_of_slice/);
 });
 
 test("LIC monthly path month beats upload timestamp in filename", () => {

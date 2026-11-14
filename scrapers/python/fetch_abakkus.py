@@ -113,7 +113,30 @@ def safe_filename(name: str) -> str:
     return s[:220] or "abakkus_monthly_portfolio.xlsx"
 
 
+def _curl_session():
+    try:
+        from curl_cffi import requests as creq  # type: ignore
+
+        return creq
+    except ImportError:
+        return None
+
+
 def fetch_html(*, ctx: ssl.SSLContext) -> str:
+    creq = _curl_session()
+    if creq is not None:
+        try:
+            r = creq.get(
+                PAGE_URL,
+                headers=HEADERS,
+                impersonate="chrome131",
+                timeout=180,
+                verify=ctx.verify_mode != ssl.CERT_NONE,
+            )
+            r.raise_for_status()
+            return r.text
+        except Exception:
+            pass
     req = urllib.request.Request(PAGE_URL, headers=HEADERS, method="GET")
     with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
         return resp.read().decode("utf-8", errors="ignore")
@@ -213,11 +236,22 @@ def extract_rows_from_verticals(page_html: str, *, fortnightly: bool = False) ->
 
 
 def download(url: str, *, ctx: ssl.SSLContext) -> bytes:
-    req = urllib.request.Request(
-        url,
-        headers={**HEADERS, "Accept": "*/*", "Referer": PAGE_URL},
-        method="GET",
-    )
+    headers = {**HEADERS, "Accept": "*/*", "Referer": PAGE_URL}
+    creq = _curl_session()
+    if creq is not None:
+        try:
+            r = creq.get(
+                url,
+                headers=headers,
+                impersonate="chrome131",
+                timeout=180,
+                verify=ctx.verify_mode != ssl.CERT_NONE,
+            )
+            r.raise_for_status()
+            return r.content
+        except Exception:
+            pass
+    req = urllib.request.Request(url, headers=headers, method="GET")
     with urllib.request.urlopen(req, timeout=180, context=ctx) as resp:
         return resp.read()
 

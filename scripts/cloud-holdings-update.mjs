@@ -8,6 +8,8 @@
  * Designed for kushagra-agarwal-a/fund-holdings-data monorepo (run from pipeline/).
  */
 import {
+  copyFileSync,
+  createWriteStream,
   existsSync,
   readFileSync,
   readdirSync,
@@ -15,14 +17,80 @@ import {
   writeFileSync,
   mkdirSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { ensureFullPortfoliosAsOfCheckout } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
+import { buildCompleteness, formatCompleteness } from "./lib/completeness.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
+const PROBES = join(ROOT, "data/probes");
+
+/**
+ * Where run evidence goes. Cursor Cloud Agents expose /opt/cursor/artifacts
+ * through the API (GET /v0/agents/{id}/artifacts), so traces survive the VM.
+ */
+function artifactsDir() {
+  if (process.env.HOLDINGS_ARTIFACTS_DIR) return process.env.HOLDINGS_ARTIFACTS_DIR;
+  if (existsSync("/opt/cursor/artifacts")) return "/opt/cursor/artifacts";
+  return join(PROBES, "artifacts");
+}
+
+/** Copy this run's log + probes (fetch, rejections, quarantine, report) to artifacts. */
+function exportArtifacts(sinceMs, logPath) {
+  const dest = artifactsDir();
+  try {
+    mkdirSync(dest, { recursive: true });
+  } catch (e) {
+    console.error(`Could not create artifacts dir ${dest}: ${e.message || e}`);
+    return;
+  }
+  const copied = [];
+  const files = existsSync(PROBES)
+    ? readdirSync(PROBES)
+        .filter((f) => /^(fetch-|fetch-rejections-|quarantine-|cloud-holdings-report-)/.test(f))
+        .map((f) => join(PROBES, f))
+    : [];
+  if (logPath) files.push(logPath);
+  for (const src of files) {
+    try {
+      if (!existsSync(src) || statSync(src).mtimeMs < sinceMs - 1000) continue;
+      copyFileSync(src, join(dest, basename(src)));
+      copied.push(basename(src));
+    } catch (e) {
+      console.error(`artifact copy failed for ${src}: ${e.message || e}`);
+    }
+  }
+  console.log(`\nRun evidence → ${dest} (${copied.length} file(s))`);
+}
+
+// Re-run self as a child so every line (including npm/python subprocesses) is
+// tee'd to a log file, and artifacts are exported even if the child crashes.
+if (!process.env.HOLDINGS_CLOUD_CHILD) {
+  const started = Date.now();
+  mkdirSync(PROBES, { recursive: true });
+  const logPath = join(PROBES, `holdings-cloud-run-${started}.log`);
+  const log = createWriteStream(logPath);
+  const child = spawn(process.execPath, [fileURLToPath(import.meta.url), ...process.argv.slice(2)], {
+    cwd: ROOT,
+    env: { ...process.env, HOLDINGS_CLOUD_CHILD: "1", HOLDINGS_CLOUD_LOG: logPath },
+    stdio: ["inherit", "pipe", "pipe"],
+  });
+  child.stdout.on("data", (d) => {
+    process.stdout.write(d);
+    log.write(d);
+  });
+  child.stderr.on("data", (d) => {
+    process.stderr.write(d);
+    log.write(d);
+  });
+  const code = await new Promise((resolve) => child.on("close", (c) => resolve(c ?? 1)));
+  await new Promise((resolve) => log.end(resolve));
+  exportArtifacts(started, logPath);
+  process.exit(code);
+}
 
 function hasFlag(name) {
   return process.argv.includes(`--${name}`);
@@ -92,19 +160,49 @@ function loadFetchProbe(type, period) {
   return JSON.parse(readFileSync(join(probesDir, latest), "utf8"));
 }
 
-function summarizeFetch(probe) {
-  if (!probe) return { amcs: 0, ok: 0, empty: 0, error: 0, files: 0, rejected: 0, errors: [] };
+function summarizeFetch(probe, quarantine = null) {
+  if (!probe) {
+    return {
+      amcs: 0, ok: 0, empty: 0, needs_review: 0, error: 0, files: 0, rejected: 0,
+      quarantine_promoted: 0, quarantine_unresolved: 0, errors: [], empty_amcs: [], amc_errors: {},
+    };
+  }
   const results = probe.results || [];
+  const ids = (s) => results.filter((r) => r.status === s).map((r) => r.id);
+  const amcErrors = {};
+  for (const r of results) {
+    if (r.status === "error") amcErrors[r.id] = String(r.error || `download_failed=${r.downloadFailed ?? "?"}`).slice(0, 300);
+  }
   return {
     storageKey: probe.storageKey,
     amcs: results.length,
-    ok: results.filter((r) => r.status === "ok").length,
-    empty: results.filter((r) => r.status === "empty").length,
-    error: results.filter((r) => r.status === "error").length,
+    ok: ids("ok").length,
+    empty: ids("empty").length,
+    needs_review: ids("needs_review").length,
+    error: ids("error").length,
     files: results.reduce((n, r) => n + (r.fileCount || 0), 0),
     rejected: probe.rejectedCount || results.reduce((n, r) => n + (r.rejectedCount || 0), 0),
-    errors: results.filter((r) => r.status === "error").map((r) => r.id),
+    quarantine_promoted: quarantine?.promoted || 0,
+    quarantine_unresolved: quarantine?.kept_quarantined || 0,
+    errors: ids("error"),
+    // Named, so "6 empty" is actionable without opening the VM.
+    empty_amcs: ids("empty"),
+    needs_review_amcs: ids("needs_review"),
+    amc_errors: amcErrors,
   };
+}
+
+function pythonBin() {
+  const venv = join(ROOT, ".venv/bin/python3");
+  return existsSync(venv) ? venv : "python3";
+}
+
+function loadJsonIfExists(path) {
+  try {
+    return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : null;
+  } catch {
+    return null;
+  }
 }
 
 loadDotenv();
@@ -139,9 +237,12 @@ if (!process.env.EDELWEISS_API_SECRET) {
   );
 }
 
-// Fewer parallel AMC fetches + longer HTTP timeout reduces false "error" from timeouts.
+// Per-request HTTP timeout (each httpFetch). List pagination uses FETCH_LIST_TIMEOUT_MS.
 process.env.FETCH_TIMEOUT_MS = process.env.FETCH_TIMEOUT_MS || "180000";
-const fetchConcurrency = process.env.FETCH_CONCURRENCY || "4";
+process.env.FETCH_LIST_TIMEOUT_MS =
+  process.env.FETCH_LIST_TIMEOUT_MS || "900000";
+const fetchConcurrency = process.env.FETCH_CONCURRENCY || "2";
+const monthlyFetchConcurrency = process.env.FETCH_MONTHLY_CONCURRENCY || "1";
 
 function monthEndIso(ym) {
   const [y, m] = ym.split("-").map(Number);
@@ -209,6 +310,8 @@ console.log(
       fetch_jobs: fetchJobs,
       fetch_timeout_ms: Number(process.env.FETCH_TIMEOUT_MS),
       fetch_concurrency: Number(fetchConcurrency),
+      fetch_monthly_concurrency: Number(monthlyFetchConcurrency),
+      fetch_list_timeout_ms: Number(process.env.FETCH_LIST_TIMEOUT_MS),
       holdings_owner: "kushagra-agarwal-a",
       holdings_out: outDir,
     },
@@ -217,6 +320,8 @@ console.log(
   ),
 );
 
+const probes = [];
+const quarantineReports = [];
 for (const { type, period } of fetchJobs) {
   if (type === "monthly" && isFutureMonthEnd(period)) {
     console.log(`\n→ skip fetch ${type} ${period} (month-end not reached)`);
@@ -230,6 +335,8 @@ for (const { type, period } of fetchJobs) {
     continue;
   }
 
+  const jobConcurrency =
+    type === "monthly" ? monthlyFetchConcurrency : fetchConcurrency;
   run(
     "npm",
     [
@@ -238,12 +345,22 @@ for (const { type, period } of fetchJobs) {
       "--",
       `--type=${type}`,
       `--period=${period}`,
-      `--concurrency=${fetchConcurrency}`,
+      `--concurrency=${jobConcurrency}`,
     ],
-    { label: `fetch ${type} ${period}` },
+    { label: `fetch ${type} ${period} (concurrency=${jobConcurrency})` },
   );
+  // Undated files were downloaded to data/quarantine/; promote the ones whose
+  // in-workbook as-of matches this slice so they are parsed below.
+  run(
+    pythonBin(),
+    [join(ROOT, "scrapers/python/resolve_quarantine.py"), `--type=${type}`, `--period=${period}`],
+    { label: `resolve quarantine ${type} ${period}`, allowFail: true },
+  );
+  const quarantine = loadJsonIfExists(join(PROBES, `quarantine-${type}-${period}.json`));
   const probe = loadFetchProbe(type, period);
-  report.fetch.push({ type, period, ...summarizeFetch(probe) });
+  probes.push(probe);
+  if (quarantine) quarantineReports.push(quarantine);
+  report.fetch.push({ type, period, ...summarizeFetch(probe, quarantine) });
 
   run(
     "npm",
@@ -328,11 +445,28 @@ report.fetch_totals = report.fetch.reduce(
     amcs_ok: a.amcs_ok + r.ok,
     amcs_empty: a.amcs_empty + r.empty,
     amcs_error: a.amcs_error + r.error,
+    amcs_needs_review: a.amcs_needs_review + (r.needs_review || 0),
     files_downloaded: a.files_downloaded + r.files,
     files_rejected: a.files_rejected + (r.rejected || 0),
+    quarantine_promoted: a.quarantine_promoted + (r.quarantine_promoted || 0),
+    quarantine_unresolved: a.quarantine_unresolved + (r.quarantine_unresolved || 0),
   }),
-  { amcs_checked: 0, amcs_ok: 0, amcs_empty: 0, amcs_error: 0, files_downloaded: 0, files_rejected: 0 },
+  {
+    amcs_checked: 0, amcs_ok: 0, amcs_empty: 0, amcs_error: 0, amcs_needs_review: 0,
+    files_downloaded: 0, files_rejected: 0, quarantine_promoted: 0, quarantine_unresolved: 0,
+  },
 );
+
+// Per-AMC completeness vs the previous month's same slice (after SEBI deadline).
+const checkedDates = report.fetch.filter((f) => !f.skipped).map((f) => f.period);
+report.completeness = buildCompleteness({
+  holdingsDir: outDir,
+  asOfDates: checkedDates,
+  today: todayUtcIso(),
+  probes,
+  quarantineReports,
+});
+console.log("\nCompleteness:\n" + formatCompleteness(report.completeness));
 
 const verify = spawnSync(
   "curl",
@@ -351,6 +485,12 @@ if (verify.status === 0) {
   console.warn("Warning: could not verify OpenFin filings API");
 }
 
+report.run_status = report.push_error
+  ? "push_failed"
+  : report.completeness.failures
+    ? "incomplete"
+    : "ok";
+report.log_path = process.env.HOLDINGS_CLOUD_LOG || null;
 report.finished_at = new Date().toISOString();
 mkdirSync(join(ROOT, "data/probes"), { recursive: true });
 const reportPath = join(ROOT, "data/probes", `cloud-holdings-report-${Date.now()}.json`);
@@ -360,5 +500,13 @@ console.log(JSON.stringify(report, null, 2));
 if (report.push_error) {
   console.error("\ncloud-holdings-update: finished with push failure");
   process.exit(1);
+}
+if (report.run_status === "incomplete") {
+  // Data that WAS fetched has been published; this exit code means
+  // "AMCs are missing past their SEBI deadline — investigate", not "rolled back".
+  console.error(
+    `\ncloud-holdings-update: published, but INCOMPLETE — ${report.completeness.failures} AMC gap(s) past deadline (see completeness above)`,
+  );
+  process.exit(2);
 }
 console.log("\ncloud-holdings-update: done");

@@ -20,7 +20,8 @@ import { existsSync, readFileSync, mkdirSync, writeFileSync, rmSync } from "node
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-import { filterFilesWithReport } from "./lib/portfolioFilter.js";
+import { filterFilesWithReport, PORTFOLIO_HINT } from "./lib/portfolioFilter.js";
+import { resolveListTimeoutMs } from "./lib/fetchTimeouts.js";
 import { parsePeriod } from "./lib/period.js";
 import {
   parsePeriodInput,
@@ -164,9 +165,11 @@ const run = {
   results: [],
 };
 
-const listTimeoutMs = Math.max(
-  60_000,
-  Number(process.env.FETCH_TIMEOUT_MS) || 420_000,
+const listTimeoutMs = resolveListTimeoutMs();
+// Bound quarantine downloads per AMC per slice (hubs can list years of files).
+const QUARANTINE_MAX_PER_AMC = Math.max(
+  0,
+  Number(process.env.QUARANTINE_MAX_PER_AMC) || 40,
 );
 
 function withTimeout(promise, ms, label) {
@@ -205,7 +208,11 @@ async function fetchOneAmcInner(amc) {
     const rawFiles = listed.files ?? [];
     const listedRejected = Array.isArray(listed.rejected) ? listed.rejected : [];
     const fetchCfg = amc.fetch?.[type] || {};
-    const { kept: files, rejected: sliceRejected } = filterFilesWithReport(
+    const {
+      kept: files,
+      rejected: sliceRejected,
+      quarantined: quarantineCandidates,
+    } = filterFilesWithReport(
       rawFiles,
       {
         type,
@@ -242,6 +249,46 @@ async function fetchOneAmcInner(amc) {
       }
     }
 
+    // Undated files: download to data/quarantine/ so resolve_quarantine.py can
+    // read the as-of date inside the workbook. When the AMC kept nothing for
+    // this slice every candidate is checked (that is exactly the "AMC silently
+    // empty" failure); otherwise only names that look like portfolios.
+    const quarantine = [];
+    if (!listOnly) {
+      const pool = files.length
+        ? quarantineCandidates.filter((f) =>
+            PORTFOLIO_HINT.test(String(f.filename || f.text || f.url || "")),
+          )
+        : quarantineCandidates;
+      for (const f of pool.slice(0, QUARANTINE_MAX_PER_AMC)) {
+        try {
+          const d = await downloadDisclosureFile({
+            root,
+            type,
+            period: storageKey,
+            amcId: amc.id,
+            url: f.url,
+            filename: f.filename,
+            localPath: f.localPath,
+            dryRun,
+            baseDir: "data/quarantine",
+          });
+          quarantine.push({ url: f.url || "", filename: f.filename || f.text || "", ...d });
+        } catch (e) {
+          quarantine.push({
+            url: f.url || "",
+            filename: f.filename || f.text || "",
+            status: "error",
+            error: String(e.message || e),
+          });
+        }
+        await new Promise((r) => setTimeout(r, 100));
+      }
+    }
+    const quarantinedOk = quarantine.filter(
+      (q) => q.status === "ok" || q.status === "ok_local",
+    ).length;
+
     const failedDl = downloads.filter(
       (d) => d.status && d.status !== "ok" && d.status !== "ok_local" && d.status !== "dry_run",
     );
@@ -249,13 +296,24 @@ async function fetchOneAmcInner(amc) {
       id: amc.id,
       name: amc.name,
       adapter: adapterName,
-      status: files.length ? (failedDl.length === downloads.length && downloads.length ? "error" : "ok") : "empty",
+      // needs_review: nothing kept by filename, but undated candidates were
+      // quarantined — NOT the same as "AMC has not published yet".
+      status: files.length
+        ? failedDl.length === downloads.length && downloads.length
+          ? "error"
+          : "ok"
+        : quarantinedOk
+          ? "needs_review"
+          : "empty",
       notes,
       fileCount: files.length,
       downloadOk: downloads.filter((d) => d.status === "ok" || d.status === "ok_local").length,
       downloadFailed: failedDl.length,
       rejectedCount: rejected.length,
       rejected,
+      listedCount: rawFiles.length,
+      quarantineCount: quarantinedOk,
+      quarantine,
       files: listOnly ? files : downloads,
     };
     console.log(
@@ -299,9 +357,29 @@ async function fetchOneAmc(amc) {
   return fetchOneAmcInner(amc);
 }
 
-run.results = await mapPool(amcs, concurrency, fetchOneAmc);
+async function retryErrorAmcsSerially(results, items, fn) {
+  const errorIds = results
+    .filter((r) => r?.status === "error")
+    .map((r) => r.id);
+  if (!errorIds.length || concurrency <= 1) return results;
+  const idToIndex = new Map(results.map((r, i) => [r.id, i]));
+  console.log(
+    `\nRetrying ${errorIds.length} error AMC(s) serially (after concurrency=${concurrency})…\n`,
+  );
+  for (const amc of items) {
+    if (!errorIds.includes(amc.id)) continue;
+    const idx = idToIndex.get(amc.id);
+    if (idx === undefined) continue;
+    results[idx] = await fn(amc);
+  }
+  return results;
+}
 
-const allRejected = [];
+async function main() {
+  run.results = await mapPool(amcs, concurrency, fetchOneAmc);
+  run.results = await retryErrorAmcsSerially(run.results, amcs, fetchOneAmc);
+
+  const allRejected = [];
 for (const r of run.results) {
   for (const row of r.rejected || []) {
     allRejected.push({
@@ -356,6 +434,18 @@ writeFileSync(rejectMd, mdLines.join("\n") + "\n");
 const ok = run.results.filter((r) => r.status === "ok").length;
 const empty = run.results.filter((r) => r.status === "empty").length;
 const err = run.results.filter((r) => r.status === "error").length;
-console.log(
-  `\nDone. ok=${ok} empty=${empty} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
-);
+const review = run.results.filter((r) => r.status === "needs_review").length;
+  console.log(
+    `\nDone. ok=${ok} empty=${empty} needs_review=${review} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
+  );
+}
+
+const isCli =
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === process.argv[1];
+if (isCli) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

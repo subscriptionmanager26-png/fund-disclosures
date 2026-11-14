@@ -105,7 +105,7 @@ def target_slice(as_of: str) -> str | None:
 
 
 _DMY_NAME = re.compile(
-    rf"(?<!\d)(\d{{1,2}}){ORD}{SEP}({MONTH_RE}){SEP}(\d{{2}}|\d{{4}})(?!\d)",
+    rf"(?<!\d)(\d{{1,2}}){ORD}{SEP}({MONTH_RE}){DAY_YEAR_SEP}(\d{{2}}|\d{{4}})(?!\d)",
     re.I,
 )
 _MDY_NAME = re.compile(
