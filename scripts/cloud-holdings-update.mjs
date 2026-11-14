@@ -139,9 +139,12 @@ if (!process.env.EDELWEISS_API_SECRET) {
   );
 }
 
-// Fewer parallel AMC fetches + longer HTTP timeout reduces false "error" from timeouts.
+// Per-request HTTP timeout (each httpFetch). List pagination uses FETCH_LIST_TIMEOUT_MS.
 process.env.FETCH_TIMEOUT_MS = process.env.FETCH_TIMEOUT_MS || "180000";
-const fetchConcurrency = process.env.FETCH_CONCURRENCY || "4";
+process.env.FETCH_LIST_TIMEOUT_MS =
+  process.env.FETCH_LIST_TIMEOUT_MS || "900000";
+const fetchConcurrency = process.env.FETCH_CONCURRENCY || "2";
+const monthlyFetchConcurrency = process.env.FETCH_MONTHLY_CONCURRENCY || "1";
 
 function monthEndIso(ym) {
   const [y, m] = ym.split("-").map(Number);
@@ -209,6 +212,8 @@ console.log(
       fetch_jobs: fetchJobs,
       fetch_timeout_ms: Number(process.env.FETCH_TIMEOUT_MS),
       fetch_concurrency: Number(fetchConcurrency),
+      fetch_monthly_concurrency: Number(monthlyFetchConcurrency),
+      fetch_list_timeout_ms: Number(process.env.FETCH_LIST_TIMEOUT_MS),
       holdings_owner: "kushagra-agarwal-a",
       holdings_out: outDir,
     },
@@ -230,6 +235,8 @@ for (const { type, period } of fetchJobs) {
     continue;
   }
 
+  const jobConcurrency =
+    type === "monthly" ? monthlyFetchConcurrency : fetchConcurrency;
   run(
     "npm",
     [
@@ -238,9 +245,9 @@ for (const { type, period } of fetchJobs) {
       "--",
       `--type=${type}`,
       `--period=${period}`,
-      `--concurrency=${fetchConcurrency}`,
+      `--concurrency=${jobConcurrency}`,
     ],
-    { label: `fetch ${type} ${period}` },
+    { label: `fetch ${type} ${period} (concurrency=${jobConcurrency})` },
   );
   const probe = loadFetchProbe(type, period);
   report.fetch.push({ type, period, ...summarizeFetch(probe) });
