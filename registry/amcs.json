@@ -562,6 +562,7 @@
       "notes": "",
       "fetch": {
         "monthly": {
+          "trust_adapter_period": true,
           "adapter": "python_ref",
           "script": "fetch_choice.py",
           "python_slug": "choice-mutual-fund",
@@ -569,6 +570,7 @@
           "notes": "via reference/python-fetchers (AMC-direct)"
         },
         "fortnightly": {
+          "trust_adapter_period": true,
           "adapter": "python_ref",
           "script": "fetch_choice.py",
           "python_slug": "choice-mutual-fund",
@@ -2120,6 +2122,7 @@
       "notes": "Next.js/CloudFront blocks naive scrapes; use public Strapi CMS API (cms.whiteoakamc.com/api/scheme-portfolios). Per-scheme only. Match as-of via doc_name (e.g. 30th June2026), not published_date. Fortnightly only covers Liquid + Ultra Short Duration. As of 2026-08-09, July 2026 monthlies not published yet (latest June).",
       "fetch": {
         "monthly": {
+          "trust_adapter_period": true,
           "adapter": "whiteoak_cms",
           "notes": "cms scheme-portfolios Monthly; per-scheme"
         },

@@ -15,6 +15,7 @@ data/disclosures/fortnightly/**
 !data/disclosures/fortnightly/.gitkeep
 data/disclosures/monthly/**
 !data/disclosures/monthly/.gitkeep
+data/quarantine/
 data/probes/
 data/staging/
 data/parsed/**

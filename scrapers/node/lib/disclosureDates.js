@@ -90,7 +90,8 @@ export function extractDisclosureDates(...parts) {
   }
 
   const dmyName = new RegExp(
-    `(?<!\\d)(\\d{1,2})(?:st|nd|rd|th)?[-_\\s./]+(${MONTH_TOKEN})[-_\\s./]+(\\d{2}|\\d{4})(?!\\d)`,
+    // "31 Oct, 2026" — comma between month and year (seen Oct 2026).
+    `(?<!\\d)(\\d{1,2})(?:st|nd|rd|th)?[-_\\s./]+(${MONTH_TOKEN})(?:[-_\\s./]+|,\\s*-?\\s*)(\\d{2}|\\d{4})(?!\\d)`,
     "gi",
   );
   for (const m of blob.matchAll(dmyName)) {

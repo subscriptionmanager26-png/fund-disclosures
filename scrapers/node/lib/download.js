@@ -29,6 +29,18 @@ export function isCompleteZipBuffer(buf) {
   return false;
 }
 
+/**
+ * WAF / bot-block pages ("Request Rejected", Cloudflare challenge) are often
+ * served with HTTP 200 and saved under the spreadsheet's name. They used to be
+ * counted as successful downloads and only failed later in the parser.
+ */
+export function isHtmlMasqueradingAsSpreadsheet(name, buf) {
+  if (!/\.(xlsx?|xlsm|xlsb|zip)$/i.test(String(name || ""))) return false;
+  if (!buf || !buf.length) return false;
+  const head = buf.subarray(0, 512).toString("latin1").trimStart().toLowerCase();
+  return head.startsWith("<!doctype html") || head.startsWith("<html") || head.startsWith("<?xml") && head.includes("<html");
+}
+
 function looksLikeZipName(name) {
   return /\.zip$/i.test(name || "");
 }
@@ -43,6 +55,8 @@ function looksLikeZipName(name) {
  * @param {string} [args.filename]
  * @param {string} [args.localPath]
  * @param {boolean} [args.dryRun]
+ * @param {string} [args.baseDir] Folder under root (default data/disclosures;
+ *   data/quarantine for undated files awaiting content-date resolution).
  */
 export async function downloadDisclosureFile(args) {
   const {
@@ -54,6 +68,7 @@ export async function downloadDisclosureFile(args) {
     filename,
     localPath,
     dryRun = false,
+    baseDir = "data/disclosures",
   } = args;
 
   let name =
@@ -89,7 +104,7 @@ export async function downloadDisclosureFile(args) {
     }
   }
   const safe = name.replace(/[^\w.\-()+ ]+/g, "_");
-  const outDir = join(root, "data/disclosures", type, period, amcId);
+  const outDir = join(root, baseDir, type, period, amcId);
   const outPath = join(outDir, safe);
 
   if (dryRun) {
@@ -106,6 +121,14 @@ export async function downloadDisclosureFile(args) {
       return { outPath, skipped: true, bytes: 0, status: "missing_local" };
     }
     await copyFile(fromDisk, outPath);
+    {
+      const { readFile } = await import("node:fs/promises");
+      const head = await readFile(outPath);
+      if (isHtmlMasqueradingAsSpreadsheet(safe, head)) {
+        await unlink(outPath).catch(() => {});
+        return { outPath, skipped: true, bytes: 0, status: "html_not_spreadsheet" };
+      }
+    }
     // Staging copies can still be truncated ABSL zips — never promote them.
     if (looksLikeZipName(safe)) {
       const { readFile } = await import("node:fs/promises");
@@ -137,6 +160,11 @@ export async function downloadDisclosureFile(args) {
     const contentLength = Number(res.headers.get("content-length") || 0);
     if (contentLength > 0 && buf.length < contentLength) {
       lastStatus = "truncated_content_length";
+      continue;
+    }
+
+    if (isHtmlMasqueradingAsSpreadsheet(safe, buf)) {
+      lastStatus = "html_not_spreadsheet";
       continue;
     }
 
