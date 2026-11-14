@@ -23,6 +23,16 @@ import { spawn, spawnSync } from "node:child_process";
 import { ensureFullPortfoliosAsOfCheckout } from "./lib/holdings-guard.mjs";
 import { defaultHoldingsOutDir } from "./lib/resolve-holdings-out-dir.mjs";
 import { buildCompleteness, formatCompleteness } from "./lib/completeness.mjs";
+import { isSweepDay, planFetchJobs } from "./lib/fetch-window.mjs";
+import {
+  MANIFEST_REL,
+  amcsToParse,
+  loadManifest,
+  parserFingerprint,
+  sliceDigests,
+  updateManifest,
+  writeManifest,
+} from "./lib/parse-manifest.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -107,13 +117,39 @@ function loadDotenv() {
   }
 }
 
+/** Wall-clock per step, written to report.timings so slow steps are measured, not guessed. */
+const STEP_TIMINGS = [];
+
 function run(cmd, args, { label, allowFail = false } = {}) {
-  if (label) console.log(`\n→ ${label}`);
+  if (label) console.log(`\n→ ${label}  [${new Date().toISOString()}]`);
+  const t0 = Date.now();
   const res = spawnSync(cmd, args, { stdio: "inherit", cwd: ROOT, env: process.env });
+  const seconds = Math.round((Date.now() - t0) / 100) / 10;
+  STEP_TIMINGS.push({ step: label || `${cmd} ${args[0] || ""}`.trim(), seconds, exit: res.status ?? null });
+  if (label) console.log(`← ${label}: ${seconds}s (exit ${res.status ?? "?"})`);
   if (res.status !== 0 && !allowFail) {
     throw new Error(`${label || cmd} failed (${res.status})`);
   }
   return res.status ?? 1;
+}
+
+/** Like run(), but captures stdout (still echoed) for small JSON summaries. */
+function runCapture(cmd, args, { label } = {}) {
+  if (label) console.log(`\n→ ${label}  [${new Date().toISOString()}]`);
+  const t0 = Date.now();
+  const res = spawnSync(cmd, args, {
+    stdio: ["inherit", "pipe", "inherit"],
+    cwd: ROOT,
+    env: process.env,
+    encoding: "utf8",
+    maxBuffer: 256 * 1024 * 1024,
+  });
+  const seconds = Math.round((Date.now() - t0) / 100) / 10;
+  STEP_TIMINGS.push({ step: label || cmd, seconds, exit: res.status ?? null });
+  if (res.stdout) process.stdout.write(res.stdout);
+  if (label) console.log(`← ${label}: ${seconds}s (exit ${res.status ?? "?"})`);
+  if (res.status !== 0) throw new Error(`${label || cmd} failed (${res.status})`);
+  return res.stdout || "";
 }
 
 function monthYm(d = new Date()) {
@@ -189,6 +225,11 @@ function summarizeFetch(probe, quarantine = null) {
     empty_amcs: ids("empty"),
     needs_review_amcs: ids("needs_review"),
     amc_errors: amcErrors,
+    slowest_amcs: results
+      .filter((r) => typeof r.seconds === "number")
+      .sort((a, b) => b.seconds - a.seconds)
+      .slice(0, 5)
+      .map((r) => `${r.id} ${r.seconds}s`),
   };
 }
 
@@ -206,6 +247,36 @@ function loadJsonIfExists(path) {
 }
 
 loadDotenv();
+
+/**
+ * Cloud Agent secrets are sometimes saved with different casing
+ * (e.g. "cloudflare_account_id", "cloudflare_API_token"), which the fetchers
+ * never see — Navi was blocked on every run for that reason. Copy any
+ * case-insensitive match onto the canonical name. Values are never logged.
+ */
+const CANONICAL_SECRETS = [
+  "HOLDINGS_GH_TOKEN",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_API_TOKEN",
+  "UNION_WEBSHARE_PROXY_USER",
+  "UNION_WEBSHARE_PROXY_PASSWORD",
+  "UNION_WEBSHARE_PROXY_HOSTS",
+  "UNION_WEBSHARE_PROXY_URL",
+  "EDELWEISS_API_SECRET",
+  "EDELWEISS_HASH_KEY",
+  "NAVI_WP_NONCE",
+];
+const secretAliases = [];
+for (const name of CANONICAL_SECRETS) {
+  if (process.env[name]) continue;
+  const alias = Object.keys(process.env).find((k) => k !== name && k.toUpperCase() === name && process.env[k]);
+  if (alias) {
+    process.env[name] = process.env[alias];
+    secretAliases.push(`${alias} → ${name}`);
+  }
+}
+if (secretAliases.length) console.log(`Secret name aliases applied: ${secretAliases.join(", ")}`);
+const secretsPresent = Object.fromEntries(CANONICAL_SECRETS.map((n) => [n, Boolean(process.env[n])]));
 
 const doPush = hasFlag("push");
 // Cloud Agents inject GH_TOKEN / GITHUB_TOKEN as cursor[bot], which cannot
@@ -241,8 +312,16 @@ if (!process.env.EDELWEISS_API_SECRET) {
 process.env.FETCH_TIMEOUT_MS = process.env.FETCH_TIMEOUT_MS || "180000";
 process.env.FETCH_LIST_TIMEOUT_MS =
   process.env.FETCH_LIST_TIMEOUT_MS || "900000";
-const fetchConcurrency = process.env.FETCH_CONCURRENCY || "2";
-const monthlyFetchConcurrency = process.env.FETCH_MONTHLY_CONCURRENCY || "1";
+// AMCs are different hosts; errored AMCs are retried serially by fetch-period,
+// so moderate parallelism no longer trades speed for false errors.
+const fetchConcurrency = process.env.FETCH_CONCURRENCY || "4";
+const monthlyFetchConcurrency = process.env.FETCH_MONTHLY_CONCURRENCY || "3";
+const parseWorkers = String(
+  Math.max(1, Number(process.env.PARSE_WORKERS) || Math.min(4, (await import("node:os")).cpus().length || 1)),
+);
+const HOLDINGS_OWNER = process.env.HOLDINGS_DATA_OWNER || "kushagra-agarwal-a";
+const HOLDINGS_REPO = process.env.HOLDINGS_DATA_REPO || "fund-holdings-data";
+const HOLDINGS_BRANCH = process.env.HOLDINGS_DATA_BRANCH || "main";
 
 function monthEndIso(ym) {
   const [y, m] = ym.split("-").map(Number);
@@ -279,17 +358,52 @@ const toYm = monthYm();
 const fromYm = shiftYm(toYm, -1);
 const periods = [fromYm, toYm].filter((v, i, a) => a.indexOf(v) === i);
 const fetchJobs = buildFetchParseJobs(periods);
+const today = todayUtcIso();
+const sweep = isSweepDay(today, {
+  weekday: process.env.HOLDINGS_SWEEP_WEEKDAY === undefined ? 0 : Number(process.env.HOLDINGS_SWEEP_WEEKDAY),
+  force: hasFlag("full") || process.env.HOLDINGS_FULL_SWEEP === "1",
+});
+const fetchPlan = planFetchJobs(fetchJobs, {
+  today,
+  sweep,
+  windowDays: process.env.FETCH_WINDOW_DAYS ? Number(process.env.FETCH_WINDOW_DAYS) : undefined,
+});
 
 const outDir = defaultHoldingsOutDir(ROOT);
+// Clone the data repo up front (shallow: the daily job never needs its history)
+// so the parse manifest is available before deciding what to parse.
+if (doPush && !existsSync(join(outDir, ".git"))) {
+  mkdirSync(dirname(outDir), { recursive: true });
+  run(
+    "git",
+    [
+      "clone",
+      "--depth=1",
+      "--branch",
+      HOLDINGS_BRANCH,
+      "--single-branch",
+      `https://x-access-token:${holdingsToken}@github.com/${HOLDINGS_OWNER}/${HOLDINGS_REPO}.git`,
+      outDir,
+    ],
+    { label: "clone holdings data (shallow)", allowFail: true },
+  );
+}
 if (existsSync(join(outDir, ".git"))) {
   ensureFullPortfoliosAsOfCheckout(outDir);
 }
+const fingerprint = parserFingerprint(ROOT);
+const parseManifest = loadManifest(outDir);
+const forceParse = hasFlag("force-parse") || process.env.HOLDINGS_FORCE_PARSE === "1";
 const report = {
   started_at: new Date().toISOString(),
   mode: doPush ? "push" : "dry-run",
   holdings_out: outDir,
   periods,
   fetch_jobs: fetchJobs,
+  fetch_plan: fetchPlan,
+  sweep,
+  parser_fingerprint: fingerprint,
+  parse: [],
   fetch: [],
   baseline_files: countAsOfFiles(outDir),
   after_files: {},
@@ -299,6 +413,8 @@ const report = {
   openfin_filings: null,
   push_error: null,
   edelweiss_secret_present: Boolean(process.env.EDELWEISS_API_SECRET),
+  secrets_present: secretsPresent,
+  secret_aliases: secretAliases,
   holdings_token_present: Boolean(holdingsToken),
 };
 
@@ -307,7 +423,9 @@ console.log(
     {
       mode: report.mode,
       periods,
-      fetch_jobs: fetchJobs,
+      fetch_plan: fetchPlan.map((j) => `${j.type} ${j.period}: ${j.skip || "fetch"} (until ${j.fetch_until})`),
+      sweep,
+      parse_workers: Number(parseWorkers),
       fetch_timeout_ms: Number(process.env.FETCH_TIMEOUT_MS),
       fetch_concurrency: Number(fetchConcurrency),
       fetch_monthly_concurrency: Number(monthlyFetchConcurrency),
@@ -322,14 +440,16 @@ console.log(
 
 const probes = [];
 const quarantineReports = [];
-for (const { type, period } of fetchJobs) {
-  if (type === "monthly" && isFutureMonthEnd(period)) {
-    console.log(`\n→ skip fetch ${type} ${period} (month-end not reached)`);
+const parsedRecords = [];
+for (const { type, period, skip, fetch_until } of fetchPlan) {
+  if (skip) {
+    console.log(`\n→ skip fetch ${type} ${period} (${skip}; fetch window until ${fetch_until})`);
     report.fetch.push({
       type,
       period,
       skipped: true,
-      reason: "future_month_end",
+      reason: skip,
+      fetch_until,
       ...summarizeFetch(null),
     });
     continue;
@@ -362,20 +482,66 @@ for (const { type, period } of fetchJobs) {
   if (quarantine) quarantineReports.push(quarantine);
   report.fetch.push({ type, period, ...summarizeFetch(probe, quarantine) });
 
-  run(
-    "npm",
-    ["run", "parse:amc", "--", `--type=${type}`, `--period=${period}`, "--all"],
-    { label: `parse ${type} ${period}` },
-  );
+  // Incremental parse: only AMCs whose source files changed since they were
+  // last parsed + published with this code (see scripts/lib/parse-manifest.mjs).
+  const key = `${type}/${period}`;
+  const digests = sliceDigests(ROOT, type, period);
+  const decision = forceParse
+    ? { amcs: Object.keys(digests).sort(), reason: "forced" }
+    : amcsToParse(parseManifest, fingerprint, key, digests);
+  report.parse.push({
+    type,
+    period,
+    amcs_with_files: Object.keys(digests).length,
+    reason: decision.reason,
+    parsed: decision.amcs,
+  });
+  if (!decision.amcs.length) {
+    console.log(`\n→ skip parse ${type} ${period}: all ${Object.keys(digests).length} AMC(s) unchanged since last publish`);
+    continue;
+  }
+  let summary = null;
+  try {
+    const out = runCapture(
+      pythonBin(),
+      [
+        join(ROOT, "parsers/run_amc_parser.py"),
+        "--all",
+        `--type=${type}`,
+        `--period=${period}`,
+        `--only=${decision.amcs.join(",")}`,
+        `--workers=${parseWorkers}`,
+        "--summary-only",
+      ],
+      { label: `parse ${type} ${period} (${decision.amcs.length} AMC(s), ${decision.reason}, workers=${parseWorkers})` },
+    );
+    // --summary-only prints one JSON object last; earlier lines may be parser chatter.
+    const start = out.lastIndexOf('{\n  "amcs"');
+    summary = JSON.parse(out.slice(start >= 0 ? start : out.indexOf("{")));
+  } catch (e) {
+    console.error(`parse ${type} ${period} failed: ${e.message || e}`);
+  }
+  const okAmcs = (summary?.rows || [])
+    .filter((r) => r.schemes > 0 && r.errors === 0)
+    .map((r) => r.amc_id);
+  parsedRecords.push({ key, digests, amcs: okAmcs });
 }
 
+const anythingParsed = report.parse.some((p) => p.parsed.length);
+if (!anythingParsed) {
+  report.publish_skipped = "nothing_changed";
+  console.log("\n→ nothing new to parse — skipping enrich / sync / filings refresh");
+}
+
+if (anythingParsed) {
 run("npm", ["run", "holdings:enrich", "--", "--allow-incomplete"], {
   label: "enrich identifiers",
 });
 run("npm", ["run", "holdings:assert-locks"], { label: "assert mapping locks" });
+}
 
 let syncWindowFailed = false;
-try {
+if (anythingParsed) try {
   const syncArgs = [
     join(ROOT, "scripts/sync-asof-window.mjs"),
     `--from=${fromYm}`,
@@ -391,7 +557,7 @@ try {
   console.error("\nSync window failed:", report.push_error);
 }
 
-if (syncWindowFailed && doPush) {
+if (anythingParsed && syncWindowFailed && doPush) {
   for (const ym of periods) {
     const monthlyAsOf = monthEndIso(ym);
     if (isFutureMonthEnd(monthlyAsOf)) continue;
@@ -415,7 +581,7 @@ if (syncWindowFailed && doPush) {
 }
 
 try {
-  if (doPush) {
+  if (doPush && anythingParsed) {
     run(process.execPath, [join(ROOT, "scripts/refresh-filings-catalog.mjs"), "--push"], {
       label: "refresh filings catalog",
     });
@@ -428,6 +594,31 @@ try {
 } catch (e) {
   if (!report.push_error) report.push_error = String(e.message || e);
   console.error("\nFilings refresh/verify failed:", e.message || e);
+}
+
+// Remember what was parsed + published so unchanged AMCs are skipped next run.
+// Only after a fully successful publish; failed AMCs are simply retried.
+if (doPush && anythingParsed && !report.push_error && !syncWindowFailed && existsSync(join(outDir, ".git"))) {
+  try {
+    const next = updateManifest(parseManifest, fingerprint, parsedRecords, today);
+    writeManifest(outDir, next);
+    run("git", ["-C", outDir, "add", MANIFEST_REL], { label: "stage parse manifest" });
+    const st = spawnSync("git", ["-C", outDir, "status", "--porcelain", "--", MANIFEST_REL], { encoding: "utf8" });
+    if (st.stdout.trim()) {
+      run("git", [
+        "-C", outDir,
+        "-c", "user.email=holdings-bot@users.noreply.github.com",
+        "-c", "user.name=holdings-sync",
+        "commit", "-m", `meta: parse manifest ${today}`,
+      ], { label: "commit parse manifest" });
+      run("git", ["-C", outDir, "push", "origin", `HEAD:${HOLDINGS_BRANCH}`], { label: "push parse manifest" });
+    }
+    report.parse_manifest = { recorded: parsedRecords.map((r) => ({ slice: r.key, amcs: r.amcs.length })) };
+  } catch (e) {
+    // Non-fatal: next run just re-parses those AMCs.
+    report.parse_manifest = { error: String(e.message || e) };
+    console.error("parse manifest update failed (non-fatal):", e.message || e);
+  }
 }
 
 report.after_files = countAsOfFiles(outDir);
@@ -458,13 +649,15 @@ report.fetch_totals = report.fetch.reduce(
 );
 
 // Per-AMC completeness vs the previous month's same slice (after SEBI deadline).
-const checkedDates = report.fetch.filter((f) => !f.skipped).map((f) => f.period);
+// Include slices whose fetch window closed, so AMCs that never published stay flagged.
+const checkedDates = fetchPlan.filter((j) => j.skip !== "future_as_of").map((j) => j.period);
 report.completeness = buildCompleteness({
   holdingsDir: outDir,
   asOfDates: checkedDates,
   today: todayUtcIso(),
   probes,
   quarantineReports,
+  registryAmcs: (loadJsonIfExists(join(ROOT, "registry/amcs.json")) || {}).amcs || [],
 });
 console.log("\nCompleteness:\n" + formatCompleteness(report.completeness));
 
@@ -491,6 +684,10 @@ report.run_status = report.push_error
     ? "incomplete"
     : "ok";
 report.log_path = process.env.HOLDINGS_CLOUD_LOG || null;
+report.timings = {
+  total_seconds: Math.round((Date.now() - Date.parse(report.started_at)) / 1000),
+  steps: STEP_TIMINGS,
+};
 report.finished_at = new Date().toISOString();
 mkdirSync(join(ROOT, "data/probes"), { recursive: true });
 const reportPath = join(ROOT, "data/probes", `cloud-holdings-report-${Date.now()}.json`);

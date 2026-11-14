@@ -51,8 +51,34 @@ export function dueDate(asOf) {
   return iso(new Date(Date.UTC(y, m - 1, d + days)));
 }
 
+function normName(s) {
+  return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+/** { normalized AMC name → amc_id } from registry/amcs.json rows. */
+export function amcNameIndex(registryAmcs = []) {
+  const idx = {};
+  for (const a of registryAmcs) {
+    for (const n of [a.name, a.amc_name]) if (n) idx[normName(n)] = a.id;
+  }
+  return idx;
+}
+
+/**
+ * AMC of a published portfolio. Published JSON follows the public contract,
+ * which has no amc_id: it carries scheme.amc_name (registry "name", set by
+ * enrich). meta.amc_id is honoured if a future contract adds it.
+ */
+export function amcOfPayload(payload, nameIndex = {}) {
+  const id = payload?.meta?.amc_id || payload?.amc_id;
+  if (id) return String(id);
+  const name = payload?.scheme?.amc_name || payload?.meta?.amc_name;
+  if (!name) return "unknown";
+  return nameIndex[normName(name)] || `name:${normName(name)}`;
+}
+
 /** { amc_id: count } for portfolios/asof/{date}/*.json in the holdings checkout. */
-export function amcCountsForDate(holdingsDir, asOf) {
+export function amcCountsForDate(holdingsDir, asOf, nameIndex = {}) {
   const dir = join(holdingsDir, "portfolios", "asof", asOf);
   const counts = {};
   if (!existsSync(dir)) return counts;
@@ -61,7 +87,7 @@ export function amcCountsForDate(holdingsDir, asOf) {
     let amc = "unknown";
     try {
       const payload = JSON.parse(readFileSync(join(dir, name), "utf8"));
-      amc = String(payload?.meta?.amc_id || payload?.amc_id || "unknown");
+      amc = amcOfPayload(payload, nameIndex);
     } catch {
       amc = "unreadable";
     }
@@ -132,18 +158,27 @@ export function fetchDiagnosis(amc, asOf, probes, quarantineReports) {
  * Build the completeness section of the cloud report.
  * @param {{ holdingsDir: string, asOfDates: string[], today: string, probes?: object[], quarantineReports?: object[] }} args
  */
-export function buildCompleteness({ holdingsDir, asOfDates, today, probes = [], quarantineReports = [] }) {
+export function buildCompleteness({
+  holdingsDir,
+  asOfDates,
+  today,
+  probes = [],
+  quarantineReports = [],
+  registryAmcs = [],
+}) {
+  const nameIndex = amcNameIndex(registryAmcs);
   const slices = [];
   let failures = 0;
   for (const asOf of [...new Set(asOfDates)].sort()) {
     const prevAsOf = previousComparableAsOf(asOf);
     const due = dueDate(asOf);
-    const prev = amcCountsForDate(holdingsDir, prevAsOf);
-    const now = amcCountsForDate(holdingsDir, asOf);
+    const prev = amcCountsForDate(holdingsDir, prevAsOf, nameIndex);
+    const now = amcCountsForDate(holdingsDir, asOf, nameIndex);
     const { missing, dropped } = compareCounts(prev, now);
     const overdue = today > due;
     const withDiag = (rows) =>
       rows.map((r) => ({ ...r, diagnosis: fetchDiagnosis(r.amc, asOf, probes, quarantineReports) }));
+    const unattributed = (prev.unknown || 0) + (now.unknown || 0);
     const slice = {
       as_of: asOf,
       compared_with: prevAsOf,
@@ -153,6 +188,8 @@ export function buildCompleteness({ holdingsDir, asOfDates, today, probes = [], 
       total_now: Object.values(now).reduce((a, b) => a + b, 0),
       missing: withDiag(missing),
       dropped: withDiag(dropped),
+      // Portfolios with no AMC field at all — if this is large the per-AMC check is blind.
+      unattributed,
     };
     if (slice.status === "incomplete") failures += missing.length + dropped.length;
     slices.push(slice);

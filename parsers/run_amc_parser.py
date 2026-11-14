@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import inspect
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -217,6 +218,38 @@ def parse_paths(
     }
 
 
+def _empty_report(amc_id: str, *, errors: list | None = None) -> dict:
+    return {
+        "amc_id": amc_id,
+        "files": 0,
+        "parsed_files": 0,
+        "skipped_resume": 0,
+        "skipped_files": [],
+        "schemes": 0,
+        "holdings": 0,
+        "errors": errors or [],
+        "schemes_detail": [],
+    }
+
+
+def _parse_amc_job(job: tuple) -> dict:
+    """One AMC for --all (top-level so ProcessPoolExecutor can pickle it)."""
+    amc_id, dtype, period, limit, resume = job
+    paths = iter_amc_files(amc_id, dtype, period)
+    if limit:
+        paths = paths[:limit]
+    if not paths:
+        return _empty_report(amc_id)
+    return parse_paths(amc_id, paths, resume=resume)
+
+
+def _amc_input_bytes(amc_id: str, dtype: str, period: str) -> int:
+    try:
+        return sum(p.stat().st_size for p in iter_amc_files(amc_id, dtype, period))
+    except Exception:
+        return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--amc", help="AMC id (e.g. nj-mutual-fund)")
@@ -237,6 +270,19 @@ def main() -> int:
         "--no-resume",
         action="store_true",
         help=argparse.SUPPRESS,  # alias for --force
+    )
+    ap.add_argument(
+        "--only",
+        default="",
+        help="With --all: comma-separated AMC ids to parse (others skipped). "
+        "The daily cloud job passes only AMCs whose source files changed.",
+    )
+    ap.add_argument(
+        "--workers",
+        type=int,
+        default=int(os.environ.get("PARSE_WORKERS", "1") or 1),
+        help="With --all: parse this many AMCs in parallel processes (default 1, or $PARSE_WORKERS). "
+        "Safe because each AMC writes only under data/parsed/{type}/{period}/{amc}/.",
     )
     ap.add_argument(
         "--summary-only",
@@ -278,26 +324,31 @@ def main() -> int:
         if args.all:
             if not args.type:
                 raise SystemExit("--type required with --all")
-            for amc_id in list_amcs():
-                paths = iter_amc_files(amc_id, args.type, args.period)
-                if args.limit:
-                    paths = paths[: args.limit]
-                if not paths:
-                    reports.append(
-                        {
-                            "amc_id": amc_id,
-                            "files": 0,
-                            "parsed_files": 0,
-                            "skipped_resume": 0,
-                            "skipped_files": [],
-                            "schemes": 0,
-                            "holdings": 0,
-                            "errors": [],
-                            "schemes_detail": [],
-                        }
-                    )
-                    continue
-                reports.append(parse_paths(amc_id, paths, resume=resume))
+            only = {s.strip() for s in args.only.split(",") if s.strip()}
+            amc_ids = [a for a in list_amcs() if not only or a in only]
+            if only - set(list_amcs()):
+                print(f"--only: no parser for {sorted(only - set(list_amcs()))}", file=sys.stderr)
+            jobs = [(a, args.type, args.period, args.limit, resume) for a in amc_ids]
+            workers = max(1, min(args.workers, len(jobs) or 1))
+            if workers == 1:
+                reports.extend(_parse_amc_job(j) for j in jobs)
+            else:
+                from concurrent.futures import ProcessPoolExecutor
+
+                # Largest AMCs first so one big pack does not finish last alone.
+                order = sorted(
+                    range(len(jobs)),
+                    key=lambda i: -_amc_input_bytes(jobs[i][0], args.type, args.period),
+                )
+                results: dict[int, dict] = {}
+                with ProcessPoolExecutor(max_workers=workers) as pool:
+                    futures = {pool.submit(_parse_amc_job, jobs[i]): i for i in order}
+                    for fut, i in futures.items():
+                        try:
+                            results[i] = fut.result()
+                        except Exception as e:  # worker crash: report, keep others
+                            results[i] = _empty_report(jobs[i][0], errors=[{"error": f"worker: {e}"}])
+                reports.extend(results[i] for i in range(len(jobs)))
         elif not args.amc:
             raise SystemExit("Need --amc or --all (or --all-fixtures / --list)")
         else:
