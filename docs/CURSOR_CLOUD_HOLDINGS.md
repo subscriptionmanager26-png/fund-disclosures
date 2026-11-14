@@ -152,6 +152,8 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 
 **Union (`unionmf.com`):** Follow **`docs/UNION_MF_WEBSHARE_PROXY.md`** — route all Union traffic through Webshare (`UNION_WEBSHARE_PROXY_USER` / `UNION_WEBSHARE_PROXY_PASSWORD`). Datacenter egress without proxy fails with SSL EOF / connection refused; Browser Rendering does not help.
 
+**If curl_cffi still 403/SSL from a Cloud Agent VM:** Navi (`navi.com`) and Union (`www.unionmf.com`) may block datacenter IPs at the edge. Use **residential capture**: open the [mobile capture page](https://subscriptionmanager26-png.github.io/fund-disclosures/residential-capture/) on your phone, tap **Capture all AMCs** (APIs run in your mobile browser on each AMC site), and set `RESIDENTIAL_CAPTURE_URL` so the cloud agent reads manifests from the Worker. See `docs/RESIDENTIAL_CAPTURE.md`. Legacy: commit `data/residential-capture/manifests/…` or `scripts/fetch-navi-local.sh` / `fetch-union-local.sh`. Do not disable the as-of filter globally — only use `trust_adapter_period` for API-scoped adapters.
+
 ### `excluded_non_portfolio` — Kotak Consolidated SEBI monthly
 
 **Symptom:** Kotak monthly fetch keeps only `FortnightlyPortfolio*312026.xlsx` (~24 debt schemes); `ConsolidatedSEBIPortfolio*.xlsx` is rejected.

@@ -58,7 +58,7 @@ def safe_filename(url: str) -> str:
     if not base or base in (".", ".."):
         base = "download.xlsx"
     base = re.sub(r"[^\w.\-() ]", "_", base).strip()[:200] or "download.xlsx"
-    if not re.search(r"\.(xlsx|xls)$", base, re.I):
+    if not re.search(r"\.(xlsx|xls|xlsm|zip)$", base, re.I):
         base = f"{base}.xlsx"
     return base
 
@@ -81,11 +81,29 @@ def month_key_from_document_path(href: str) -> str | None:
     return f"{year:04d}-{month:02d}"
 
 
-def fetch_html() -> str:
-    req = Request(PAGE_URL, headers=HEADERS)
+def _http_get(url: str, *, referer: str = PAGE_URL, accept: str = "*/*") -> bytes:
     try:
+        from curl_cffi import requests as creq  # type: ignore
+
+        r = creq.get(
+            url,
+            headers={**HEADERS, "Accept": accept, "Referer": referer},
+            impersonate="chrome131",
+            timeout=120,
+        )
+        r.raise_for_status()
+        return r.content
+    except Exception:
+        req = Request(url, headers={**HEADERS, "Accept": accept, "Referer": referer})
         with urlopen(req, timeout=300) as resp:
-            return resp.read().decode("utf-8", "ignore")
+            return resp.read()
+
+
+def fetch_html() -> str:
+    try:
+        return _http_get(PAGE_URL, referer=PAGE_URL, accept=HEADERS["Accept"]).decode(
+            "utf-8", "ignore"
+        )
     except Exception:
         # HSBC occasionally stalls with urllib TLS reads; curl is more reliable here.
         body = curl_fetch(PAGE_URL, referer=PAGE_URL)
@@ -105,7 +123,7 @@ def text_to_month_key(text: str) -> str | None:
 
 
 FORTNIGHTLY_LINK_RE = re.compile(
-    r'href="([^"]*fortnightly-debt-portfolio/document-\d{8}/[^"]+\.(?:xlsx|xls))"',
+    r'href="([^"]*fortnightly-debt-portfolio/document-\d{8}/[^"#?]+)"',
     re.I,
 )
 
@@ -188,17 +206,8 @@ def extract_rows(html: str) -> list[dict]:
 
 
 def download(url: str) -> bytes:
-    req = Request(
-        url,
-        headers={
-            "User-Agent": HEADERS["User-Agent"],
-            "Accept": "*/*",
-            "Referer": PAGE_URL,
-        },
-    )
     try:
-        with urlopen(req, timeout=300) as resp:
-            return resp.read()
+        return _http_get(url, referer=PAGE_URL, accept="*/*")
     except Exception:
         return curl_fetch(url, referer=PAGE_URL)
 

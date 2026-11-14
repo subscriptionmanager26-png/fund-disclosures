@@ -75,12 +75,21 @@ export function classifyDisclosureFile(file, opts = {}) {
     return { keep: false, reason: "excluded_non_portfolio" };
   }
 
-  // Filename cadence must match job type even when trust_adapter_period is set.
+  // Cadence guards use the download name only (not CDN folders such as
+  // Shriram's ".../Monthly--Fortnightly--Weekly-Portfolio.../"). Monthly jobs
+  // always reject fortnightly filenames, even when the adapter scoped the
+  // period. Fortnightly jobs may trust the adapter when filenames are CMS
+  // hashes (e.g. Sundaram monthlyportfolio_* on Catid=Fortnightly).
   const cadence = cadenceLabel(file);
   if (type === "monthly" && /fortnight(?:ly)?/i.test(cadence)) {
     return { keep: false, reason: "wrong_cadence", detail: "fortnightly_in_monthly" };
   }
-  if (type === "fortnightly" && /monthly/i.test(cadence) && !/fortnight/i.test(cadence)) {
+  if (
+    !trustAdapterPeriod &&
+    type === "fortnightly" &&
+    /monthly/i.test(cadence) &&
+    !/fortnight/i.test(cadence)
+  ) {
     return { keep: false, reason: "wrong_cadence", detail: "monthly_in_fortnightly" };
   }
 
