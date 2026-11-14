@@ -28,6 +28,7 @@ PY = ROOT / "scrapers" / "python"
 sys.path.insert(0, str(PY))
 
 OUT: list[str] = []
+SAVE_DIR: Path | None = None
 
 
 def log(*parts) -> None:
@@ -71,6 +72,19 @@ def diag_union() -> None:
         from lib.union_webshare_proxy import proxy_configured
 
         log("proxy_configured:", proxy_configured())
+        # Each credential source / host separately (no secrets printed).
+        from lib.union_webshare_proxy import _get_via_curl_cffi, describe_proxy, proxy_candidates
+
+        for proxy in proxy_candidates():
+            t0 = time.time()
+            try:
+                body = _get_via_curl_cffi(
+                    "https://www.unionmf.com/", headers={"User-Agent": "Mozilla/5.0", "Accept": "text/html"},
+                    proxy=proxy, timeout=60,
+                )
+                log(f"  proxy {describe_proxy(proxy)}: OK {len(body)} bytes {time.time() - t0:.1f}s")
+            except Exception as e:  # noqa: BLE001
+                log(f"  proxy {describe_proxy(proxy)}: FAIL {str(e)[:160]}")
         for label, url in (("monthly page", fu.PAGE_URL), ("fortnightly page", fu.FORTNIGHTLY_PAGE_URL)):
             t0 = time.time()
             try:
@@ -129,6 +143,15 @@ def diag_edelweiss() -> None:
             except Exception as e:  # noqa: BLE001
                 log("  ERR", url[:160], e)
         log("bundle bytes:", len(bundle))
+        if SAVE_DIR:
+            SAVE_DIR.mkdir(parents=True, exist_ok=True)
+            (SAVE_DIR / "edelweiss-main.js").write_text(bundle, encoding="utf-8")
+            (SAVE_DIR / "edelweiss-page.html").write_text(html, encoding="utf-8")
+            log("saved bundle + page to", SAVE_DIR)
+        # Code around the statutory-menu call sites (constant name varies per build).
+        for const in re.findall(r'([A-Za-z_$][\w$]*)="mf/statutory-menus/single"', bundle):
+            for h in snippets(bundle, r"\b" + re.escape(const) + r"\b", width=700, limit=4):
+                log("\n-- use of", const, "…", h[:1500])
         for pat in (
             r"statutory-menus[^\"'`]{0,120}",
             r"secreat|secret[A-Za-z]*\s*[:=]",
@@ -172,7 +195,10 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "data" / "probes" / "diag-amcs.txt"))
     ap.add_argument("--only", choices=["union", "edelweiss"], default=None)
+    ap.add_argument("--save-dir", default="", help="save Edelweiss page + JS bundle here")
     args = ap.parse_args()
+    global SAVE_DIR
+    SAVE_DIR = Path(args.save_dir) if args.save_dir else None
     log("diagnose_blocked_amcs", time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()))
     log("env present:", {k: bool(os.environ.get(k)) for k in (
         "UNION_WEBSHARE_PROXY_USER", "UNION_WEBSHARE_PROXY_PASSWORD", "UNION_WEBSHARE_PROXY_URL",
