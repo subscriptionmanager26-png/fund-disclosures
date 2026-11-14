@@ -87,6 +87,16 @@ def fetch_html(*, ctx: ssl.SSLContext) -> str:
 
 
 def extract_props(html_text: str) -> dict:
+    """Return the React props object that carries ``disclosuresData``.
+
+    Next.js RSC payload: ``self.__next_f.push([1, "<escaped>"])`` chunks. Older
+    builds put the downloads props in their own chunk; since Nov 2026 the whole
+    tree is one chunk whose FIRST ``null,{...}`` object is the root layout
+    (``{"lang", "children"}``), so taking the first object silently returned no
+    rows. Decode every ``null,{`` candidate with a real JSON decoder (string-
+    aware, unlike brace counting) and keep the one that has ``disclosuresData``.
+    """
+    decoder = json.JSONDecoder()
     for m in PUSH_RE.finditer(html_text):
         raw = m.group(1)
         if "disclosuresData" not in raw:
@@ -97,29 +107,22 @@ def extract_props(html_text: str) -> dict:
         except json.JSONDecodeError:
             unescaped = raw.replace('\\"', '"').replace("\\\\", "\\").replace("\\n", "\n")
 
-        array_str = re.sub(r"^[a-zA-Z0-9_]+:", "", unescaped.strip())
-        null_match = re.search(r"null,(\{)", array_str)
-        if not null_match:
-            continue
+        for cand in re.finditer(r"null,(\{)", unescaped):
+            try:
+                obj, _end = decoder.raw_decode(unescaped, cand.start(1))
+            except json.JSONDecodeError:
+                continue
+            if isinstance(obj, dict) and "disclosuresData" in obj:
+                return obj
 
-        start = null_match.start(1)
-        depth = 0
-        end = start
-        for i, ch in enumerate(array_str[start:], start):
-            if ch == "{":
-                depth += 1
-            elif ch == "}":
-                depth -= 1
-                if depth == 0:
-                    end = i + 1
-                    break
-
-        obj_str = array_str[start:end]
-        try:
-            return json.loads(obj_str)
-        except json.JSONDecodeError as e:
-            Path("debug_angelone_payload.txt").write_text(obj_str[:8000], encoding="utf-8")
-            raise ValueError(f"JSON parse failed: {e}. Saved debug_angelone_payload.txt") from e
+        # Fallback: the key may sit deeper than a props object we can anchor on.
+        for key in re.finditer(r'"disclosuresData"\s*:', unescaped):
+            try:
+                val, _end = decoder.raw_decode(unescaped, key.end() + (len(unescaped[key.end():]) - len(unescaped[key.end():].lstrip())))
+            except json.JSONDecodeError:
+                continue
+            if isinstance(val, (dict, list)):
+                return {"disclosuresData": val}
 
     raise ValueError("Could not find disclosuresData in __next_f payload")
 

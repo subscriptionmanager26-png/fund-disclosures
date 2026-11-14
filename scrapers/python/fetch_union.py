@@ -282,6 +282,9 @@ def main() -> None:
         except Exception as e:
             print(f"  HTML scrape failed: {e}", flush=True)
             page_docs = []
+            html_error = e
+        else:
+            html_error = None
         if not page_docs:
             try:
                 page_docs = load_fortnightly_docs_from_api(as_of)
@@ -292,6 +295,12 @@ def main() -> None:
                 )
             except Exception as e:
                 print(f"  API fallback failed: {e}", flush=True)
+                if html_error is not None:
+                    # Both sources unreachable: an error, not "nothing published".
+                    raise SystemExit(
+                        f"unionmf.com unreachable (fortnightly): html: {html_error}; api: {e}"
+                        + ("" if proxy_configured() else " [UNION_WEBSHARE_PROXY_* not set]")
+                    )
 
         for month_key in args.months:
             selected = list(page_docs)
@@ -344,6 +353,9 @@ def main() -> None:
     except Exception as e:
         print(f"  HTML scrape failed: {e}", flush=True)
         page_docs = []
+        html_error = e
+    else:
+        html_error = None
 
     api_docs: list[dict] = []
     try:
@@ -351,6 +363,12 @@ def main() -> None:
         print(f"  API indexed {len(api_docs)} document(s)", flush=True)
     except Exception as e:
         print(f"  API load failed: {e}", flush=True)
+        if html_error is not None:
+            # Both sources unreachable: an error, not "nothing published".
+            raise SystemExit(
+                f"unionmf.com unreachable (monthly): html: {html_error}; api: {e}"
+                + ("" if proxy_configured() else " [UNION_WEBSHARE_PROXY_* not set]")
+            )
 
     for month_key in args.months:
         segment = month_key_to_path_segment(month_key)
