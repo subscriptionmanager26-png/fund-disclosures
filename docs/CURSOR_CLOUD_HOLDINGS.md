@@ -72,18 +72,19 @@ Optional env (defaults are fine):
 ## What `holdings:cloud` does
 
 1. Fetch **fortnightly mid-month, fortnightly month-end, and monthly** for the **previous + current** calendar month (never skip FN-31 — new debt launches often appear only there)
-2. **LLM cadence gate (required before parse/publish)** — after Excel/ZIP files land under `data/disclosures/{cadence}/{YYYY-MM-DD}/{amc}/`, the agent must inspect filenames (and paths) and confirm each file belongs in that cadence folder:
+2. **Cadence gate + quarantine resolution (automatic, before parse)** — `holdings:cloud` parses straight after each fetch, so these rules are enforced in code: filename cadence guards in `portfolioFilter.js`, and `resolve_quarantine.py` for undated files (promoted only when the in-workbook as-of matches the slice). The rules:
    - **Fortnightly mid-month (`…-15`)** — mid-month / fortnightly / debt-scheme packs dated ~15th. Reject monthly packs, `31-Jul` / month-end files, equity/ELSS/flexi workbooks, and stale archives misfiled into the FN tree.
    - **Fortnightly month-end (`…-31`)** — month-end debt/fortnightly packs only (same cadence tree as mid-month FN, different date folder).
    - **Monthly (`…-31` or month-end)** — full monthly portfolios; do not mix mid-month FN packs here.
    - Misfiled files must be **moved** to the correct cadence/date folder (or deleted), never synced “as-is” because `meta.as_of` happened to match.
-   - Record the verdict (keep / move / drop) in `data/probes/` before continuing.
-3. Parse all AMCs (`--all`) — only after the cadence gate
+   - Verdicts are recorded in `data/probes/quarantine-*.json`.
+3. Parse all AMCs (`--all`) — after quarantine resolution
 4. Enrich identifiers (`--allow-incomplete` — partial months are normal early in the month)
 5. **Merge-sync** to GitHub via `sync-asof-window.mjs --merge --continue-on-error` (fortnightly slice failures do not block month-end monthly; fallback monthly sync if the window still aborts)
 6. Refresh `catalog/filings.json` + pin `meta.json`
 7. Verify `https://openfin.pocketedge.in/api/v1/filings`
-8. Write JSON report under `data/probes/cloud-holdings-report-*.json`
+8. **Completeness check** per AMC vs last month's same slice (after SEBI deadline) → `run_status`
+9. Write JSON report under `data/probes/cloud-holdings-report-*.json`; copy log + probes to `/opt/cursor/artifacts`
 
 ## Filings API vs portfolio files
 
@@ -114,10 +115,38 @@ Manual check: `npm run holdings:verify-filings` (uses `.tmp/fund-holdings-data` 
 | Status | Meaning |
 |--------|---------|
 | **ok** | Files downloaded for this period |
-| **empty** | Scraper ran; AMC has not published this period yet (common early in the month) |
-| **error** | Request failed (timeout, network) — retry next day or lower concurrency |
+| **empty** | Nothing new listed for this period (only older / other-slice files). Normal before the AMC publishes |
+| **needs_review** | Files were listed but **none had a readable date in the name** — they were quarantined, not dropped. `resolve_quarantine.py` promotes the ones whose in-workbook as-of matches; whatever is left is in `data/probes/quarantine-*.json` |
+| **error** | Listing or every download failed (timeout, WAF/HTML block page, network). Errored AMCs are retried serially once per job |
 
-`empty` is not a bug. Most AMCs publish month-end monthly 3–7 days after month close.
+`empty` before the SEBI deadline is not a bug. **After the deadline it is** — the completeness check below names those AMCs.
+
+### Quarantine (undated files)
+
+Filename rules used to **drop** any file without a parseable date (`undated_no_month`), so every AMC rename (hash names, `October` with no year, `oct15`, `31 Oct, 2026`) silently emptied that AMC until someone patched a regex. Now:
+
+1. `fetch-period.js` downloads undated candidates to `data/quarantine/{type}/{as_of}/{amc}/` (all candidates when the AMC kept nothing; otherwise only portfolio-looking names; max `QUARANTINE_MAX_PER_AMC`, default 40).
+2. `scrapers/python/resolve_quarantine.py` opens each workbook (zip members too), requires a holdings table (ISIN + %NAV / market value) and an *as on* banner, and promotes the file into `data/disclosures/…` only when that date matches the slice. Month-end fortnightly needs an explicit *fortnight* marker so monthly equity packs never leak into the FN tree.
+3. Verdicts: `data/probes/quarantine-{type}-{as_of}.json` (`content_as_of_matches`, `as_of_other_period`, `not_a_portfolio_workbook`, `no_as_of_banner`, `unreadable`, …).
+
+Adapters that already filter by month (API / CMS / python fetchers) should still set `trust_adapter_period: true` — that skips quarantine entirely. Only plain HTML hubs (`static_html`) need it.
+
+Downloads that are really HTML (WAF "Request Rejected", Cloudflare challenge) saved under a spreadsheet name now fail as `html_not_spreadsheet` instead of counting as `ok`.
+
+### Completeness check and `run_status`
+
+After sync, every fetched as-of date is compared per AMC with the same slice last month (`scripts/lib/completeness.mjs`), once the SEBI deadline has passed (monthly: month end + 10 days; fortnightly: + 5 days; +1 day grace):
+
+- **MISSING** — AMC had portfolios last month, has none now.
+- **DROPPED** — AMC lost ≥25% and ≥3 portfolios.
+
+Each row carries the fetch diagnosis (status, error text, rejection reasons, quarantine verdicts) so the cause is in the report, not on a dead VM.
+
+`report.run_status`: `ok` | `incomplete` (published what it had, but AMC gaps past deadline — **exit code 2**) | `push_failed` (exit 1).
+
+### Run evidence
+
+`holdings:cloud` tees its full output to `data/probes/holdings-cloud-run-*.log` and copies the log, `fetch-*.json`, `fetch-rejections-*`, `quarantine-*.json` and the report to `/opt/cursor/artifacts` (Cursor exposes these via `GET /v0/agents/{id}/artifacts`), or to `HOLDINGS_ARTIFACTS_DIR`. This happens even if the run crashes.
 
 ## Troubleshooting fetch rejections (agent playbook)
 
@@ -188,14 +217,32 @@ If the monolithic `holdings:cloud --push` run is too slow (~1h+ pipeline, more w
 
 ## Slack / Cloud Agent prompt
 
-Keep the prompt short. After setup:
+**The automation checks out `subscriptionmanager26-png/fund-disclosures` (repo root, no `pipeline/`).** The prompt must say the same thing — an Oct–Nov 2026 prompt pointed at the monorepo while the agent actually ran the mirror, so fixes committed to one never reached the other.
 
-1. Run fetch for the target periods.
-2. **LLM cadence gate** — verify every new disclosure file sits in the correct `fortnightly` vs `monthly` date folder; move/drop misfiles and note verdicts under `data/probes/`.
-3. Only then run `npm run holdings:cloud -- --push` (or parse → enrich → sync).
-4. Print the latest `data/probes/cloud-holdings-report-*.json`.
+**Fixes only count once merged to `main` of the repo the automation checks out.** In Nov 2026 five `cursor/*` branches held fixes (timeouts, Shriram cadence, fortnightly trust flags) for the exact failures that recurred, but were never merged. Fix agents must open a PR to `main`; review and merge it before the next run.
 
-Do not search the repo, Slack tools, or automations APIs afterwards. If Slack is configured, DM that summary.
+Suggested automation prompt:
+
+```text
+You maintain the OpenFin Indian mutual fund holdings pipeline.
+Repo: subscriptionmanager26-png/fund-disclosures (branch main), run from the repo root.
+Follow docs/CURSOR_CLOUD_HOLDINGS.md.
+
+1. npm ci
+2. python3 -m venv .venv && .venv/bin/pip install -q -r requirements.txt
+3. export GH_TOKEN="$HOLDINGS_GH_TOKEN"
+4. npm run holdings:cloud -- --push   (exit 2 = published but incomplete; still continue)
+
+Safety: never use --allow-regression or prune/retention scripts; never delete portfolio data;
+if the regression guard blocks a push, stop and report.
+
+Report (Slack DM): read the newest data/probes/cloud-holdings-report-*.json and send
+run_status, fetch totals incl. needs_review and quarantine promoted/unresolved,
+empty_amcs and amc_errors per job, and the completeness section verbatim
+(every MISSING / DROPPED AMC with its diagnosis). Run evidence is already in /opt/cursor/artifacts.
+```
+
+The previous manual "LLM cadence gate" step is now enforced in code (filename cadence guards + content-date quarantine resolution); the agent no longer needs to move files by hand.
 
 ## Canonical repo
 
