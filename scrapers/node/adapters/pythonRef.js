@@ -147,9 +147,12 @@ export function createPythonRefAdapter(cfg) {
 
       // Prefer dry-run if the script supports it (unless we must stage files)
       const result = runWithArgFallback(cfg.script, baseArgs, forceRealFetch);
+      // Keep the END of stderr: a Python traceback's last lines name the exception.
+      // (The first 240 chars, kept before, only ever showed "Traceback … in main".)
+      const errText = String(result.stderr || result.stdout || result.error || "").trim();
       const pythonNotes = result.ok
         ? ""
-        : `python_exit_${result.status ?? "x"}: ${(result.stderr || result.stdout || result.error || "").slice(0, 240)}`;
+        : `python_exit_${result.status ?? "x"} (${cfg.script}): ${errText.length > 700 ? "…" + errText.slice(-700) : errText}`;
 
       const rows = result.ok ? readManifest(cfg.slug, ctx.period, ctx.type) : [];
       const stageDir = join(cadenceRoot, "amcs", cfg.slug, ctx.period);
@@ -198,7 +201,10 @@ export function createPythonRefAdapter(cfg) {
       }
 
       if (!files.length && pythonNotes) {
-        return { files: [], notes: pythonNotes };
+        // A crashed fetcher is an error, not "AMC has not published yet".
+        // Throwing marks the AMC status=error (and triggers the serial retry);
+        // returning [] used to report Edelweiss / IL&FS / Navi as "empty".
+        throw new Error(pythonNotes);
       }
 
       return {

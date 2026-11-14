@@ -225,6 +225,11 @@ function summarizeFetch(probe, quarantine = null) {
     empty_amcs: ids("empty"),
     needs_review_amcs: ids("needs_review"),
     amc_errors: amcErrors,
+    slowest_amcs: results
+      .filter((r) => typeof r.seconds === "number")
+      .sort((a, b) => b.seconds - a.seconds)
+      .slice(0, 5)
+      .map((r) => `${r.id} ${r.seconds}s`),
   };
 }
 
@@ -242,6 +247,36 @@ function loadJsonIfExists(path) {
 }
 
 loadDotenv();
+
+/**
+ * Cloud Agent secrets are sometimes saved with different casing
+ * (e.g. "cloudflare_account_id", "cloudflare_API_token"), which the fetchers
+ * never see — Navi was blocked on every run for that reason. Copy any
+ * case-insensitive match onto the canonical name. Values are never logged.
+ */
+const CANONICAL_SECRETS = [
+  "HOLDINGS_GH_TOKEN",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_API_TOKEN",
+  "UNION_WEBSHARE_PROXY_USER",
+  "UNION_WEBSHARE_PROXY_PASSWORD",
+  "UNION_WEBSHARE_PROXY_HOSTS",
+  "UNION_WEBSHARE_PROXY_URL",
+  "EDELWEISS_API_SECRET",
+  "EDELWEISS_HASH_KEY",
+  "NAVI_WP_NONCE",
+];
+const secretAliases = [];
+for (const name of CANONICAL_SECRETS) {
+  if (process.env[name]) continue;
+  const alias = Object.keys(process.env).find((k) => k !== name && k.toUpperCase() === name && process.env[k]);
+  if (alias) {
+    process.env[name] = process.env[alias];
+    secretAliases.push(`${alias} → ${name}`);
+  }
+}
+if (secretAliases.length) console.log(`Secret name aliases applied: ${secretAliases.join(", ")}`);
+const secretsPresent = Object.fromEntries(CANONICAL_SECRETS.map((n) => [n, Boolean(process.env[n])]));
 
 const doPush = hasFlag("push");
 // Cloud Agents inject GH_TOKEN / GITHUB_TOKEN as cursor[bot], which cannot
@@ -378,6 +413,8 @@ const report = {
   openfin_filings: null,
   push_error: null,
   edelweiss_secret_present: Boolean(process.env.EDELWEISS_API_SECRET),
+  secrets_present: secretsPresent,
+  secret_aliases: secretAliases,
   holdings_token_present: Boolean(holdingsToken),
 };
 
@@ -620,6 +657,7 @@ report.completeness = buildCompleteness({
   today: todayUtcIso(),
   probes,
   quarantineReports,
+  registryAmcs: (loadJsonIfExists(join(ROOT, "registry/amcs.json")) || {}).amcs || [],
 });
 console.log("\nCompleteness:\n" + formatCompleteness(report.completeness));
 

@@ -354,7 +354,10 @@ async function mapPool(items, poolSize, fn) {
 
 async function fetchOneAmc(amc) {
   // No outer wall-clock kill — listing has listTimeoutMs; downloads run to completion.
-  return fetchOneAmcInner(amc);
+  const t0 = Date.now();
+  const result = await fetchOneAmcInner(amc);
+  // Per-AMC wall clock, so slow hubs are visible in probes / reports.
+  return { ...result, seconds: Math.round((Date.now() - t0) / 100) / 10 };
 }
 
 async function retryErrorAmcsSerially(results, items, fn) {

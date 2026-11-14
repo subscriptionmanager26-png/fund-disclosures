@@ -96,3 +96,37 @@ test("buildCompleteness: before deadline nothing fails", () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test("published contract shape (scheme.amc_name, no amc_id) is attributed via the registry", () => {
+  const dir = mkdtempSync(join(tmpdir(), "completeness-"));
+  try {
+    const write = (asOf, rows) => {
+      const d = join(dir, "portfolios", "asof", asOf);
+      mkdirSync(d, { recursive: true });
+      rows.forEach(([amcName, n], k) => {
+        for (let i = 0; i < n; i++) {
+          writeFileSync(
+            join(d, `${200000 + k * 1000 + i}.json`),
+            JSON.stringify({ scheme: { amc_name: amcName }, meta: { as_of: asOf }, holdings: [] }),
+          );
+        }
+      });
+    };
+    write("2026-09-30", [["Choice Mutual Fund", 12], ["SBI Mutual Fund", 40]]);
+    write("2026-10-31", [["SBI Mutual Fund", 40]]);
+    const c = buildCompleteness({
+      holdingsDir: dir,
+      asOfDates: ["2026-10-31"],
+      today: "2026-11-14",
+      registryAmcs: [
+        { id: "choice-mutual-fund", name: "Choice Mutual Fund" },
+        { id: "sbi-mutual-fund", name: "SBI Mutual Fund" },
+      ],
+    });
+    assert.equal(c.slices[0].status, "incomplete");
+    assert.deepEqual(c.slices[0].missing.map((m) => m.amc), ["choice-mutual-fund"]);
+    assert.equal(c.slices[0].unattributed, 0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

@@ -42,8 +42,17 @@ function yearlessMonthDetail(name) {
   return m ? `month_without_year:${m[1]}` : "";
 }
 
-/** Names that are worth downloading for a content-date check (vs. obvious junk). */
-export const PORTFOLIO_HINT = /portfolio|portolio|holding|fortnight|monthly|scheme|fund/i;
+/**
+ * Names worth downloading for a content-date check when the AMC already kept
+ * files for this slice. ("scheme"/"fund" matched every Unifi performance sheet:
+ * 40 wasted downloads per job in the 2026-11-14 run.) When the AMC kept
+ * nothing, every undated candidate is still checked.
+ */
+const PORTFOLIO_WORD = /portfolio|portolio|holding|fortnight|monthly/i;
+const NOT_PORTFOLIO_WORD = /performance|tracking|commission|comparative|factsheet|riskometer/i;
+export const PORTFOLIO_HINT = {
+  test: (name) => PORTFOLIO_WORD.test(name) && !NOT_PORTFOLIO_WORD.test(name),
+};
 
 function fileBlob(file) {
   const url = String(file?.url || "");
