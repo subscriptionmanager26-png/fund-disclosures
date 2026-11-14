@@ -11,6 +11,16 @@ Response body is OpenSSL-salted AES-CBC; passphrase =
 
 Keys are in the public SPA (`main.*.js` encryption block). Update DEFAULT_* when
 the bundle rotates. Set EDELWEISS_API_SECRET to that `secreat` or leave unset.
+
+Nov 2026: the SPA moved to a per-session ECDH handshake (the legacy call above
+now returns HTTP 500). Protocol, from main.79fb35c62ee428a6.js (`L2` crypto
+service + `F2` HTTP interceptor):
+  1. POST {API}/analytics/init  {"clientPublickey": b64(SPKI of an ECDH P-256 key)}
+     -> {serverPublicKey (b64 SPKI), salt (b64), sessionId, expiresIn (s)}
+  2. key = HKDF-SHA256(ECDH(client_priv, server_pub), salt, info="aes-session-key", 32 bytes)
+  3. GET requests carry  x-app-context: <sessionId>,  x-request-id: <uuid4>
+  4. responses are {cipherText, iv, authTag} (b64); AES-GCM decrypt(cipherText||authTag)
+fetch_menu_payload() tries this first and falls back to the legacy call.
 """
 from __future__ import annotations
 
@@ -25,8 +35,14 @@ from hashlib import md5
 from pathlib import Path
 from urllib.parse import unquote, urljoin
 
+import uuid
+
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 try:
     from curl_cffi import requests as cf_requests
@@ -37,6 +53,9 @@ except ImportError as e:
 
 PAGE = "https://www.edelweissmf.com/statutory/portfolio-of-schemes"
 CDN = "https://www.edelweissmf.com"
+API_BASE = "https://api.edelweissmf.com/edelweissmf/api/v1/"
+HANDSHAKE_URL = API_BASE + "analytics/init"
+HKDF_INFO = b"aes-session-key"
 API_SINGLE = (
     "https://api.edelweissmf.com/edelweissmf/api/v1/mf/statutory-menus/single"
     "?type=Statutory&fundType=MF&menuName=Portfolio%20of%20scheme(s)"
@@ -130,7 +149,123 @@ def abs_url(path: str | None) -> str | None:
     return urljoin(CDN + "/", path.lstrip("/"))
 
 
+def _b64d(s: str) -> bytes:
+    return base64.b64decode(s)
+
+
+def _b64e(b: bytes) -> str:
+    return base64.b64encode(b).decode("ascii")
+
+
+def _unwrap(obj, key: str):
+    """Find a dict containing `key` (responses are sometimes wrapped in data/result)."""
+    if isinstance(obj, dict):
+        if key in obj:
+            return obj
+        for v in obj.values():
+            hit = _unwrap(v, key)
+            if hit is not None:
+                return hit
+    elif isinstance(obj, list):
+        for v in obj:
+            hit = _unwrap(v, key)
+            if hit is not None:
+                return hit
+    return None
+
+
+class SessionCrypto:
+    """ECDH P-256 + HKDF-SHA256 + AES-256-GCM session, as in the Edelweiss SPA (Nov 2026)."""
+
+    def __init__(self, http, *, handshake_url: str = HANDSHAKE_URL):
+        self.http = http
+        self.handshake_url = handshake_url
+        self.session_id: str | None = None
+        self.key: bytes | None = None
+        self.expires_at = 0.0
+
+    def handshake(self) -> None:
+        priv = ec.generate_private_key(ec.SECP256R1())
+        spki = priv.public_key().public_bytes(
+            serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        r = self.http.post(
+            self.handshake_url,
+            json={"clientPublickey": _b64e(spki)},
+            headers={
+                "accept": "application/json, text/plain, */*",
+                "content-type": "application/json",
+                "origin": "https://www.edelweissmf.com",
+                "referer": PAGE,
+            },
+            timeout=60,
+        )
+        r.raise_for_status()
+        d = _unwrap(r.json(), "serverPublicKey")
+        if not d:
+            raise RuntimeError(f"handshake: no serverPublicKey in {list(r.json())[:10]}")
+        server_pub = serialization.load_der_public_key(_b64d(d["serverPublicKey"]))
+        shared = priv.exchange(ec.ECDH(), server_pub)
+        self.key = HKDF(
+            algorithm=hashes.SHA256(), length=32, salt=_b64d(d["salt"]), info=HKDF_INFO
+        ).derive(shared)
+        self.session_id = str(d["sessionId"])
+        self.expires_at = time.time() + float(d.get("expiresIn") or 300) - 5
+
+    def ensure(self) -> None:
+        if not self.session_id or time.time() > self.expires_at:
+            self.handshake()
+
+    def decrypt(self, body: dict):
+        assert self.key is not None
+        plain = AESGCM(self.key).decrypt(
+            _b64d(body["iv"]), _b64d(body["cipherText"]) + _b64d(body["authTag"]), None
+        )
+        return json.loads(plain.decode("utf-8"))
+
+    def get_json(self, url: str):
+        self.ensure()
+        r = self.http.get(
+            url,
+            headers={
+                "accept": "application/json, text/plain, */*",
+                "origin": "https://www.edelweissmf.com",
+                "referer": PAGE,
+                "x-app-context": self.session_id,
+                "x-request-id": str(uuid.uuid4()),
+            },
+            timeout=60,
+        )
+        r.raise_for_status()
+        body = r.json()
+        if isinstance(body, dict) and {"cipherText", "iv", "authTag"} <= body.keys():
+            return self.decrypt(body)
+        return body
+
+
+def fetch_menu_payload_session(session) -> dict:
+    data = SessionCrypto(session).get_json(API_SINGLE)
+    payload = _unwrap(data, "files")
+    if not isinstance(payload, dict):
+        raise RuntimeError(f"session API: no 'files' in response (keys: {list(data)[:15] if isinstance(data, dict) else type(data).__name__})")
+    return payload
+
+
 def fetch_menu_payload(session, ip: str) -> dict:
+    """Current session protocol first; legacy salted-AES call as fallback."""
+    try:
+        return fetch_menu_payload_session(session)
+    except Exception as e_new:  # noqa: BLE001
+        print(f"  session protocol failed: {type(e_new).__name__}: {str(e_new)[:200]}", flush=True)
+        try:
+            return fetch_menu_payload_legacy(session, ip)
+        except Exception as e_old:
+            raise RuntimeError(
+                f"Edelweiss menu: session protocol: {e_new}; legacy protocol: {e_old}"
+            ) from e_old
+
+
+def fetch_menu_payload_legacy(session, ip: str) -> dict:
     ts = int(time.time() * 1000)
     headers = {
         "accept": "application/json, text/plain, */*",
