@@ -43,14 +43,32 @@ def proxy_url_for_host(host_port: str) -> str | None:
 
 
 def proxy_candidates() -> list[str]:
+    """Every configured proxy, most specific first.
+
+    UNION_WEBSHARE_PROXY_URL used to shadow USER/PASSWORD entirely (the same URL
+    was returned for every host), so one stale secret meant HTTP 407 on every
+    attempt (Nov 2026). Now: the explicit URL first, then user:pass on each
+    host. Duplicates removed.
+    """
     raw = (os.environ.get("UNION_WEBSHARE_PROXY_HOSTS") or "").strip()
     hosts = [h.strip() for h in raw.split(",") if h.strip()] if raw else list(DEFAULT_PROXY_HOSTS)
     urls: list[str] = []
-    for host in hosts:
-        u = proxy_url_for_host(host)
-        if u:
-            urls.append(u)
-    return urls
+    direct = (os.environ.get("UNION_WEBSHARE_PROXY_URL") or "").strip()
+    if direct:
+        urls.append(direct)
+    user, pw = _proxy_user(), _proxy_password()
+    if user and pw:
+        for host in hosts:
+            urls.append(f"http://{user}:{pw}@{host}")
+    seen: set[str] = set()
+    return [u for u in urls if not (u in seen or seen.add(u))]
+
+
+def describe_proxy(url: str) -> str:
+    """host:port plus where the credentials came from — never the secret itself."""
+    host = url.rsplit("@", 1)[-1]
+    src = "UNION_WEBSHARE_PROXY_URL" if url == (os.environ.get("UNION_WEBSHARE_PROXY_URL") or "").strip() else "USER/PASSWORD"
+    return f"{host} ({src})"
 
 
 def proxy_configured() -> bool:
@@ -73,15 +91,17 @@ def http_get(
     proxies_list = proxy_candidates()
 
     if proxies_list:
-        last_err: Exception | None = None
+        failures: list[str] = []
         for proxy in proxies_list:
             try:
                 return _get_via_curl_cffi(url, headers=headers, proxy=proxy, timeout=timeout)
             except Exception as e:
-                last_err = e
+                msg = str(e)
+                if " 407" in msg or "407 " in msg:
+                    msg = "HTTP 407 proxy authentication rejected (check Webshare username/password/plan)"
+                failures.append(f"{describe_proxy(proxy)}: {msg[:160]}")
                 continue
-        if last_err:
-            raise last_err
+        raise ConnectionError("all Webshare proxies failed — " + " | ".join(failures))
 
     return _get_via_curl_cffi(url, headers=headers, proxy=None, timeout=timeout)
 

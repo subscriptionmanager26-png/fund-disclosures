@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl * https://api.cursor.com/v1/agents*)",
+      "Bash(curl * https://api.cursor.com/v0/agents*)"
+    ]
+  }
+}
