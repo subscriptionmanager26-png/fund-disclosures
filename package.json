@@ -5,6 +5,7 @@
   "type": "module",
   "description": "AMC disclosure fetch/parse + AMFI parent mapping for Indian mutual funds",
   "scripts": {
+    "test": "node --test \"scrapers/**/*.test.js\" \"scripts/**/*.test.mjs\"",
     "list": "node scrapers/node/list-sources.js",
     "stats": "node scrapers/node/list-sources.js --stats",
     "fetch": "node scrapers/node/fetch-period.js",
