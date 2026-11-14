@@ -81,7 +81,7 @@ export function loadManifest(holdingsDir) {
   } catch {
     /* missing or unreadable → empty */
   }
-  return { version: 1, fingerprint: null, slices: {} };
+  return { version: 1, fingerprint: null, slices: {}, urls: {} };
 }
 
 /**
@@ -101,27 +101,44 @@ export function amcsToParse(manifest, fingerprint, key, digests) {
 /**
  * Record successfully published AMCs and drop entries older than KEEP_MONTHS.
  * When the fingerprint changed, entries recorded under the old code are discarded.
- * @param {{ key: string, digests: object, amcs: string[] }[]} recorded
+ * @param {{ key: string, digests: object, amcs: string[], urls?: object }[]} recorded
+ *   urls: { amc_id: urlsHash } of the published file lists (fetch probe), used
+ *   by fetch-period to skip downloading unchanged AMCs.
  */
 export function updateManifest(manifest, fingerprint, recorded, today) {
+  const same = manifest.fingerprint === fingerprint;
   const next = {
     version: 1,
     fingerprint,
     updated_at: new Date().toISOString(),
-    slices: manifest.fingerprint === fingerprint ? { ...manifest.slices } : {},
+    slices: same ? { ...manifest.slices } : {},
+    urls: same ? { ...(manifest.urls || {}) } : {},
   };
-  for (const { key, digests, amcs } of recorded) {
+  for (const { key, digests, amcs, urls = {} } of recorded) {
     const slice = { ...(next.slices[key] || {}) };
-    for (const a of amcs) if (digests[a]) slice[a] = digests[a];
+    const urlSlice = { ...(next.urls[key] || {}) };
+    for (const a of amcs) {
+      if (digests[a]) slice[a] = digests[a];
+      if (urls[a]) urlSlice[a] = urls[a];
+    }
     if (Object.keys(slice).length) next.slices[key] = slice;
+    if (Object.keys(urlSlice).length) next.urls[key] = urlSlice;
   }
   const [y, m] = today.split("-").map(Number);
   const cutoff = new Date(Date.UTC(y, m - 1 - KEEP_MONTHS, 1)).toISOString().slice(0, 10);
-  for (const key of Object.keys(next.slices)) {
-    const asOf = key.split("/")[1] || "";
-    if (asOf < cutoff) delete next.slices[key];
+  for (const map of [next.slices, next.urls]) {
+    for (const key of Object.keys(map)) {
+      const asOf = key.split("/")[1] || "";
+      if (asOf < cutoff) delete map[key];
+    }
   }
   return next;
+}
+
+/** { amc_id: urlsHash } already published for a slice (skip-download cache). */
+export function unchangedUrlCache(manifest, fingerprint, key) {
+  if (manifest.fingerprint !== fingerprint) return {};
+  return { ...((manifest.urls || {})[key] || {}) };
 }
 
 export function writeManifest(holdingsDir, manifest) {
