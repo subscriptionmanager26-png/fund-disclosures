@@ -211,7 +211,19 @@ When `fetch-period` reports `rejectedCount > 0` or monthly files land but never 
 | AMC `empty` after month-end + peers published | Investigate adapter (API change, TLS, regex) |
 | Files fetched but `rejectedCount` high | See rejection reasons above; do **not** bypass with `--allow-regression` |
 
-## Runtime / splitting the daily job
+## Runtime: what the daily job skips
+
+The daily job only does work that can change the published data:
+
+| Mechanism | What it skips | Override |
+|-----------|---------------|----------|
+| **Fetch window** (`scripts/lib/fetch-window.mjs`) | Slices whose as-of date is in the future, and slices more than 7 days past their SEBI deadline (+1 day grace). Sunday (UTC) is a full sweep of every past slice. | `HOLDINGS_FULL_SWEEP=1` or `--full`; `FETCH_WINDOW_DAYS`; `HOLDINGS_SWEEP_WEEKDAY` (0–6, `-1` = never) |
+| **Incremental parse** (`scripts/lib/parse-manifest.mjs`) | AMCs whose source workbooks are byte-identical to what was last parsed **and** published with the same code. State lives in the data repo at `meta/parse-sources.json`; any change under `parsers/`, `registry/`, `data/sources/`, `holdings-browser/` or `scripts/` forces a full parse. | `HOLDINGS_FORCE_PARSE=1` or `--force-parse` |
+| **Nothing changed** | Enrich, sync and filings refresh when no AMC was parsed. | — |
+| **Parallel parse** | Runs AMCs in parallel processes (default `min(4, CPUs)`). | `PARSE_WORKERS` |
+
+`report.timings` lists every step's wall-clock seconds; `report.fetch_plan` and `report.parse` show what was fetched and parsed, and why.
+
 
 If the monolithic `holdings:cloud --push` run is too slow (~1h+ pipeline, more with cold setup), see **[`CLOUD_HOLDINGS_OPTIMIZATION.md`](./CLOUD_HOLDINGS_OPTIMIZATION.md)** for trace-based breakdown and parallel automation layouts.
 
