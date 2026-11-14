@@ -30,6 +30,7 @@ import {
   loadManifest,
   parserFingerprint,
   sliceDigests,
+  unchangedUrlCache,
   updateManifest,
   writeManifest,
 } from "./lib/parse-manifest.mjs";
@@ -213,6 +214,7 @@ function summarizeFetch(probe, quarantine = null) {
     storageKey: probe.storageKey,
     amcs: results.length,
     ok: ids("ok").length,
+    unchanged: ids("unchanged").length,
     empty: ids("empty").length,
     needs_review: ids("needs_review").length,
     error: ids("error").length,
@@ -457,6 +459,14 @@ for (const { type, period, skip, fetch_until } of fetchPlan) {
 
   const jobConcurrency =
     type === "monthly" ? monthlyFetchConcurrency : fetchConcurrency;
+  // Skip downloading AMCs whose file list matches what was last published
+  // (not on full sweeps, which re-download everything to catch revisions).
+  const key = `${type}/${period}`;
+  const urlCache = sweep || forceParse ? {} : unchangedUrlCache(parseManifest, fingerprint, key);
+  const cachePath = join(PROBES, `fetch-cache-${type}-${period}.json`);
+  mkdirSync(PROBES, { recursive: true });
+  writeFileSync(cachePath, JSON.stringify(urlCache) + "\n");
+  process.env.FETCH_UNCHANGED_CACHE = cachePath;
   run(
     "npm",
     [
@@ -477,14 +487,18 @@ for (const { type, period, skip, fetch_until } of fetchPlan) {
     { label: `resolve quarantine ${type} ${period}`, allowFail: true },
   );
   const quarantine = loadJsonIfExists(join(PROBES, `quarantine-${type}-${period}.json`));
+  delete process.env.FETCH_UNCHANGED_CACHE;
   const probe = loadFetchProbe(type, period);
   probes.push(probe);
+  const urlsByAmc = Object.fromEntries(
+    (probe?.results || []).filter((r) => r.status === "ok" && r.urlsHash).map((r) => [r.id, r.urlsHash]),
+  );
   if (quarantine) quarantineReports.push(quarantine);
   report.fetch.push({ type, period, ...summarizeFetch(probe, quarantine) });
 
   // Incremental parse: only AMCs whose source files changed since they were
   // last parsed + published with this code (see scripts/lib/parse-manifest.mjs).
-  const key = `${type}/${period}`;
+  // AMCs skipped as "unchanged" have no files on disk, so they are not parsed.
   const digests = sliceDigests(ROOT, type, period);
   const decision = forceParse
     ? { amcs: Object.keys(digests).sort(), reason: "forced" }
@@ -524,7 +538,7 @@ for (const { type, period, skip, fetch_until } of fetchPlan) {
   const okAmcs = (summary?.rows || [])
     .filter((r) => r.schemes > 0 && r.errors === 0)
     .map((r) => r.amc_id);
-  parsedRecords.push({ key, digests, amcs: okAmcs });
+  parsedRecords.push({ key, digests, amcs: okAmcs, urls: urlsByAmc });
 }
 
 const anythingParsed = report.parse.some((p) => p.parsed.length);
@@ -634,6 +648,7 @@ report.fetch_totals = report.fetch.reduce(
   (a, r) => ({
     amcs_checked: a.amcs_checked + r.amcs,
     amcs_ok: a.amcs_ok + r.ok,
+    amcs_unchanged: a.amcs_unchanged + (r.unchanged || 0),
     amcs_empty: a.amcs_empty + r.empty,
     amcs_error: a.amcs_error + r.error,
     amcs_needs_review: a.amcs_needs_review + (r.needs_review || 0),
@@ -643,7 +658,7 @@ report.fetch_totals = report.fetch.reduce(
     quarantine_unresolved: a.quarantine_unresolved + (r.quarantine_unresolved || 0),
   }),
   {
-    amcs_checked: 0, amcs_ok: 0, amcs_empty: 0, amcs_error: 0, amcs_needs_review: 0,
+    amcs_checked: 0, amcs_ok: 0, amcs_unchanged: 0, amcs_empty: 0, amcs_error: 0, amcs_needs_review: 0,
     files_downloaded: 0, files_rejected: 0, quarantine_promoted: 0, quarantine_unresolved: 0,
   },
 );

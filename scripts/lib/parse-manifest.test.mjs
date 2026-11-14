@@ -80,3 +80,19 @@ test("parser fingerprint is stable and content-sensitive outside git", () =>
     put(root, "parsers/p.py", "v2");
     assert.notEqual(parserFingerprint(root, ["parsers"]), a);
   }));
+
+test("url hashes: recorded with the AMC, served as the skip-download cache, reset on code change", async () => {
+  const { unchangedUrlCache } = await import("./parse-manifest.mjs");
+  const empty = { version: 1, fingerprint: null, slices: {}, urls: {} };
+  const m = updateManifest(
+    empty,
+    "fp1",
+    [{ key: "monthly/2026-10-31", digests: { sbi: "s1", hdfc: "h1" }, amcs: ["sbi"], urls: { sbi: "u1", hdfc: "u2" } }],
+    "2026-11-14",
+  );
+  // Only AMCs that parsed + published are recorded (hdfc was not).
+  assert.deepEqual(unchangedUrlCache(m, "fp1", "monthly/2026-10-31"), { sbi: "u1" });
+  assert.deepEqual(unchangedUrlCache(m, "fp2", "monthly/2026-10-31"), {});
+  const m2 = updateManifest(m, "fp1", [{ key: "monthly/2026-10-31", digests: { hdfc: "h1" }, amcs: ["hdfc"], urls: { hdfc: "u2" } }], "2026-11-15");
+  assert.deepEqual(unchangedUrlCache(m2, "fp1", "monthly/2026-10-31"), { sbi: "u1", hdfc: "u2" });
+});

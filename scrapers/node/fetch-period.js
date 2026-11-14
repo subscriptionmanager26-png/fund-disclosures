@@ -20,6 +20,7 @@ import { existsSync, readFileSync, mkdirSync, writeFileSync, rmSync } from "node
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { filterFilesWithReport, PORTFOLIO_HINT } from "./lib/portfolioFilter.js";
 import { resolveListTimeoutMs } from "./lib/fetchTimeouts.js";
 import { parsePeriod } from "./lib/period.js";
@@ -166,6 +167,28 @@ const run = {
 };
 
 const listTimeoutMs = resolveListTimeoutMs();
+/**
+ * { amc_id: urlsHash } of AMCs whose kept file list was already downloaded,
+ * parsed and published (written by cloud-holdings-update.mjs from the data
+ * repo's parse manifest). Same list → skip downloads; the published data is
+ * already current. Not set on full sweeps.
+ */
+const unchangedCache = (() => {
+  const p = process.env.FETCH_UNCHANGED_CACHE;
+  if (!p || !existsSync(p)) return {};
+  try {
+    return JSON.parse(readFileSync(p, "utf8")) || {};
+  } catch {
+    return {};
+  }
+})();
+
+/** Order-independent hash of the files an AMC lists for this slice. */
+function urlSetHash(files) {
+  const keys = (files || []).map((f) => String(f.url || f.filename || "")).sort();
+  return createHash("sha256").update(keys.join("\n")).digest("hex").slice(0, 24);
+}
+
 // Bound quarantine downloads per AMC per slice (hubs can list years of files).
 const QUARANTINE_MAX_PER_AMC = Math.max(
   0,
@@ -229,6 +252,28 @@ async function fetchOneAmcInner(amc) {
       ? `rejected ${sliceRejected.length} (see rejection report)`
       : "";
     const notes = [listed.notes, notesExtra].filter(Boolean).join(" · ");
+    const urlsHash = urlSetHash(files);
+    const unchanged = files.length > 0 && unchangedCache[amc.id] === urlsHash;
+    if (unchanged) {
+      console.log(`  ${amc.name}: ${files.length} file(s) unchanged since last publish — skip download`);
+      return {
+        id: amc.id,
+        name: amc.name,
+        adapter: adapterName,
+        status: "unchanged",
+        notes: [notes, "unchanged since last publish"].filter(Boolean).join(" · "),
+        fileCount: files.length,
+        downloadOk: 0,
+        downloadFailed: 0,
+        rejectedCount: rejected.length,
+        rejected,
+        listedCount: rawFiles.length,
+        quarantineCount: 0,
+        quarantine: [],
+        urlsHash,
+        files: [],
+      };
+    }
 
     const downloads = [];
     if (!listOnly) {
@@ -314,6 +359,7 @@ async function fetchOneAmcInner(amc) {
       listedCount: rawFiles.length,
       quarantineCount: quarantinedOk,
       quarantine,
+      urlsHash,
       files: listOnly ? files : downloads,
     };
     console.log(
@@ -438,8 +484,9 @@ const ok = run.results.filter((r) => r.status === "ok").length;
 const empty = run.results.filter((r) => r.status === "empty").length;
 const err = run.results.filter((r) => r.status === "error").length;
 const review = run.results.filter((r) => r.status === "needs_review").length;
+const same = run.results.filter((r) => r.status === "unchanged").length;
   console.log(
-    `\nDone. ok=${ok} empty=${empty} needs_review=${review} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
+    `\nDone. ok=${ok} unchanged=${same} empty=${empty} needs_review=${review} error=${err} rejected=${allRejected.length}\nManifest: ${outPath}\nRejections: ${rejectMd}`,
   );
 }
 
