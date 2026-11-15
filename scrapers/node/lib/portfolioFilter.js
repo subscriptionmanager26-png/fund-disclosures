@@ -1,6 +1,7 @@
 import {
   blobMatchesYearMonth,
   datesMatchAsOf,
+  extractDayPreciseDates,
   extractDisclosureDates,
   extractYearMonth,
 } from "./disclosureDates.js";
@@ -142,6 +143,23 @@ export function classifyDisclosureFile(file, opts = {}) {
   }
 
   if (storageKey && /^\d{4}-\d{2}-\d{2}$/.test(storageKey)) {
+    // Fortnightly slices differ only by day (15th vs month-end). A name that
+    // only says the month ("…Fortnightly_Portfolio_Oct-26.xlsx") gets a
+    // synthesized month-end day, which put LIC's 15-Oct book into the 31-Oct
+    // slice. Let the in-workbook as-of decide (resolve_quarantine.py).
+    if (type === "fortnightly" && period) {
+      const precise = extractDayPreciseDates(blob).filter(
+        (d) => d.year === period.year && d.month === period.month,
+      );
+      if (!precise.length && blobMatchesYearMonth(blob, period.year, period.month)) {
+        return {
+          keep: false,
+          reason: "undated_no_month",
+          detail: "month_only_no_day",
+          quarantine: true,
+        };
+      }
+    }
     if (datesMatchAsOf(blob, storageKey)) {
       return { keep: true, reason: "as_of_slice", detail: dateDetail };
     }

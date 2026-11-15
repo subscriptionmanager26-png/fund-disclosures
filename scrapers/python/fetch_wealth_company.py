@@ -26,17 +26,22 @@ HEADERS = {"User-Agent": "Mozilla/5.0"}
 MONTHS = {
     "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
     "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
+    # Nov 2026: CMS titles switched to abbreviations ("Oct 31, 2026").
+    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8,
+    "sep": 9, "sept": 9, "oct": 10, "nov": 11, "dec": 12,
 }
+_MONTH_ALT = (
+    r"Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|"
+    r"Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?"
+)
 FN_LABEL_RE = re.compile(
     r"Fortnightly - The Wealth Company [^\"<>]+? - "
-    r"((January|February|March|April|May|June|July|August|September|October|November|December)"
-    r" \d{1,2}, 20\d{2})",
+    rf"(({_MONTH_ALT})\.? \d{{1,2}}, 20\d{{2}})",
     re.I,
 )
 MO_LABEL_RE = re.compile(
     r"Monthly - The Wealth Company [^\"<>]+? - "
-    r"((January|February|March|April|May|June|July|August|September|October|November|December)"
-    r" \d{1,2}, 20\d{2})",
+    rf"(({_MONTH_ALT})\.? \d{{1,2}}, 20\d{{2}})",
     re.I,
 )
 FN_UPLOAD_RE = re.compile(r"/uploads/Fortnightly_[Pp]ortfolio[\w.-]+\.(?:xlsx?|xlsb)", re.I)
@@ -58,7 +63,7 @@ def ssl_ctx(insecure: bool) -> ssl.SSLContext:
 
 
 def parse_ymd(label_date: str) -> tuple[int, int, int] | None:
-    m = re.match(r"([A-Za-z]+)\s+(\d{1,2}),\s*(20\d{2})", label_date.strip())
+    m = re.match(r"([A-Za-z]+)\.?\s+(\d{1,2}),\s*(20\d{2})", label_date.strip())
     if not m:
         return None
     mon = MONTHS.get(m.group(1).lower())
@@ -72,26 +77,56 @@ def parse_ym(label_date: str) -> tuple[int, int] | None:
     return (ymd[0], ymd[1]) if ymd else None
 
 
+_NAME_DATE_RE = re.compile(rf"\b(({_MONTH_ALT})\.?\s+\d{{1,2}},\s*20\d{{2}})", re.I)
+_ROW_START_RE = re.compile(r'\{"uploadDate":"')
+
+
 def collect_pairs_from_cms(text: str) -> list[dict]:
-    """Parse Strapi rows embedded in page HTML (authoritative uploadDate → file URL)."""
+    """Parse Strapi rows embedded in the page (``downloads: [{uploadDate, name, attachment}]``).
+
+    The disclosure date comes from the row ``name`` ("Monthly - The Wealth Company
+    Multi Cap Fund - Oct 31, 2026"). ``uploadDate`` is when the file was uploaded:
+    for October 2026 it was 2026-11-09, so using it filed every October portfolio
+    under November and the monthly fetch for October came back empty. It is
+    only used when the name carries no date.
+    """
     text = text.replace("&amp;", "&")
+    decoder = json.JSONDecoder()
     out: list[dict] = []
     seen: set[tuple[str, str]] = set()
-    for m in CMS_UPLOAD_RE.finditer(text):
-        upload_date, path = m.group(1), m.group(2)
-        key = (upload_date, path)
+    for m in _ROW_START_RE.finditer(text):
+        try:
+            row, _ = decoder.raw_decode(text, m.start())
+        except json.JSONDecodeError:
+            continue
+        path = ((row.get("attachment") or {}) if isinstance(row, dict) else {}).get("url") or ""
+        if not re.match(r"/uploads/(?:Fortnightly|Monthly)_[^\"]+\.(?:xlsx?|xlsb)$", path, re.I):
+            continue
+        upload_date = str(row.get("uploadDate") or "")
+        name = str(row.get("name") or "").replace("\\n", " ").strip()
+        ymd = None
+        nm = _NAME_DATE_RE.search(name)
+        if nm:
+            ymd = parse_ymd(nm.group(1))
+        source = "name"
+        if not ymd and re.fullmatch(r"\d{4}-\d{2}-\d{2}", upload_date):
+            ymd = tuple(int(x) for x in upload_date.split("-"))
+            source = "uploadDate"
+        if not ymd:
+            continue
+        key = (f"{ymd[0]}-{ymd[1]}-{ymd[2]}", path)
         if key in seen:
             continue
         seen.add(key)
-        y, mo, d = (int(x) for x in upload_date.split("-"))
         out.append(
             {
-                "year": y,
-                "month": mo,
-                "day": d,
-                "label": upload_date,
+                "year": ymd[0],
+                "month": ymd[1],
+                "day": ymd[2],
+                "label": name or upload_date,
                 "path": path,
                 "upload_date": upload_date,
+                "date_source": source,
             }
         )
     return out
@@ -153,7 +188,7 @@ def main() -> None:
         pairs = collect_pairs(text, label_re=label_re, upload_re=upload_re)
         print("  (fallback label/upload pairing)", flush=True)
     else:
-        print(f"  CMS uploadDate rows: {len(pairs)}", flush=True)
+        print(f"  CMS rows: {len(pairs)} (dated from name: {sum(1 for p in pairs if p.get('date_source') == 'name')})", flush=True)
 
     as_of_parts = None
     if args.as_of:

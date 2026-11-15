@@ -118,3 +118,12 @@ def test_cli_writes_probe(tmp_path, monkeypatch):
     rq.main()
     probe = json.loads((tmp_path / "data/probes/quarantine-monthly-2026-10-31.json").read_text())
     assert probe["promoted"] == 1
+
+
+def test_lic_month_only_fortnightly_goes_to_15th_not_month_end(tmp_path):
+    """LIC 'Fortnightly_Portfolio_Oct-26.xlsx' is the 15-Oct book."""
+    for key, want in (("2026-10-15", "promote"), ("2026-10-31", "keep_quarantined")):
+        q = quarantine(tmp_path, "fortnightly", key, "lic-mutual-fund")
+        make_book(q / "LIC_MF_Fortnightly_Portfolio_Oct-26.xlsx", "Portfolio as on 15-Oct-2026")
+        rep = rq.resolve(tmp_path, "fortnightly", key)
+        assert rep["amcs"]["lic-mutual-fund"][0]["verdict"] == want, rep

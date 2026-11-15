@@ -98,6 +98,31 @@ const cases = [
     { filename: "Fortnightly_Portfolio_31_10_2026_b6be8ac722.xlsx" },
     "monthly", "2026-10-31", true, "wrong_cadence",
   ],
+  [
+    "LIC fortnightly 'Oct-26' (month only; content is 15-Oct) → quarantine for the 15th",
+    { filename: "LIC_MF_Fortnightly_Portfolio_Oct-26.xlsx" },
+    "fortnightly", "2026-10-15", false, "quarantine",
+  ],
+  [
+    "LIC fortnightly 'Oct-26' is NOT kept as month-end any more",
+    { filename: "LIC_MF_Fortnightly_Portfolio_Oct-26.xlsx" },
+    "fortnightly", "2026-10-31", false, "quarantine",
+  ],
+  [
+    "month-only junk no longer lands in both fortnightly slices",
+    { filename: "Equity Exposure Report - October 2026.xlsx" },
+    "fortnightly", "2026-10-15", false, "quarantine",
+  ],
+  [
+    "monthly jobs still accept month-only names (Old Bridge Aug_26 style)",
+    { filename: "OBMF_Flexi_Cap_Portfolio_Oct_26_ab12cd.xlsx" },
+    "monthly", "2026-10-31", false, "keep",
+  ],
+  [
+    "fortnightly with a written day is unaffected",
+    { filename: "FortnightlyPortfolioOctober152026.xlsx" },
+    "fortnightly", "2026-10-15", false, "keep",
+  ],
 ];
 
 for (const [label, file, type, storageKey, trustAdapterPeriod, expect] of cases) {
