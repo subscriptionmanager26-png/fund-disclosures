@@ -101,9 +101,12 @@ test("spreadsheet with a month is enough; no portfolio/fortnightly tag required"
     ),
     true,
   );
+  // Month-only names are not kept for a specific fortnightly slice any more
+  // (LIC "Oct-26" 15-Oct book was misfiled as month-end, Nov 2026); they are
+  // quarantined and resolve_quarantine.py picks the slice from the workbook.
   assert.equal(
     fileMatchesAsOfStrict({ filename: "Helios-OV-August-2026.xls" }, "2026-08-15"),
-    true,
+    false,
   );
   assert.equal(
     isPeriodPortfolioFile(

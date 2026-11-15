@@ -78,7 +78,21 @@ function monthYearTokenOk(sep, yearRaw, blob, end) {
 
 /** Unique calendar dates from labels, titles, and filenames. */
 export function extractDisclosureDates(...parts) {
-  const blob = parts.filter(Boolean).join(" ");
+  return collectDates(parts.filter(Boolean).join(" "), { includeMonthOnly: true });
+}
+
+/**
+ * Dates whose DAY is actually written in the text. Excludes rules that only
+ * know the month and synthesize month-end (Old Bridge "Aug_26", LIC
+ * ".../monthly/2026/8/"). Fortnightly slicing (15th vs month-end) must not
+ * trust a synthesized day: LIC's "Fortnightly_Portfolio_Oct-26.xlsx" is the
+ * 15-Oct-2026 book but read as 31-Oct (Nov 2026).
+ */
+export function extractDayPreciseDates(...parts) {
+  return collectDates(parts.filter(Boolean).join(" "), { includeMonthOnly: false });
+}
+
+function collectDates(blob, { includeMonthOnly }) {
   if (!blob) return [];
   const found = new Map();
   const add = (d) => {
@@ -113,7 +127,7 @@ export function extractDisclosureDates(...parts) {
     `(?<![A-Za-z])(${MONTH_TOKEN})[-_](\\d{2})(?:_|\\.xls)`,
     "gi",
   );
-  for (const m of blob.matchAll(monthUnderscoreYear)) {
+  for (const m of includeMonthOnly ? blob.matchAll(monthUnderscoreYear) : []) {
     const mon = MONTH_NUM[m[1].toLowerCase()];
     const yy = Number(m[2]);
     // 20–29 = 2-digit year (Aug_26). 30–31 are usually month-end days (Jul_31_<hash>).
@@ -177,7 +191,7 @@ export function extractDisclosureDates(...parts) {
   }
 
   // LIC CDN paths: .../portfolio/monthly/2026/8/LEFE3009-....xlsx
-  for (const m of blob.matchAll(/(?:^|[/\\])monthly[/\\](20\d{2})[/\\](\d{1,2})(?:[/\\]|$)/gi)) {
+  for (const m of includeMonthOnly ? blob.matchAll(/(?:^|[/\\])monthly[/\\](20\d{2})[/\\](\d{1,2})(?:[/\\]|$)/gi) : []) {
     const year = Number(m[1]);
     const month = Number(m[2]);
     if (month >= 1 && month <= 12) {
